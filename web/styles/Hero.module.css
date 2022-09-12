@@ -1,0 +1,45 @@
+
+  .container{
+    display: inline-block;
+    border-bottom: solid #444 2px;
+    
+ 
+    width: 160px
+
+
+
+    
+  }
+
+  @media only screen and (max-width: 1005px) {
+    .container{
+      width: 20vw;
+    }
+  }
+
+  .typedOut{
+    overflow: hidden;
+    border-right: .15em solid #39C698;
+    white-space: nowrap;
+    animation: 
+        typing 2s forwards;
+    font-size: 50px;
+    width: 0;
+    /* text-align: center; */
+  }
+  @keyframes typing {
+    /* from { width: 0 }
+    to { width: 100% } */
+
+    0% { width: 0 }
+    25% { width: 100% }
+    90% { width: 100% }
+    100% { width: 0 }
+  }
+
+
+  /* 0% { width: 0 }
+  50% { width: 100% }
+  100% { width: 0 } */
+
+  /* typing 1s alternate; */

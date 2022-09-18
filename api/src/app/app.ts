@@ -1,0 +1,47 @@
+import bodyParser from 'body-parser';
+import compression from 'compression';
+import cors from 'cors';
+import express, { Request, Response } from 'express';
+import routes from './routes';
+import { AwilixContainer } from 'awilix';
+import AppConfig from './configs/app.config';
+// import { loadControllers, scopePerRequest } from 'awilix-express';
+// import { ServerStarted } from '../index';
+
+export default class App {
+  appConfig: any;
+
+  constructor(appConfig: AppConfig) {
+    this.appConfig = appConfig;
+  }
+
+  start(container: AwilixContainer, callback: any) {
+    const app = this._create(container);
+    const port = this.appConfig.port;
+
+    app.listen(port, callback(port));
+  }
+
+  _create(container: AwilixContainer) {
+    const app = express();
+
+    app.use(compression());
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json());
+    app.use(cors());
+
+    app.use((req: Request, res: Response, next) => {
+      // We want a new scope for each request!
+      req.container = container.createScope();
+
+      return next();
+    });
+
+    app.use('/', routes);
+
+    // app.use(scopePerRequest(container));
+    // app.use(loadControllers('routes/**/*.controller.js', { cwd: __dirname }));
+
+    return app;
+  }
+}

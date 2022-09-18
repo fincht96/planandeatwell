@@ -1,4 +1,5 @@
-import { Text, Box, Stack, Container } from "@chakra-ui/react";
+import { Text, Box, Stack, Container, Link } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 const Contact = () => {
   return (
@@ -24,9 +25,13 @@ const Contact = () => {
 
           <Text fontSize="16px" color="gray.normal" fontWeight={400}>
             If you have any questions email us at&nbsp;
-            <Text as="span" fontWeight={500}>
+            <Link
+              fontWeight={500}
+              href="mailto:support@planandeatwell.uk"
+              isExternal
+            >
               support@planandeatwell.uk
-            </Text>
+            </Link>
             &nbsp;or drop us a message on Instagram
           </Text>
         </Stack>

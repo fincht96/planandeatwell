@@ -43,7 +43,7 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
 
             <Text fontSize="20px" color="gray.normal" fontWeight={400}>
               A free tool for creating budgeted recipe plans from your local
-              supermarket with meals starting at £0.99/pp
+              supermarket with meals starting from less than £0.99/pp
             </Text>
           </Stack>
 
@@ -104,7 +104,7 @@ const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
 
             <Text fontSize={{ md: "3vw" }} color="gray.normal" fontWeight={400}>
               A free tool for creating budgeted recipe plans from your local
-              supermarket with meals starting at £0.99/pp
+              supermarket with meals starting from less than £0.99/pp
             </Text>
 
             <SignupForm />

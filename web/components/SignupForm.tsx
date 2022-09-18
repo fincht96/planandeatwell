@@ -13,6 +13,7 @@ const SignupForm = () => {
       <Input
         placeholder="Email"
         fontSize={{ base: "5vw", sm: "4vw", md: "20px" }}
+        w={"20em"}
       />
       <Button
         colorScheme="brand"

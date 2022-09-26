@@ -3,13 +3,13 @@ import {
   InjectionMode,
   createContainer,
   AwilixContainer,
-  Lifetime
+  Lifetime,
+  asFunction
 } from 'awilix';
 
 import App from './app';
 import AppConfig from './configs/app.config';
-// import HeroesRepository from './routes/heroes/heroes.repository';
-import { TodosService } from './services/todos_service';
+import { makeDbConnection } from './db';
 
 export default class Bootstrap {
   private instance: AwilixContainer;
@@ -18,7 +18,13 @@ export default class Bootstrap {
     this.instance = this._createContainer();
   }
 
-  run(callback: any) {
+  async run(callback: any) {
+    const environment = this.instance.resolve('appConfig').environment;
+
+    if (environment === 'development') {
+      await this.instance.resolve('db').migrate.latest();
+    }
+
     const app = this.instance.resolve('app');
     app.start(this.instance, callback);
   }
@@ -27,32 +33,22 @@ export default class Bootstrap {
     const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
     container.register({
-      app: asClass(App).singleton(),
       appConfig: asClass(AppConfig).singleton(),
-      todosService: asClass(TodosService).scoped()
+      app: asClass(App).singleton(),
+      db: asFunction(makeDbConnection).singleton()
     });
 
-    // The `TodosService` lives in services/TodosService
-    container.loadModules(['services/*.ts'], {
-      // we want `TodosService` to be registered as `todosService`.
-      formatName: 'camelCase',
-      resolverOptions: {
-        // We want instances to be scoped to the Express request.
-        // We need to set that up.
-        lifetime: Lifetime.SCOPED
+    container.loadModules(
+      ['src/app/services/*.ts', 'src/app/controllers/*.ts'],
+      {
+        formatName: 'camelCase',
+        resolverOptions: {
+          // We want instances to be scoped to the Express request.
+          // We need to set that up.
+          lifetime: Lifetime.SCOPED
+        }
       }
-    });
-
-    // The `TodosService` lives in services/TodosService
-    container.loadModules(['controllers/*.ts'], {
-      // we want `TodosService` to be registered as `todosService`.
-      formatName: 'camelCase',
-      resolverOptions: {
-        // We want instances to be scoped to the Express request.
-        // We need to set that up.
-        lifetime: Lifetime.SCOPED
-      }
-    });
+    );
 
     return container;
   }

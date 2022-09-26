@@ -1,5 +1,6 @@
 import { AwilixContainer } from 'awilix';
 
+// global scope, overrides specific namespaces
 declare global {
   namespace NodeJS {
     interface ProcessEnv {

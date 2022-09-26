@@ -5,8 +5,6 @@ import express, { Request, Response } from 'express';
 import routes from './routes';
 import { AwilixContainer } from 'awilix';
 import AppConfig from './configs/app.config';
-// import { loadControllers, scopePerRequest } from 'awilix-express';
-// import { ServerStarted } from '../index';
 
 export default class App {
   appConfig: any;
@@ -33,14 +31,10 @@ export default class App {
     app.use((req: Request, res: Response, next) => {
       // We want a new scope for each request!
       req.container = container.createScope();
-
       return next();
     });
 
     app.use('/', routes);
-
-    // app.use(scopePerRequest(container));
-    // app.use(loadControllers('routes/**/*.controller.js', { cwd: __dirname }));
 
     return app;
   }

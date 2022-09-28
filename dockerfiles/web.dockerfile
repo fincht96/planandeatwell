@@ -16,6 +16,16 @@ RUN \
 
 # Rebuild the source code only when needed
 FROM node:16-alpine AS builder
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+ARG NEXT_PUBLIC_GA_TRACKING_ID
+ENV NEXT_PUBLIC_GA_TRACKING_ID=${NEXT_PUBLIC_GA_TRACKING_ID}
+
+ARG NEXT_PUBLIC_ENV
+ENV NEXT_PUBLIC_ENV=${NEXT_PUBLIC_ENV}
+
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY ./web .

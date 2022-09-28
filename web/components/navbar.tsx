@@ -20,6 +20,9 @@ import {
   ChevronRightIcon,
 } from "@chakra-ui/icons";
 import Image from "next/image";
+import NextLink from "next/link";
+import React from "react";
+import ChakraNextLink from "./NextChakraLink";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
@@ -56,15 +59,17 @@ export default function WithSubnavigation() {
           flex={{ base: 1.5 }}
           justify={{ base: "center", md: "start" }}
         >
-          <Link href={"/"}>
-            <Image
-              priority
-              src="/images/logo.png"
-              height={43}
-              width={176}
-              alt={"logo"}
-            />
-          </Link>
+          <NextLink href={"/"}>
+            <Link>
+              <Image
+                priority
+                src="/images/logo.png"
+                height={43}
+                width={176}
+                alt={"logo"}
+              />
+            </Link>
+          </NextLink>
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <DesktopNav />
@@ -92,7 +97,7 @@ const DesktopNav = () => {
         <Box key={navItem.label}>
           <Popover trigger={"hover"} placement={"bottom-start"}>
             <PopoverTrigger>
-              <Link
+              <ChakraNextLink
                 p={2}
                 href={navItem.href ?? "#"}
                 fontSize={"md"}
@@ -104,10 +109,10 @@ const DesktopNav = () => {
                 }}
               >
                 {navItem.label}
-              </Link>
+              </ChakraNextLink>
             </PopoverTrigger>
 
-            {navItem.children && (
+            {/* {navItem.children && (
               <PopoverContent
                 border={0}
                 boxShadow={"xl"}
@@ -122,7 +127,7 @@ const DesktopNav = () => {
                   ))}
                 </Stack>
               </PopoverContent>
-            )}
+            )} */}
           </Popover>
         </Box>
       ))}
@@ -250,14 +255,14 @@ interface NavItem {
 const NAV_ITEMS: Array<NavItem> = [
   {
     label: "What is it?",
-    href: "#what-is-it",
+    href: "/#what-is-it",
   },
   {
     label: "How it works",
-    href: "#how-it-works",
+    href: "/#how-it-works",
   },
   {
     label: "Contact",
-    href: "#contact",
+    href: "/#contact",
   },
 ];

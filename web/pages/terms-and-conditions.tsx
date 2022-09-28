@@ -41,9 +41,10 @@ export default function TermsAndConditions() {
             Effective date: Sep 28, 2022
             <br />
             <br />
-            These Terms and Conditions ("Terms", "Terms and Conditions") govern
-            your relationship with planandeatwell.uk website (the "Service")
-            operated by New Stack Limited ("us", "we", or "our"). Please read
+            These Terms and Conditions (&quot;Terms&quot;, &quot;Terms and
+            Conditions&quot;) govern your relationship with planandeatwell.uk
+            website (the &quot;Service&quot;) operated by New Stack Limited
+            (&quot;us&quot;, &quot;we&quot;, or &quot;our&quot;). Please read
             these Terms and Conditions carefully before using the Service. Your
             access to and use of the Service is conditioned on your acceptance
             of and compliance with these Terms. These Terms apply to all
@@ -60,14 +61,14 @@ export default function TermsAndConditions() {
             We respect the intellectual property rights of others. It is our
             policy to respond to any claim that Content posted on the Service
             infringes the copyright or other intellectual property infringement
-            ("Infringement") of any person. If you are a copyright owner, or
-            authorized on behalf of one, and you believe that the copyrighted
-            work has been copied in a way that constitutes copyright
+            (&quot;Infringement&quot;) of any person. If you are a copyright
+            owner, or authorized on behalf of one, and you believe that the
+            copyrighted work has been copied in a way that constitutes copyright
             infringement that is taking place through the Service, you must
-            submit your notice in writing to the attention of "Copyright
-            Infringement" of support@planandeatwell.uk and include in your
+            submit your notice in writing to the attention of &quot;Copyright
+            Infringement&quot; of support@planandeatwell.uk and include in your
             notice a detailed description of the alleged Infringement. You may
-            be held accountable for damages (including costs and attorneys'
+            be held accountable for damages (including costs and attorneys&#39;
             fees) for misrepresenting that any Content is infringing your
             copyright.
           </MainText>
@@ -126,16 +127,17 @@ export default function TermsAndConditions() {
           <Heading mb={2}>Disclaimer</Heading>
           <MainText>
             Your use of the Service is at your sole risk. The Service is
-            provided on an "AS IS" and "AS AVAILABLE" basis. The Service is
-            provided without warranties of any kind, whether express or implied,
-            including, but not limited to, implied warranties of
-            merchantability, fitness for a particular purpose, non-infringement
-            or course of performance. Plan and Eat Well its subsidiaries,
-            affiliates, and its licensors do not warrant that a) the Service
-            will function uninterrupted, secure or available at any particular
-            time or location; b) any errors or defects will be corrected; c) the
-            Service is free of viruses or other harmful components; or d) the
-            results of using the Service will meet your requirements.
+            provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis.
+            The Service is provided without warranties of any kind, whether
+            express or implied, including, but not limited to, implied
+            warranties of merchantability, fitness for a particular purpose,
+            non-infringement or course of performance. Plan and Eat Well its
+            subsidiaries, affiliates, and its licensors do not warrant that a)
+            the Service will function uninterrupted, secure or available at any
+            particular time or location; b) any errors or defects will be
+            corrected; c) the Service is free of viruses or other harmful
+            components; or d) the results of using the Service will meet your
+            requirements.
           </MainText>
         </Box>
 

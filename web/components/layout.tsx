@@ -3,6 +3,7 @@ import Head from "next/head";
 import styles from "../styles/layout.module.css";
 import Navbar from "../components/navbar";
 import { Container } from "@chakra-ui/react";
+import Footer from "./sections/Footer";
 
 interface layoutArg {
   children: ReactNode;
@@ -32,6 +33,10 @@ export default function Layout({ children }: layoutArg) {
       <Container p={0} maxW={"100%"} w={"100%"}>
         {children}
       </Container>
+
+      <footer>
+        <Footer />
+      </footer>
     </div>
   );
 }

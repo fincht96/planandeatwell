@@ -1,6 +1,7 @@
 import { Text, Box, Stack, Container, Link } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
 import { BsInstagram } from "react-icons/bs";
+import NextLink from "next/link";
 
 const Footer = () => {
   return (
@@ -34,6 +35,30 @@ const Footer = () => {
           <Box borderBottom={"solid 1px #CCCCCC"} w={"100px"}></Box>
         </Stack>
       </Container>
+      <NextLink href="/privacy" passHref>
+        <Link
+          fontSize="16px"
+          color="gray.light"
+          fontWeight={500}
+          display={"inline-block"}
+          sx={{ mb: 5, width: "100%" }}
+          textAlign={"center"}
+        >
+          Privacy policy
+        </Link>
+      </NextLink>
+      <NextLink href="/terms-and-conditions" passHref>
+        <Link
+          fontSize="16px"
+          color="gray.light"
+          fontWeight={500}
+          display={"inline-block"}
+          sx={{ mb: 5, width: "100%" }}
+          textAlign={"center"}
+        >
+          Terms and conditions
+        </Link>
+      </NextLink>
 
       <Text
         fontSize="16px"

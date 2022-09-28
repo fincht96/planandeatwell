@@ -1,0 +1,105 @@
+version: "3.3"
+
+services:
+  ################################################
+  ####        Traefik Proxy Setup           #####
+  ###############################################
+  traefik:
+    image: traefik:v2.9
+    restart: always
+    container_name: traefik_planandeatwell
+
+    ports:
+      - "80:80" # <== http
+      - "8080:8080" # <== :8080 is where the dashboard runs on
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+      # - ./infra/traefik.toml:/traefik.toml # static config file
+    labels:
+      #### Labels define the behavior and rules of the traefik proxy for this container ####
+      - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+      - "traefik.http.routers.revproxy.rule=Host(`traefik.localhost`)" # <== Setting the domain for the dashboard
+      - "traefik.http.routers.revproxy.service=api@internal" # <== Enabling the api to be a service to access
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+
+  # ##########
+  # # database
+  # ##########
+
+  db:
+    image: postgres:13.1
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "postgres", "-U", "postgres"]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+
+    ports:
+      - 5432:5432
+
+    volumes:
+      - ./db/data:/var/lib/postgresql/data/
+
+    env_file:
+      - ./env/local/db.env
+
+    labels:
+      - "traefik.enable=false"
+
+  ##########
+  # web app
+  ##########
+
+  app:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/web.dev.dockerfile
+    ports:
+      - 3000:3000
+    labels:
+      - "traefik.http.routers.app.rule=Host(`planandeatwell.localhost`,`localhost`)"
+      - "traefik.http.middlewares.test-redirectregex.redirectregex.regex=^http://localhost:3000/(.*)"
+      - "traefik.http.middlewares.test-redirectregex.redirectregex.replacement=http://planandeatwell.localhost/$${1}"
+      - "traefik.http.routers.app.middlewares=test-redirectregex@docker"
+      - "traefik.enable=true"
+
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api.planandeatwell.localhost
+      - NEXT_PUBLIC_GA_TRACKING_ID=G-07YWLRN2XY
+      - NEXT_PUBLIC_ENV=development
+    volumes:
+      - ./web:/app
+      - ./web/node_modules:/app/node_modules
+      - ./web/.next:/app/.next
+
+  ##########
+  # api
+  ##########
+
+  api:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/api.dev.dockerfile
+    ports:
+      - 4000:4000
+    labels:
+      - "traefik.http.routers.api.rule=Host(`api.planandeatwell.localhost`)"
+      - "traefik.http.middlewares.api-redirectregex.redirectregex.regex=^http://localhost:4000/(.*)"
+      - "traefik.http.middlewares.api-redirectregex.redirectregex.replacement=http://api.planandeatwell.localhost:4000/$${1}"
+      - "traefik.http.routers.api.middlewares=api-redirectregex@docker"
+      - "traefik.enable=true"
+    volumes:
+      - ./api:/app:delegated
+    env_file:
+      - ./env/local/api.env
+
+    depends_on:
+      db:
+        condition: service_healthy

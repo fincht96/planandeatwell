@@ -1,9 +1,7 @@
 export default {
   development: {
-    client: 'sqlite3',
-    connection: {
-      filename: ':memory:'
-    },
+    client: 'pg',
+    connection: process.env.DATABASE_URL,
     migrations: {
       directory: __dirname + '/migrations'
     },

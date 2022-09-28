@@ -4,7 +4,7 @@ type GTagEvent = {
   action: string;
   category: string;
   label: string;
-  value: number;
+  value?: string;
 };
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/pages
@@ -17,12 +17,17 @@ export const pageview = (url: URL): void => {
 };
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
-export const event = ({ action, category, label, value }: GTagEvent): void => {
+export const event = ({
+  action,
+  category = "general",
+  label,
+  value,
+}: GTagEvent): void => {
   if (window.gtag) {
     window.gtag("event", action, {
       event_category: category,
       event_label: label,
-      value,
+      ...(value && { value }),
     });
   }
 };

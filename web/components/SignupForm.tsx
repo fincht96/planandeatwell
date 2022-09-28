@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { ApiResp } from "../util/api-requests/response_type";
 import { capitalizeFirstLetter } from "../util/helper/capitalize_first_letter";
+import * as ga from "../lib/gtag";
 
 type Inputs = {
   email: string;
@@ -31,6 +32,13 @@ const SignupForm = () => {
     const emailRegisterRes: ApiResp = await registerEmail(values.email);
 
     const { errors } = emailRegisterRes;
+
+    ga.event({
+      action: "email_submission",
+      category: "user_input",
+      label: "user_register_interest",
+      value: errors.length ? `error: ${errors[0]}` : "success",
+    });
 
     const title = errors.length ? "Error!" : "Success!";
     const description = errors.length

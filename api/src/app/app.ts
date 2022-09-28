@@ -5,6 +5,7 @@ import express, { Request, Response } from 'express';
 import routes from './routes';
 import { AwilixContainer } from 'awilix';
 import AppConfig from './configs/app.config';
+import helmet from 'helmet';
 
 export default class App {
   appConfig: any;
@@ -21,12 +22,21 @@ export default class App {
   }
 
   _create(container: AwilixContainer) {
-    const app = express();
+    const whitelist = [
+      'http://planandeatwell.localhost',
+      'https://planandeatwell.uk'
+    ];
 
+    const app = express();
     app.use(compression());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json());
-    app.use(cors());
+    app.use(
+      cors({
+        origin: whitelist
+      })
+    );
+    app.use(helmet());
 
     app.use((req: Request, res: Response, next) => {
       // We want a new scope for each request!

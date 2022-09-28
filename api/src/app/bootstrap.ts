@@ -10,6 +10,7 @@ import {
 import App from './app';
 import AppConfig from './configs/app.config';
 import { makeDbConnection } from './db';
+import Mailer from './mailer';
 
 export default class Bootstrap {
   private instance: AwilixContainer;
@@ -25,6 +26,8 @@ export default class Bootstrap {
       await this.instance.resolve('db').migrate.latest();
     }
 
+    await this.instance.resolve('mailer').init();
+
     const app = this.instance.resolve('app');
     app.start(this.instance, callback);
   }
@@ -32,10 +35,13 @@ export default class Bootstrap {
   _createContainer() {
     const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
+    // init mailerConfig
+
     container.register({
       appConfig: asClass(AppConfig).singleton(),
       app: asClass(App).singleton(),
-      db: asFunction(makeDbConnection).singleton()
+      db: asFunction(makeDbConnection).singleton(),
+      mailer: asClass(Mailer).singleton()
     });
 
     container.loadModules(

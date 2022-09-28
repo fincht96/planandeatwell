@@ -13,7 +13,6 @@ export default class EmailService {
         .where('email', email)
         .first();
 
-      console.log('found', found);
       return {
         result: found,
         error: false

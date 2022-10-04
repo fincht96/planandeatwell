@@ -42,6 +42,7 @@
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "express-slow-down": "^1.5.0",
+    "fast-glob": "^3.2.12",
     "helmet": "^6.0.0",
     "knex": "^2.3.0",
     "knex-stringcase": "^1.4.6",

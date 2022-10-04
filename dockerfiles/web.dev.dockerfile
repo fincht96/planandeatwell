@@ -1,5 +1,8 @@
 # Dockerfile
 
+# Use node alpine as it's a small node image
+FROM node:alpine
+
 
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
@@ -9,9 +12,6 @@ ENV NEXT_PUBLIC_GA_TRACKING_ID=${NEXT_PUBLIC_GA_TRACKING_ID}
 
 ARG NEXT_PUBLIC_ENV
 ENV NEXT_PUBLIC_ENV=${NEXT_PUBLIC_ENV}
-
-# Use node alpine as it's a small node image
-FROM node:alpine
 
 # Create the directory on the node image 
 # where our Next.js app will live

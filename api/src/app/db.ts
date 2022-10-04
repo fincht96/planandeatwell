@@ -4,5 +4,15 @@ import knex, { Knex } from 'knex';
 
 export const makeDbConnection = (appConfig: AppConfig): Knex => {
   const options = knexFile[`${appConfig.environment}`];
+  const db = knex(options);
+  db.raw('SELECT 1')
+    .then(() => {
+      console.log('PostgreSQL connected');
+    })
+    .catch((e) => {
+      console.log('PostgreSQL not connected');
+      console.error(e);
+    });
+
   return knex(options);
 };

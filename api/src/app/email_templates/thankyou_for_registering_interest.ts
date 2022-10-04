@@ -1,5 +1,5 @@
 export default {
-  from: 'Plan and Eat Well Team<support@planandeatwell.uk>',
+  from: 'Plan and Eat Well Team<thomas@planandeatwell.uk>',
   to: '',
   subject: 'Thank you for registering your interest - Plan and Eat Well',
   txt: `                              Hello,          Thanks for taking the time to register your interest, we're excited to have you onboard! We'd like to invite you to take part in some user testing in the upcoming weeks. If this sounds like something you'd be interested in simply respond to this email. In the meantime keep up to date with everything on our  Instagram page  .                     Customer Service,      Plan and Eat well        Website:      https://planandeatwell.uk       Instagram:      https://www.instagram.com/planandeatwell                `,

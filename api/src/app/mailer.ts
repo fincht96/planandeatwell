@@ -1,6 +1,5 @@
 import AppConfig from './configs/app.config';
 import nodemailer, { Transporter } from 'nodemailer';
-import path from 'path';
 
 export default class Mailer {
   private appConfig: AppConfig;
@@ -20,19 +19,6 @@ export default class Mailer {
         pass: this.appConfig.mailPass
       }
     };
-
-    // TEMP
-    // -----
-    // options = {
-    //   host: 'smtp.zoho.eu',
-    //   secure: true,
-    //   port: 465,
-    //   auth: {
-    //     user: 'thomas@planandeatwell.uk',
-    //     pass: 'LjK87PezJUm0'
-    //   }
-    // };
-    // -----
 
     if (this.appConfig.environment === 'development') {
       const testAccount = await nodemailer.createTestAccount();

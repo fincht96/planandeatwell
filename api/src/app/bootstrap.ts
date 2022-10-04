@@ -4,6 +4,7 @@ import {
   createContainer,
   AwilixContainer,
   Lifetime,
+  listModules,
   asFunction
 } from 'awilix';
 
@@ -44,8 +45,27 @@ export default class Bootstrap {
       mailer: asClass(Mailer).singleton()
     });
 
+    console.log(
+      'container',
+      listModules([`./services/*.{ts,js}`, `./controllers/*.{ts,js}`], {
+        cwd: __dirname
+      })
+    );
+
+    const modules = listModules(
+      [`./services/*.{ts,js}`, `./controllers/*.{ts,js}`],
+      {
+        cwd: __dirname
+      }
+    );
+
     container.loadModules(
-      ['src/app/services/*.ts', 'src/app/controllers/*.ts'],
+      modules.map((el) => el.path),
+      // [
+      //   // `${process.cwd()}/src/app/services/*.ts`
+      //   // `src/app/controllers/*.ts`
+
+      // ],
       {
         formatName: 'camelCase',
         resolverOptions: {

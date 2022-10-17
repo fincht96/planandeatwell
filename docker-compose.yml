@@ -15,18 +15,21 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
       # - ./infra/traefik.toml:/traefik.toml # static config file
-    labels:
-      #### Labels define the behavior and rules of the traefik proxy for this container ####
-      - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
-      - "traefik.http.routers.revproxy.rule=Host(`traefik.localhost`)" # <== Setting the domain for the dashboard
-      - "traefik.http.routers.revproxy.service=api@internal" # <== Enabling the api to be a service to access
+    # labels:
+    #### Labels define the behavior and rules of the traefik proxy for this container ####
+    # - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+    # - "traefik.http.routers.revproxy.rule=Host(`traefik.localhost`)" # <== Setting the domain for the dashboard
+    # - "traefik.http.routers.revproxy.service=api@internal" # <== Enabling the api to be a service to access
+    # - "traefik.http.routers.revproxy.service=app@internal" # <== Enabling the app to be a service to access
+    # - "traefik.http.routers.revproxy.service=web@internal" # <== Enabling the web to be a service to access
     command:
-      - "--log.level=DEBUG"
+      # - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      # - "--entrypoints.app.address=:80"
 
   # ##########
   # # database
@@ -54,20 +57,18 @@ services:
       - "traefik.enable=false"
 
   ##########
-  # web app
+  # www
   ##########
 
-  app:
+  www:
     build:
       context: .
       dockerfile: ./dockerfiles/web.dev.dockerfile
     ports:
       - 3000:3000
     labels:
-      - "traefik.http.routers.app.rule=Host(`planandeatwell.localhost`,`localhost`)"
-      - "traefik.http.middlewares.test-redirectregex.redirectregex.regex=^http://localhost:3000/(.*)"
-      - "traefik.http.middlewares.test-redirectregex.redirectregex.replacement=http://planandeatwell.localhost/$${1}"
-      - "traefik.http.routers.app.middlewares=test-redirectregex@docker"
+      - "traefik.http.routers.www.rule=Host(`planandeatwell.localhost`)"
+      - "traefik.http.routers.www.entrypoints=web"
       - "traefik.enable=true"
 
     environment:
@@ -78,6 +79,31 @@ services:
       - ./web:/app
       - ./web/node_modules:/app/node_modules
       - ./web/.next:/app/.next
+
+  ##########
+  # app
+  ##########
+
+  app:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/app.dev.dockerfile
+    ports:
+      - 3001:3001
+    labels:
+      - "traefik.http.routers.app.rule=Host(`app.planandeatwell.localhost`)"
+      - "traefik.http.routers.app.entrypoints=web"
+      - "traefik.http.services.app.loadbalancer.server.port=3001" # required to update loadbalancer port, as next js running on different port
+      - "traefik.enable=true"
+
+    # environment:
+    #   # - NEXT_PUBLIC_API_URL=http://api.planandeatwell.localhost
+    #   # - NEXT_PUBLIC_GA_TRACKING_ID=G-07YWLRN2XY
+    #   # - NEXT_PUBLIC_ENV=development
+    volumes:
+      - ./app:/app
+      - ./app/node_modules:/app/node_modules
+      - ./app/.next:/app/.next
 
   ##########
   # api
@@ -91,9 +117,9 @@ services:
       - 4000:4000
     labels:
       - "traefik.http.routers.api.rule=Host(`api.planandeatwell.localhost`)"
-      - "traefik.http.middlewares.api-redirectregex.redirectregex.regex=^http://localhost:4000/(.*)"
-      - "traefik.http.middlewares.api-redirectregex.redirectregex.replacement=http://api.planandeatwell.localhost:4000/$${1}"
-      - "traefik.http.routers.api.middlewares=api-redirectregex@docker"
+      # - "traefik.http.middlewares.api-redirectregex.redirectregex.regex=^http://localhost:4000/(.*)"
+      # - "traefik.http.middlewares.api-redirectregex.redirectregex.replacement=http://api.planandeatwell.localhost:4000/$${1}"
+      # - "traefik.http.routers.api.middlewares=api-redirectregex@docker"
       - "traefik.enable=true"
     volumes:
       - ./api:/app:delegated

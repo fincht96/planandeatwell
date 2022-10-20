@@ -1,4 +1,4 @@
-knex migrate:make --esm --knexfile ./api/src/knexfile.ts 'test_migration'
+DATABASE_URL=database_url knex migrate:make --knexfile ./api/src/knexfile.ts 'test_migration'
 
 To connect to db in prod use the following
 

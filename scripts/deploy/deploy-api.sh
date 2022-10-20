@@ -1,5 +1,5 @@
  #!/bin/bash 
-./scripts/build/build_api.sh
+./scripts/build/build-api.sh
 
 echo 'Copying docker image to vps'
 

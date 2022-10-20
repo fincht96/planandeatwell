@@ -1,6 +1,6 @@
-import { registerEmail } from "../util/api-requests/email_requests";
-import { useEffect } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { registerEmail } from '../util/api-requests/email_requests';
+import { useEffect } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import {
   useToast,
   FormErrorMessage,
@@ -9,10 +9,10 @@ import {
   Input,
   Button,
   Text,
-} from "@chakra-ui/react";
-import { ApiResp } from "../util/api-requests/response_type";
-import { capitalizeFirstLetter } from "../util/helper/capitalize_first_letter";
-import * as ga from "../lib/gtag";
+} from '@chakra-ui/react';
+import { ApiResp } from '../util/api-requests/response_type';
+import { capitalizeFirstLetter } from '../util/helper/capitalize_first_letter';
+import * as ga from '../lib/gtag';
 
 type Inputs = {
   email: string;
@@ -34,21 +34,21 @@ const SignupForm = () => {
     const { errors } = emailRegisterRes;
 
     ga.event({
-      action: "email_submission",
-      category: "user_input",
-      label: "user_register_interest",
-      value: errors.length ? `error: ${errors[0]}` : "success",
+      action: 'email_submission',
+      category: 'user_input',
+      label: 'user_register_interest',
+      value: errors.length ? `error: ${errors[0]}` : 'success',
     });
 
-    const title = errors.length ? "Error!" : "Success!";
+    const title = errors.length ? 'Error!' : 'Success!';
     const description = errors.length
       ? capitalizeFirstLetter(errors[0])
-      : "Your email has been successfully registered.";
+      : 'Your email has been successfully registered.';
 
-    const status = errors.length ? "error" : "success";
+    const status = errors.length ? 'error' : 'success';
 
     toast({
-      position: "top",
+      position: 'top',
       title,
       description,
       status,
@@ -59,7 +59,7 @@ const SignupForm = () => {
 
   useEffect(() => {
     if (isSubmitSuccessful) {
-      reset({ email: "" });
+      reset({ email: '' });
     }
   }, [isSubmitSuccessful, reset]);
 
@@ -67,7 +67,7 @@ const SignupForm = () => {
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
       <FormControl isInvalid={!!errors.email}>
         <Text
-          fontSize={{ base: "5vw", sm: "4vw", md: "20px" }}
+          fontSize={{ base: '5vw', sm: '4vw', md: '20px' }}
           color="gray.normal"
           fontWeight={400}
           mb={5}
@@ -78,14 +78,14 @@ const SignupForm = () => {
         <Input
           id="email"
           placeholder="Email"
-          fontSize={{ base: "5vw", sm: "4vw", md: "20px" }}
+          fontSize={{ base: '5vw', sm: '4vw', md: '20px' }}
           autoComplete="off"
-          w={"20em"}
-          {...register("email", {
-            required: "This is required",
+          w={'20em'}
+          {...register('email', {
+            required: 'This is required',
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Provide a valid email",
+              message: 'Provide a valid email',
             },
           })}
         />
@@ -97,9 +97,9 @@ const SignupForm = () => {
         mt={4}
         colorScheme="brand"
         maxW="min-content"
-        fontSize={{ base: "5vw", sm: "4vw", md: "20px" }}
+        fontSize={{ base: '5vw', sm: '4vw', md: '20px' }}
         fontWeight={400}
-        padding={"10px 25px"}
+        padding={'10px 25px'}
         isLoading={isSubmitting}
         type="submit"
       >

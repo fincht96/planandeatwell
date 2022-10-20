@@ -1,20 +1,20 @@
-import { Container, ListItem, UnorderedList } from "@chakra-ui/react";
-import Head from "next/head";
-import Layout from "../components/layout";
-import { Text, Link } from "@chakra-ui/react";
-import { forwardRef, Box, TextProps } from "@chakra-ui/react";
+import { Container, ListItem, UnorderedList } from '@chakra-ui/react';
+import Head from 'next/head';
+import Layout from '../components/layout';
+import { Text, Link } from '@chakra-ui/react';
+import { forwardRef, Box, TextProps } from '@chakra-ui/react';
 
-const Title = forwardRef<TextProps, "h1">((props, ref) => (
-  <Text color="gray.dark" fontSize={"36px"} ref={ref} as={"h1"} {...props} />
+const Title = forwardRef<TextProps, 'h1'>((props, ref) => (
+  <Text color="gray.dark" fontSize={'36px'} ref={ref} as={'h1'} {...props} />
 ));
 
-const Heading = forwardRef<TextProps, "h3">((props, ref) => (
-  <Text fontSize={"24px"} ref={ref} as={"h3"} {...props} />
+const Heading = forwardRef<TextProps, 'h3'>((props, ref) => (
+  <Text fontSize={'24px'} ref={ref} as={'h3'} {...props} />
 ));
 
-const MainText = forwardRef<TextProps, "p">((props, ref) => (
+const MainText = forwardRef<TextProps, 'p'>((props, ref) => (
   <Text
-    fontSize={"16"}
+    fontSize={'16'}
     color="gray.normal"
     fontWeight={400}
     ref={ref}
@@ -31,9 +31,9 @@ export default function Privacy() {
 
       <Container
         maxW="1200px"
-        mt={"5rem"}
+        mt={'5rem'}
         mb={20}
-        sx={{ position: "relative" }}
+        sx={{ position: 'relative' }}
       >
         <Box mb={5}>
           <Title mb={2}>Privacy Policy</Title>
@@ -138,12 +138,12 @@ export default function Privacy() {
 
         <Box mb={5}>
           <Heading mb={2}>Information Collection and Use</Heading>
-          <Heading mb={5} fontSize={"1.25rem"}>
+          <Heading mb={5} fontSize={'1.25rem'}>
             Types of Data Collected
           </Heading>
 
           <Box mb={5}>
-            <Heading mb={2} fontSize={"1.1rem"}>
+            <Heading mb={2} fontSize={'1.1rem'}>
               Personal Data
             </Heading>
             <MainText>
@@ -174,7 +174,7 @@ export default function Privacy() {
           </Box>
 
           <Box mb={5}>
-            <Heading mb={2} fontSize={"1.1rem"}>
+            <Heading mb={2} fontSize={'1.1rem'}>
               Usage Data
             </Heading>
             <MainText>
@@ -189,7 +189,7 @@ export default function Privacy() {
           </Box>
 
           <Box mb={5}>
-            <Heading mb={2} fontSize={"1.1rem"}>
+            <Heading mb={2} fontSize={'1.1rem'}>
               Tracking & Cookies Data
             </Heading>
             <MainText>
@@ -204,18 +204,18 @@ export default function Privacy() {
               cookie is being sent. However, if you do not accept cookies, you
               may not be able to use some portions of our Service. Examples of
               Cookies we use: <br />
-              <MainText fontWeight={500} color="gray.dark" as={"span"}>
+              <MainText fontWeight={500} color="gray.dark" as={'span'}>
                 Session Cookies
               </MainText>
               . We use Session Cookies to operate our Service.
               <br />
-              <MainText fontWeight={500} color="gray.dark" as={"span"}>
+              <MainText fontWeight={500} color="gray.dark" as={'span'}>
                 Preference Cookies
               </MainText>
               . We use Preference Cookies to remember your preferences and
               various settings.
               <br />
-              <MainText fontWeight={500} color="gray.dark" as={"span"}>
+              <MainText fontWeight={500} color="gray.dark" as={'span'}>
                 Security Cookies
               </MainText>
               . We use Security Cookies for security purposes.
@@ -312,7 +312,7 @@ export default function Privacy() {
           <Heading mb={2}>Disclosure of Data</Heading>
 
           <Box mb={5}>
-            <Heading mb={5} fontSize={"1.25rem"}>
+            <Heading mb={5} fontSize={'1.25rem'}>
               Business Transaction
             </Heading>
             <MainText>
@@ -324,7 +324,7 @@ export default function Privacy() {
           </Box>
 
           <Box mb={5}>
-            <Heading mb={5} fontSize={"1.25rem"}>
+            <Heading mb={5} fontSize={'1.25rem'}>
               Disclosure for Law Enforcement
             </Heading>
             <MainText>
@@ -336,7 +336,7 @@ export default function Privacy() {
           </Box>
 
           <Box mb={5}>
-            <Heading mb={5} fontSize={"1.25rem"}>
+            <Heading mb={5} fontSize={'1.25rem'}>
               Legal Requirements
             </Heading>
             <MainText>
@@ -384,7 +384,7 @@ export default function Privacy() {
             In certain circumstances, you have the following data protection
             rights: <br />
             <br />
-            <MainText fontWeight={500} color="gray.dark" as={"span"}>
+            <MainText fontWeight={500} color="gray.dark" as={'span'}>
               The right to access, update or delete the information we have on
               you.&nbsp;
             </MainText>
@@ -392,30 +392,30 @@ export default function Privacy() {
             of your Personal Data directly within your account settings section.
             If you are unable to perform these actions yourself, please contact
             us to assist you. <br />
-            <MainText fontWeight={500} color="gray.dark" as={"span"}>
+            <MainText fontWeight={500} color="gray.dark" as={'span'}>
               The right of rectification.&nbsp;
             </MainText>
             You have the right to have your information rectified if that
             information is inaccurate or incomplete. <br />
-            <MainText fontWeight={500} color="gray.dark" as={"span"}>
+            <MainText fontWeight={500} color="gray.dark" as={'span'}>
               The right to object.&nbsp;
             </MainText>
             You have the right to object to our processing of your Personal
             Data. <br />
-            <MainText fontWeight={500} color="gray.dark" as={"span"}>
+            <MainText fontWeight={500} color="gray.dark" as={'span'}>
               The right of restriction.&nbsp;
             </MainText>
             You have the right to request that we restrict the processing of
             your personal information.
             <br />
-            <MainText fontWeight={500} color="gray.dark" as={"span"}>
+            <MainText fontWeight={500} color="gray.dark" as={'span'}>
               The right to data portability.&nbsp;
             </MainText>
             You have the right to be provided with a copy of the information we
             have on you in a structured, machine-readable and commonly used
             format.
             <br />
-            <MainText fontWeight={500} color="gray.dark" as={"span"}>
+            <MainText fontWeight={500} color="gray.dark" as={'span'}>
               The right to withdraw consent.&nbsp;
             </MainText>
             You also have the right to withdraw your consent at any time where
@@ -444,7 +444,7 @@ export default function Privacy() {
           </MainText>
 
           <Box mb={5}>
-            <Heading mb={5} fontSize={"1.25rem"}>
+            <Heading mb={5} fontSize={'1.25rem'}>
               Analytics
             </Heading>
             <MainText>

@@ -13,6 +13,13 @@ ENV NEXT_PUBLIC_GA_TRACKING_ID=${NEXT_PUBLIC_GA_TRACKING_ID}
 ARG NEXT_PUBLIC_ENV
 ENV NEXT_PUBLIC_ENV=${NEXT_PUBLIC_ENV}
 
+ARG NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+
+
 # Create the directory on the node image 
 # where our Next.js app will live
 RUN mkdir -p /app
@@ -22,13 +29,13 @@ WORKDIR /app
 
 # Copy package.json and package-lock.json
 # to the /app working directory
-COPY ./web/package*.json ./
+COPY ./www/package*.json ./
 
 # Install dependencies in /app
 RUN npm install
 
 # Copy the rest of our Next.js folder into /app
-COPY ./web ./
+COPY ./www ./
 
 # Ensure port 3000 is accessible to our system
 EXPOSE 3000

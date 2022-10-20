@@ -63,7 +63,7 @@ services:
   www:
     build:
       context: .
-      dockerfile: ./dockerfiles/web.dev.dockerfile
+      dockerfile: ./dockerfiles/www.dev.dockerfile
     ports:
       - 3000:3000
     labels:
@@ -71,14 +71,13 @@ services:
       - "traefik.http.routers.www.entrypoints=web"
       - "traefik.enable=true"
 
-    environment:
-      - NEXT_PUBLIC_API_URL=http://api.planandeatwell.localhost
-      - NEXT_PUBLIC_GA_TRACKING_ID=G-07YWLRN2XY
-      - NEXT_PUBLIC_ENV=development
     volumes:
-      - ./web:/app
-      - ./web/node_modules:/app/node_modules
-      - ./web/.next:/app/.next
+      - ./www:/app
+      - ./www/node_modules:/app/node_modules
+      - ./www/.next:/app/.next
+
+    env_file:
+      - ./env/local/www.env
 
   ##########
   # app

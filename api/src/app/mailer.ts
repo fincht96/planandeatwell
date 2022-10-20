@@ -16,8 +16,8 @@ export default class Mailer {
       port: 465,
       auth: {
         user: this.appConfig.mailUser,
-        pass: this.appConfig.mailPass
-      }
+        pass: this.appConfig.mailPass,
+      },
     };
 
     if (this.appConfig.environment === 'development') {
@@ -28,8 +28,8 @@ export default class Mailer {
         secure: false, // true for 465, false for other ports
         auth: {
           user: testAccount.user, // generated ethereal user
-          pass: testAccount.pass // generated ethereal password
-        }
+          pass: testAccount.pass, // generated ethereal password
+        },
       };
     }
 
@@ -42,7 +42,7 @@ export default class Mailer {
     subject: string,
     text: string,
     html: string,
-    attachments?: Array<{ filename: string; path: string; cid: string }>
+    attachments?: Array<{ filename: string; path: string; cid: string }>,
   ) {
     const info = await this.transporter?.sendMail({
       from, // sender address
@@ -50,7 +50,7 @@ export default class Mailer {
       subject, // Subject line
       text, // plain text body
       html, // html body
-      attachments
+      attachments,
     });
 
     console.log('Message sent: %s', info.messageId);
@@ -60,5 +60,7 @@ export default class Mailer {
       // Preview only available when sending through an Ethereal account
       console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
     }
+
+    return info;
   }
 }

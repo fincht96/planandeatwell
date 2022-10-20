@@ -3,12 +3,14 @@ import EmailService from '../services/email_service';
 import validator from 'validator';
 import Mailer from '../mailer';
 import registerInterestEmailTemplate from '../email_templates/thankyou_for_registering_interest';
+import EventsService from '../services/events_service';
 
 export default class EmailController {
-  private emailService: EmailService;
-  private mailer: Mailer;
-
-  constructor(emailService: EmailService, mailer: Mailer) {
+  constructor(
+    private readonly emailService: EmailService,
+    private readonly mailer: Mailer,
+    private readonly eventsService: EventsService,
+  ) {
     this.emailService = emailService;
     this.mailer = mailer;
   }
@@ -16,41 +18,39 @@ export default class EmailController {
   async registerCustomerEmail(req: Request, res: Response) {
     const email = req.body.email.toLowerCase();
 
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({
-        errors: ['invalid email provided']
-      });
-    }
+    try {
+      if (!validator.isEmail(email)) {
+        throw new Error('Invalid email provided');
+      }
 
-    const found = await this.emailService.findOne(email);
+      const { error } = await this.emailService.insertEmail(email);
+      if (error) {
+        throw new Error(`Email already registered, ${email}`);
+      }
 
-    if (found.error) {
-      return res.status(500).json({
-        errors: [`error unable to store email, ${email}`]
-      });
-    }
+      const { from, subject, txt, html, attachments } =
+        registerInterestEmailTemplate;
 
-    if (found.result) {
+      await this.mailer.sendMail(from, email, subject, txt, html, attachments);
+
+      await this.eventsService.insert(
+        'REGISTER_EMAIL',
+        'SUCCESS',
+        `Email, ${email} successfully registered`,
+      );
+
       return res.status(200).json({
-        errors: ['email has already been registered']
+        errors: [],
+      });
+    } catch (e: any) {
+      await this.eventsService.insert(
+        'REGISTER_EMAIL',
+        'ERROR',
+        e.message ?? '',
+      );
+      return res.status(400).json({
+        errors: [e?.message],
       });
     }
-
-    const inserted = await this.emailService.insertEmail(email);
-
-    if (inserted.error) {
-      return res.status(500).json({
-        errors: ['error unable to store email']
-      });
-    }
-
-    const { from, subject, txt, html, attachments } =
-      registerInterestEmailTemplate;
-
-    this.mailer.sendMail(from, email, subject, txt, html, attachments);
-
-    return res.status(200).json({
-      errors: []
-    });
   }
 }

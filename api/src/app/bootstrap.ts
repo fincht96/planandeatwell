@@ -5,7 +5,7 @@ import {
   AwilixContainer,
   Lifetime,
   listModules,
-  asFunction
+  asFunction,
 } from 'awilix';
 
 import App from './app';
@@ -21,16 +21,20 @@ export default class Bootstrap {
   }
 
   async run(callback: any) {
-    const environment = this.instance.resolve('appConfig').environment;
+    try {
+      const environment = this.instance.resolve('appConfig').environment;
 
-    if (environment === 'development') {
-      await this.instance.resolve('db').migrate.latest();
+      if (environment === 'development') {
+        await this.instance.resolve('db').migrate.latest();
+      }
+
+      await this.instance.resolve('mailer').init();
+
+      const app = this.instance.resolve('app');
+      app.start(this.instance, callback);
+    } catch (e) {
+      console.log('bootstrap run error: ', e);
     }
-
-    await this.instance.resolve('mailer').init();
-
-    const app = this.instance.resolve('app');
-    app.start(this.instance, callback);
   }
 
   _createContainer() {
@@ -42,21 +46,21 @@ export default class Bootstrap {
       appConfig: asClass(AppConfig).singleton(),
       app: asClass(App).singleton(),
       db: asFunction(makeDbConnection).singleton(),
-      mailer: asClass(Mailer).singleton()
+      mailer: asClass(Mailer).singleton(),
     });
 
-    console.log(
-      'container',
-      listModules([`./services/*.{ts,js}`, `./controllers/*.{ts,js}`], {
-        cwd: __dirname
-      })
-    );
+    // console.log(
+    //   'container',
+    //   listModules([`./services/*.{ts,js}`, `./controllers/*.{ts,js}`], {
+    //     cwd: __dirname
+    //   })
+    // );
 
     const modules = listModules(
       [`./services/*.{ts,js}`, `./controllers/*.{ts,js}`],
       {
-        cwd: __dirname
-      }
+        cwd: __dirname,
+      },
     );
 
     container.loadModules(
@@ -71,9 +75,9 @@ export default class Bootstrap {
         resolverOptions: {
           // We want instances to be scoped to the Express request.
           // We need to set that up.
-          lifetime: Lifetime.SCOPED
-        }
-      }
+          lifetime: Lifetime.SCOPED,
+        },
+      },
     );
 
     return container;

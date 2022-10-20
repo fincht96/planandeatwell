@@ -25,7 +25,7 @@ export default class App {
   _create(container: AwilixContainer) {
     const whitelist = [
       'http://planandeatwell.localhost',
-      'https://planandeatwell.uk'
+      'https://planandeatwell.uk',
     ];
 
     const app = express();
@@ -34,16 +34,20 @@ export default class App {
     app.use(bodyParser.json());
     app.use(
       cors({
-        origin: whitelist
-      })
+        origin: whitelist,
+      }),
     );
     app.use(helmet());
+    // running on dokku which uses dokku proxy
     app.enable('trust proxy');
+
+    // enable preflight requests across all endpoints
+    app.options('*', cors());
 
     const speedLimiter = slowDown({
       windowMs: 15 * 60 * 1000, // 15 minutes
       delayAfter: 100, // allow 100 requests per 15 minutes, then...
-      delayMs: 500 // begin adding 500ms of delay per request above 100:
+      delayMs: 500, // begin adding 500ms of delay per request above 100:
       // request # 101 is delayed by  500ms
       // request # 102 is delayed by 1000ms
       // request # 103 is delayed by 1500ms
@@ -57,7 +61,6 @@ export default class App {
       req.container = container.createScope();
       return next();
     });
-
     app.use('/', routes);
 
     return app;

@@ -15,12 +15,12 @@ export default class EmailService {
 
       return {
         result: found,
-        error: false
+        error: false,
       };
     } catch (e) {
       return {
         result: null,
-        error: true
+        error: true,
       };
     }
   }
@@ -29,11 +29,11 @@ export default class EmailService {
     try {
       await this.db('emails').insert({ email }).returning('*');
       return {
-        error: false
+        error: false,
       };
     } catch (e) {
       return {
-        error: true
+        error: true,
       };
     }
   }

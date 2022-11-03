@@ -26,6 +26,8 @@ export default class App {
     const whitelist = [
       'http://planandeatwell.localhost',
       'https://planandeatwell.uk',
+      'http://app.planandeatwell.localhost',
+      'https://app.planandeatwell.uk',
     ];
 
     const app = express();

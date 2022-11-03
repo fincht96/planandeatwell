@@ -10,10 +10,23 @@ export async function seed(knex: Knex): Promise<void> {
     {
       name: 'Greek Fajitas',
       servings: 4,
+      price_per_serving: 2.0,
+      image_path: '/images/recipes/aldi/greek-fajitas.jpg',
+      link: 'https://www.aldi.co.uk/greek-fajitas-/p/000000460308800',
     },
     {
       name: 'Vegan Pesto Pasta',
       servings: 4,
+      price_per_serving: 1.43,
+      image_path: '/images/recipes/aldi/vegan-pesto-pasta.jpg',
+      link: 'https://www.aldi.co.uk/vegan-pesto-pasta/p/000000481143300',
+    },
+    {
+      name: 'Fish Pie',
+      servings: 4,
+      price_per_serving: 3.01,
+      image_path: '/images/recipes/aldi/fish-pie.jpg',
+      link: 'https://www.aldi.co.uk/fish-pie/p/000000093912700',
     },
   ]);
 }

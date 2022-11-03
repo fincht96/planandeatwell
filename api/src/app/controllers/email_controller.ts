@@ -10,10 +10,7 @@ export default class EmailController {
     private readonly emailService: EmailService,
     private readonly mailer: Mailer,
     private readonly eventsService: EventsService,
-  ) {
-    this.emailService = emailService;
-    this.mailer = mailer;
-  }
+  ) {}
 
   async registerCustomerEmail(req: Request, res: Response) {
     const email = req.body.email.toLowerCase();

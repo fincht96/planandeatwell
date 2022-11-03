@@ -46,8 +46,6 @@ export default class RecipeService {
       ? await this.db.select('*').from(rawQuery)
       : await this.db('recipes').select('*');
 
-    return {
-      result: found,
-    };
+    return found;
   }
 }

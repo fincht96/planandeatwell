@@ -135,10 +135,6 @@ const Menu: NextPage = () => {
     },
   });
 
-  // useEffect(() => {
-  //   console.log('recipes query', recipesQuery.data);
-  // }, [recipesQuery.data]);
-
   const onNavigate = (pathname: string) => {
     // display loading
     router.push(pathname, undefined, { shallow: true });

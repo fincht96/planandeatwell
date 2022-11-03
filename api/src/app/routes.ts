@@ -9,6 +9,12 @@ router.post('/email', (req: Request, res: Response) => {
   req.container.resolve('emailController').registerCustomerEmail(req, res);
 });
 
+/** ingredients */
+
+router.get('/ingredients', (req: Request, res: Response) =>
+  req.container.resolve('ingredientsController').getIngredients(req, res),
+);
+
 /** recipe plan */
 
 router.get('/recipe-plan/:id', (req: Request, res: Response) => {

@@ -16,7 +16,6 @@ export async function up(knex: Knex): Promise<void> {
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
     table.decimal('unit_quantity').notNullable();
-    table.decimal('price').notNullable();
     table.timestamp('created_at').defaultTo(knex.fn.now());
   });
 }

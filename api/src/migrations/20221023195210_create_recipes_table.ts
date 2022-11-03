@@ -5,6 +5,9 @@ export async function up(knex: Knex): Promise<void> {
     table.increments('id').primary();
     table.string('name').notNullable();
     table.integer('servings').notNullable();
+    table.decimal('price_per_serving').notNullable();
+    table.string('image_path').notNullable();
+    table.string('link').notNullable();
     table.timestamp('created_at').defaultTo(knex.fn.now());
   });
 }

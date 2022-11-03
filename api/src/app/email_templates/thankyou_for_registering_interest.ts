@@ -11,7 +11,7 @@ export default {
     {
       filename: 'logo.png',
       path: process.cwd() + '/src/app/static/logo.png',
-      cid: 'logo_footer@planandeatwell.uk' //same cid value as in the html
-    }
-  ]
+      cid: 'logo_footer@planandeatwell.uk', //same cid value as in the html
+    },
+  ],
 };

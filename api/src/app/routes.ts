@@ -9,4 +9,14 @@ router.post('/email', (req: Request, res: Response) => {
   req.container.resolve('emailController').registerCustomerEmail(req, res);
 });
 
+/** recipe plan */
+
+router.get('/recipe-plan/:id', (req: Request, res: Response) => {
+  req.container.resolve('recipePlanController').getRecipePlan(req, res);
+});
+
+router.post('/recipe-plan', (req: Request, res: Response) => {
+  req.container.resolve('recipePlanController').saveRecipePlan(req, res);
+});
+
 export default router;

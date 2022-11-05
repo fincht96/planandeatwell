@@ -3,7 +3,6 @@ import { Knex } from 'knex';
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable('recipe_plan_recipes', function (table) {
     table.increments('id').primary();
-
     table.integer('recipe_plan_id').unsigned();
     table
       .foreign('recipe_plan_id')

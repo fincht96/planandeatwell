@@ -3,9 +3,6 @@ import {
   Button,
   Container,
   Divider,
-  Editable,
-  EditableInput,
-  EditablePreview,
   Flex,
   Grid,
   Icon,
@@ -13,16 +10,20 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { FiLink2 } from 'react-icons/fi';
 import { MdModeEdit } from 'react-icons/md';
-import { SiMinutemailer } from 'react-icons/si';
+import Editable from '../../components/Editable';
 import Layout from '../../components/layout';
-import { getRecipePlan } from '../../utils/requests/recipe-plans';
+import {
+  getRecipePlan,
+  updateRecipePlan,
+} from '../../utils/requests/recipe-plans';
 
 const ContentBox = ({
   title,
@@ -76,39 +77,50 @@ const RecipePlan: NextPage = () => {
   const recipePlanUuid =
     typeof router.query.id === 'string' ? router.query.id : '';
 
-  useQuery(
-    {
-      queryKey: [`recipesQuery-${recipePlanUuid}`],
-      queryFn: () => getRecipePlan(recipePlanUuid, true),
-      refetchOnMount: false,
-      staleTime: Infinity,
-      enabled: !!recipePlanUuid.length,
-      onSuccess: (data) => {
-        const ingredients = data[0].ingredients.map((ing) => {
+  const [recipePlanName, setRecipePlanName] = useState<string>('');
+
+  const recipeQuery = useQuery({
+    queryKey: [`recipesQuery-${recipePlanUuid}`],
+    queryFn: () => getRecipePlan(recipePlanUuid, true),
+    refetchOnMount: 'always',
+    enabled: !!recipePlanUuid.length,
+    staleTime: 'Infinity',
+  });
+
+  const recipePlanMutation = useMutation({
+    mutationFn: ({ recipePlanName }: { recipePlanName: string }) => {
+      return updateRecipePlan(recipePlanUuid, { name: recipePlanName });
+    },
+    onSuccess: (data) => {
+      setRecipePlanName(data.name);
+    },
+  });
+
+  const recipes: Array<{
+    id: number;
+    name: string;
+    servings: number;
+    link: string;
+  }> = useMemo(() => {
+    return !recipeQuery.isLoading && !recipeQuery.error
+      ? recipeQuery.data[0].recipes
+      : [];
+  }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
+
+  const ingredients: Array<{
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+  }> = useMemo(() => {
+    return !recipeQuery.isLoading && !recipeQuery.error
+      ? recipeQuery.data[0].ingredients.map((ing) => {
           const quantity = Math.ceil(ing.quantity);
           const price = ing.pricePerUnit * quantity;
           return { ...ing, quantity, price };
-        });
-
-        setRecipes(data[0].recipes);
-        setIngredients(ingredients);
-      },
-    },
-
-    // {
-    //   refetchOnMount: false,
-    //   staleTime: Infinity,
-    //   enabled: !!recipePlanUuid.length,
-    // },
-  );
-
-  const [ingredients, setIngredients] = useState<
-    Array<{ id: number; name: string; price: number; quantity: number }>
-  >([]);
-
-  const [recipes, setRecipes] = useState<
-    Array<{ id: number; name: string; servings: number; link: string }>
-  >([]);
+        })
+      : [];
+  }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
 
   const onNavigate = (pathname: string, query: any) => {
     router.push({ pathname, query });
@@ -137,38 +149,67 @@ const RecipePlan: NextPage = () => {
     });
   };
 
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<any>({});
+
+  const onSubmit: SubmitHandler<any> = (data, closeEditing) => {
+    if (data.recipePlanName !== recipePlanName) {
+      recipePlanMutation.mutate({
+        recipePlanName: data.recipePlanName,
+      });
+    }
+    closeEditing();
+  };
+
+  useEffect(() => {
+    if (!recipeQuery.isLoading && !recipeQuery.error) {
+      setRecipePlanName(recipeQuery.data[0].recipePlanName);
+      setValue('recipePlanName', `${recipeQuery.data[0].recipePlanName}`);
+    }
+  }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
+
   return (
     <Layout>
       <Head>
         <title>Recipe Plan | Plan and Eat Well</title>
       </Head>
 
-      <Container my={'5rem'} w={'95vw'} maxW={'1100px'} pt={'4rem'}>
+      <Container my={'2rem'} w={'95vw'} maxW={'1100px'} pt={'4rem'}>
         <Flex
           justifyContent={'space-between'}
           alignItems={'center'}
-          gap={'1rem'}
+          gap={'5rem'}
           mb={'2rem'}
         >
-          <Editable
-            fontSize={{ base: '1.25rem', md: '1.5rem' }}
-            color="gray.dark"
-            fontWeight={600}
-            defaultValue="Aldi - Recipe Plan #1"
-            onChange={(textValue: string) => {
-              console.log(textValue);
-            }}
-            flexGrow={1}
-            selectAllOnFocus={false}
-          >
-            <EditablePreview
-              _hover={{
-                background: 'gray.100',
+          <Box flex={1}>
+            <Editable
+              previewValue={recipePlanName}
+              handleSubmit={(e, closeEditing) => {
+                handleSubmit((d) => onSubmit(d, closeEditing))(e);
               }}
+              {...register('recipePlanName', {
+                required: 'A name is required',
+                maxLength: {
+                  value: 199,
+                  message: 'Must be less than 200 characters',
+                },
+              })}
+              resetForm={() => {
+                reset({ recipePlanName });
+              }}
+              error={{
+                isError: !!errors.recipePlanName,
+                message: errors.recipePlanName?.message,
+              }}
+              name={'recipePlanName'}
             />
-
-            <EditableInput />
-          </Editable>
+          </Box>
 
           <Button
             bg={'#ffffff'}
@@ -179,6 +220,13 @@ const RecipePlan: NextPage = () => {
             fontWeight={400}
             minW={'min-content'}
             display={{ base: 'none', md: 'block' }}
+            onClick={() => {
+              onNavigate('/menu', {
+                supermarket: 'aldi',
+                servings: 4,
+                recipe_plan_uuid: recipePlanUuid,
+              });
+            }}
           >
             <Flex
               justifyContent={'space-between'}
@@ -223,7 +271,7 @@ const RecipePlan: NextPage = () => {
               <Text>Copy Link</Text>
             </Flex>
           </Button>
-          <Button
+          {/* <Button
             bg={'#ffffff'}
             border={'solid 1px'}
             borderColor={'#cccccc'}
@@ -246,7 +294,7 @@ const RecipePlan: NextPage = () => {
 
               <Text>Email recipe plan</Text>
             </Flex>
-          </Button>
+          </Button> */}
         </Flex>
 
         <Grid

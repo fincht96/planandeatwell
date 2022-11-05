@@ -89,7 +89,7 @@ const CartMenu = ({
             fontWeight={600}
             textAlign={'center'}
           >
-            Recipes
+            Recipes ({recipeList.length})
           </Text>
 
           {recipeList.map((item: any) => {
@@ -111,7 +111,7 @@ const CartMenu = ({
             fontWeight={600}
             textAlign={'center'}
           >
-            Ingredients
+            Ingredients ({ingredientList.length})
           </Text>
 
           {ingredientList.map((item: any) => {

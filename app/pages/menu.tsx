@@ -13,10 +13,14 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Layout from '../components/layout';
 import MenuSummaryBar from '../components/MenuSummaryBar';
-import { insertRecipePlan } from '../utils/requests/recipe-plans';
+import {
+  getRecipePlan,
+  insertRecipePlan,
+  updateRecipePlan,
+} from '../utils/requests/recipe-plans';
 import { getRecipes } from '../utils/requests/recipes';
 
 const roundTo2dp = (val: number) => {
@@ -78,7 +82,6 @@ const Recipe = ({
                 fontSize={'0.9rem'}
                 fontWeight={600}
                 width={'100%'}
-                // padding={'0.5rem'}
                 onClick={() => onClick(id)}
               >
                 - Remove Recipe
@@ -89,7 +92,6 @@ const Recipe = ({
                 fontSize={'0.9rem'}
                 fontWeight={600}
                 width={'100%'}
-                // padding={'0.5rem'}
                 onClick={() => onClick(id)}
               >
                 + Add Recipe
@@ -118,22 +120,65 @@ const Menu: NextPage = () => {
   const [exactIngredientsBasket, setExactIngredientsBasket] = useState<
     Array<Ingredient>
   >([]);
-  const [ingredientsBasket, setIngredientsBasket] = useState<Array<Ingredient>>(
-    [],
-  );
+  // const [ingredientsBasket, setIngredientsBasket] = useState<Array<Ingredient>>(
+  //   [],
+  // );
+
+  const ingredientsBasket = useMemo(() => {
+    return exactIngredientsBasket.map((ingredient) => {
+      const unitQuantity = Math.ceil(ingredient.unitQuantity);
+      const price = roundTo2dp(unitQuantity * ingredient.pricePerUnit);
+
+      return {
+        ...ingredient,
+        unitQuantity,
+        price,
+      };
+    });
+  }, [exactIngredientsBasket]);
+
+  const recipePlanUuid =
+    typeof router.query.recipe_plan_uuid === 'string'
+      ? router.query.recipe_plan_uuid
+      : '';
+
+  const recipePlanMutation = useMutation({
+    mutationFn: ({
+      updateExisting,
+      recipeIdList,
+    }: {
+      updateExisting: boolean;
+      recipeIdList: Array<number>;
+    }) => {
+      return updateExisting
+        ? updateRecipePlan(recipePlanUuid, { recipeIdList })
+        : insertRecipePlan(recipeIdList);
+    },
+    onSuccess: (data) => {
+      return onNavigate(`/recipe-plan/${data.uuid}`);
+    },
+  });
 
   const recipesQuery = useQuery(['recipes'], () => getRecipes(true), {
     refetchOnMount: false,
     staleTime: Infinity,
   });
 
-  const recipePlanMutation = useMutation({
-    mutationFn: ({ recipeIdList }: { recipeIdList: Array<number> }) =>
-      insertRecipePlan(recipeIdList),
+  const recipePlanQuery = useQuery({
+    queryKey: [`recipePlanQuery-${recipePlanUuid}`],
+    queryFn: () => getRecipePlan(recipePlanUuid, false),
+    staleTime: Infinity,
+    enabled: false,
     onSuccess: (data) => {
-      onNavigate(`/recipe-plan/${data.uuid}`);
+      addRecipesToBasket(data[0].recipes.map((recipe) => recipe.id));
     },
   });
+
+  useEffect(() => {
+    if (recipePlanUuid) {
+      recipePlanQuery.refetch({ cancelRefetch: false });
+    }
+  }, [recipePlanUuid, recipePlanQuery.refetch]);
 
   const onNavigate = (pathname: string) => {
     // display loading
@@ -216,19 +261,48 @@ const Menu: NextPage = () => {
       exactIngredientsBasket,
     );
 
-    const newIngredientsBasket = newExactIngredientsBasket.map((ingredient) => {
-      const unitQuantity = Math.ceil(ingredient.unitQuantity);
-      const price = roundTo2dp(unitQuantity * ingredient.pricePerUnit);
+    setExactIngredientsBasket(newExactIngredientsBasket);
+  };
 
-      return {
-        ...ingredient,
-        unitQuantity,
-        price,
-      };
+  const addRecipesToBasket = (recipeIdList: Array<number>) => {
+    // get recipes from recipeList
+    const recipes = recipeIdList.map((recipeId) => {
+      return recipesQuery.data.find((recipe) => recipe.id === recipeId);
     });
 
-    setExactIngredientsBasket(newExactIngredientsBasket);
-    setIngredientsBasket(newIngredientsBasket);
+    // create an array of all recipes with duplicates
+    const allIngredients = recipes.reduce((allIngredients, recipe) => {
+      return [...allIngredients, ...recipe.ingredientsList];
+    }, []);
+
+    // get all unique ingredients in recipe
+    const uniqueIngredientsIds: Array<Ingredient> = Array.from(
+      new Set<Ingredient>(allIngredients.map((ing) => ing.id)),
+    );
+
+    // group each unique element and create new array
+    const exactIngredientsInBasket = uniqueIngredientsIds.map((uIngId) => {
+      const likeIngs = allIngredients.filter((ing) => ing.id === uIngId);
+
+      return likeIngs.reduce(
+        (prev, current) => {
+          return {
+            ...prev,
+            ...current,
+            unitQuantity: roundTo2dp(
+              (prev.unitQuantity += current.unitQuantity),
+            ),
+          };
+        },
+        { unitQuantity: 0 },
+      );
+    });
+
+    setRecipeBasket(
+      recipes.map((recipe) => ({ id: recipe.id, name: recipe.name })),
+    );
+
+    setExactIngredientsBasket(exactIngredientsInBasket);
   };
 
   const totalBasketPrice: number = useMemo(() => {
@@ -318,6 +392,7 @@ const Menu: NextPage = () => {
         servings={recipeBasket.length * 4}
         onComplete={() => {
           recipePlanMutation.mutate({
+            updateExisting: !!recipePlanUuid,
             recipeIdList: recipeBasket.map((recipe) => recipe.id),
           });
         }}

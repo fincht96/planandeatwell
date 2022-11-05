@@ -15,17 +15,20 @@ export default class RecipePlanService {
 
     const rawQuery = this.db.raw(`
 (select 
-  recipes.recipe_plan_id as recipe_plan_id, 
+  recipes.recipe_plan_name,
+  recipes.recipe_plan_id, 
   recipes.recipes, 
   ingredients.ingredients 
 from 
   (
     select 
+      rps.recipe_plan_name,
       rps.recipe_plan_id, 
       rps.recipes 
     from 
       (
-        select 
+        select
+          recipe_plans.name as recipe_plan_name,
           recipe_plan_recipes.recipe_plan_id, 
           json_agg(recipes.*) as recipes 
         from 
@@ -33,7 +36,7 @@ from
           left join recipe_plan_recipes on recipe_plans.id = recipe_plan_recipes.recipe_plan_id 
           left join recipes on recipe_plan_recipes.recipe_id = recipes.id 
         group by 
-          recipe_plan_recipes.recipe_plan_id
+          recipe_plan_recipes.recipe_plan_id, recipe_plans.name
       ) as rps
   ) as recipes 
   left join (
@@ -76,11 +79,15 @@ from
 
     const found = includeIngredients
       ? await this.db
-          .select('recipe_plans.recipes', 'recipe_plans.ingredients')
+          .select(
+            'recipe_plans.recipe_plan_name',
+            'recipe_plans.recipes',
+            'recipe_plans.ingredients',
+          )
           .from(rawQuery)
           .where('recipe_plans.recipe_plan_id', planId)
       : await this.db
-          .select('recipe_plans.recipes')
+          .select('recipe_plans.recipe_plan_name', 'recipe_plans.recipes')
           .from(rawQuery)
           .where('recipe_plans.recipe_plan_id', planId);
 
@@ -106,6 +113,56 @@ from
         .transacting(trx);
 
       return recipe_plan_uuid;
+    });
+  }
+
+  async updatePlan({
+    uuid,
+    recipeIdList,
+    name,
+  }: {
+    uuid: string;
+    recipeIdList?: Array<number>;
+    name?: string;
+  }) {
+    return await this.db.transaction(async (trx) => {
+      const result = await this.db('recipe_plans')
+        .select('id')
+        .where('uuid', uuid)
+        .transacting(trx);
+
+      const { id: planId } = result[0];
+
+      // update recipes associated with recipe_plan (if provided recipeIdList)
+      if (recipeIdList?.length) {
+        // delete recipe_recipe_plan rows associated with recipe plan id
+        await this.db('recipe_plan_recipes')
+          .where('recipe_plan_id', planId)
+          .del()
+          .transacting(trx);
+
+        // insert recipe_plan_recipes with associated recipe_plan.id
+        const recipe_plan_recipes = recipeIdList.map((recipe_id) => ({
+          recipe_plan_id: planId,
+          recipe_id,
+        }));
+
+        await this.db('recipe_plan_recipes')
+          .insert(recipe_plan_recipes)
+          .transacting(trx);
+      }
+
+      // update recipe_plan name (if provided recipe_plan name)
+      if (name) {
+        await this.db('recipe_plans').where('id', planId).update({ name });
+      }
+
+      const recipePlan = await this.db('recipe_plans')
+        .select('id', 'name')
+        .where('uuid', uuid)
+        .transacting(trx);
+
+      return { uuid, name: recipePlan[0].name };
     });
   }
 }

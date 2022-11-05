@@ -33,4 +33,8 @@ router.post('/recipe-plan', (req: Request, res: Response) => {
   req.container.resolve('recipePlanController').saveRecipePlan(req, res);
 });
 
+router.put('/recipe-plan/:id', (req: Request, res: Response) => {
+  req.container.resolve('recipePlanController').updateRecipePlan(req, res);
+});
+
 export default router;

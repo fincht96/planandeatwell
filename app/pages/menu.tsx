@@ -13,7 +13,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Layout from '../components/layout';
 import MenuSummaryBar from '../components/MenuSummaryBar';
 import {
@@ -168,17 +168,11 @@ const Menu: NextPage = () => {
     queryKey: [`recipePlanQuery-${recipePlanUuid}`],
     queryFn: () => getRecipePlan(recipePlanUuid, false),
     staleTime: Infinity,
-    enabled: false,
+    enabled: !!recipePlanUuid,
     onSuccess: (data) => {
       addRecipesToBasket(data[0].recipes.map((recipe) => recipe.id));
     },
   });
-
-  useEffect(() => {
-    if (recipePlanUuid) {
-      recipePlanQuery.refetch({ cancelRefetch: false });
-    }
-  }, [recipePlanUuid, recipePlanQuery.refetch]);
 
   const onNavigate = (pathname: string) => {
     // display loading

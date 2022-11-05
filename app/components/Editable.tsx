@@ -80,4 +80,6 @@ const CustomEditable = React.forwardRef(
   },
 );
 
+CustomEditable.displayName = 'CustomEditable';
+
 export default CustomEditable;

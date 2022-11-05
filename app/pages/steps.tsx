@@ -39,7 +39,11 @@ const Steps: NextPage = () => {
           </Text>
 
           <Box mb={'2rem'}>
-            <Image quality={100} src={stepsImg} />
+            <Image
+              quality={100}
+              src={stepsImg}
+              alt={'plan-and-eat-well-steps'}
+            />
           </Box>
 
           <Flex justifyContent={'center'}>

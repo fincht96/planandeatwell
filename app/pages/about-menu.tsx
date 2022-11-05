@@ -31,7 +31,7 @@ const AboutMenu: NextPage = () => {
             mr={'3rem'}
             display={{ base: 'none', md: 'block' }}
           >
-            <Image quality={100} src={aboutMenuImg} />
+            <Image quality={100} src={aboutMenuImg} alt={'about-menu'} />
           </Box>
 
           <Box>

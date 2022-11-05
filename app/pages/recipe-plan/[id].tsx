@@ -52,6 +52,7 @@ const ContentBox = ({
       </Text>
 
       {rows.map((row) => {
+        console.log('row', row);
         return (
           <Box mb={'1rem'} key={row.id}>
             {row.content}
@@ -63,10 +64,12 @@ const ContentBox = ({
         <Divider />
       </Box>
 
-      <Flex justifyContent={'space-between'} alignItems={'center'}>
+      <Box>{summary}</Box>
+
+      {/* <Flex justifyContent={'space-between'} alignItems={'center'}>
         <Box>{summary[0]}</Box>
         <Box>{summary[1]}</Box>
-      </Flex>
+      </Flex> */}
     </Box>
   );
 };
@@ -172,7 +175,7 @@ const RecipePlan: NextPage = () => {
       setRecipePlanName(recipeQuery.data[0].recipePlanName);
       setValue('recipePlanName', `${recipeQuery.data[0].recipePlanName}`);
     }
-  }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
+  }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error, setValue]);
 
   return (
     <Layout>
@@ -333,22 +336,24 @@ const RecipePlan: NextPage = () => {
                 </Flex>
               ),
             }))}
-            summary={[
-              <Text
-                fontWeight={'600'}
-                color={'#4d4d4d'}
-                fontSize={{ base: '0.9rem', md: '1rem' }}
-              >
-                Total price
-              </Text>,
-              <Text
-                fontWeight={'600'}
-                color={'#4d4d4d'}
-                fontSize={{ base: '0.9rem', md: '1rem' }}
-              >
-                £{totalPrice.toFixed(2)}
-              </Text>,
-            ]}
+            summary={
+              <Flex justifyContent={'space-between'} alignItems={'center'}>
+                <Text
+                  fontWeight={'600'}
+                  color={'#4d4d4d'}
+                  fontSize={{ base: '0.9rem', md: '1rem' }}
+                >
+                  Total price
+                </Text>
+                <Text
+                  fontWeight={'600'}
+                  color={'#4d4d4d'}
+                  fontSize={{ base: '0.9rem', md: '1rem' }}
+                >
+                  £{totalPrice.toFixed(2)}
+                </Text>
+              </Flex>
+            }
           />
 
           <Box>
@@ -386,22 +391,24 @@ const RecipePlan: NextPage = () => {
                   </Flex>
                 ),
               }))}
-              summary={[
-                <Text
-                  fontWeight={'600'}
-                  color={'#4d4d4d'}
-                  fontSize={{ base: '0.9rem', md: '1rem' }}
-                >
-                  Servings
-                </Text>,
-                <Text
-                  fontWeight={'600'}
-                  color={'#4d4d4d'}
-                  fontSize={{ base: '0.9rem', md: '1rem' }}
-                >
-                  {totalServings}
-                </Text>,
-              ]}
+              summary={
+                <Flex justifyContent={'space-between'} alignItems={'center'}>
+                  <Text
+                    fontWeight={'600'}
+                    color={'#4d4d4d'}
+                    fontSize={{ base: '0.9rem', md: '1rem' }}
+                  >
+                    Servings
+                  </Text>
+                  <Text
+                    fontWeight={'600'}
+                    color={'#4d4d4d'}
+                    fontSize={{ base: '0.9rem', md: '1rem' }}
+                  >
+                    {totalServings}
+                  </Text>
+                </Flex>
+              }
             />
           </Box>
         </Grid>

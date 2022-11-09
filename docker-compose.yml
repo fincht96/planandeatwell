@@ -95,10 +95,6 @@ services:
       - "traefik.http.services.app.loadbalancer.server.port=3001" # required to update loadbalancer port, as next js running on different port
       - "traefik.enable=true"
 
-    # environment:
-    #   # - NEXT_PUBLIC_API_URL=http://api.planandeatwell.localhost
-    #   # - NEXT_PUBLIC_GA_TRACKING_ID=G-07YWLRN2XY
-    #   # - NEXT_PUBLIC_ENV=development
     volumes:
       - ./app:/app
       - ./app/node_modules:/app/node_modules

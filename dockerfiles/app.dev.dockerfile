@@ -22,7 +22,7 @@ WORKDIR /app
 
 # Copy package.json and package-lock.json
 # to the /app working directory
-COPY ./web/package*.json ./
+COPY ./app/package*.json ./
 
 # Install dependencies in /app
 RUN npm install

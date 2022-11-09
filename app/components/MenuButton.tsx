@@ -1,7 +1,7 @@
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { Box, Button, Stack, Text } from '@chakra-ui/react';
 
-const MenuButton = ({ onClick }) => {
+const MenuButton = ({ onClick }: { onClick: any }) => {
   return (
     <Button variant="outline" maxWidth={'min-content'} onClick={onClick}>
       <Box display={'flex'} justifyContent={'center'}>

@@ -3,7 +3,7 @@ import Navbar from './navbar';
 
 export const siteTitle = 'Meal Planner | Plan and Eat Well';
 
-export default function Layout({ children }) {
+export default function Layout({ children }: { children: any }) {
   return (
     <>
       <Meta />

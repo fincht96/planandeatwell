@@ -38,20 +38,23 @@ const Steps: NextPage = () => {
             Your meal plan is just a few steps away...
           </Text>
 
-          <Box mb={'2rem'}>
-            <Image
-              quality={100}
-              src={stepsImg}
-              alt={'plan-and-eat-well-steps'}
-            />
-          </Box>
+          <Flex justifyContent={'center'}>
+            <Box mb={'2rem'} maxW={'30rem'}>
+              <Image
+                priority
+                quality={75}
+                src={stepsImg}
+                alt={'plan-and-eat-well-steps'}
+              />
+            </Box>
+          </Flex>
 
           <Flex justifyContent={'center'}>
             <Button
               mt={4}
               colorScheme="brand"
               w="15rem"
-              fontSize={{ base: '0.9rem', md: '1.1rem' }}
+              fontSize={{ base: '1.2rem', md: '1.5rem' }}
               fontWeight={600}
               padding={'1.5rem 1rem'}
               onClick={() => onNavigate('/supermarket')}

@@ -30,14 +30,15 @@ const SupermarketButton = ({
       display="flex"
       justifyContent={'center'}
       alignItems={'center'}
-      padding={'1.5rem'}
       userSelect={'none'}
       cursor={disabled ? 'default' : 'pointer'}
       onClick={disabled ? null : onClick}
       opacity={disabled ? 0.4 : 1.0}
       _hover={{ bg: disabled ? 'none' : '#fafafa' }}
     >
-      <Image quality={100} src={imageProp} alt={supermarket} />
+      <Box maxW={'7rem'}>
+        <Image quality={100} src={imageProp} alt={supermarket} />
+      </Box>
     </Box>
   );
 };

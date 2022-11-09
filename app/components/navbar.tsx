@@ -48,19 +48,22 @@ export default function WithSubnavigation() {
         >
           <NextLink href={'https://planandeatwell.uk'} passHref={true}>
             <Link>
-              {isLessThan500 ? (
+              {!!isLessThan500 && (
+                <Box position={'relative'} width={55} height={55}>
+                  <Image
+                    quality={75}
+                    src="/favicon/apple-touch-icon.png"
+                    layout={'fill'}
+                    alt={'logo'}
+                    objectFit={'cover'}
+                  />
+                </Box>
+              )}
+
+              {!isLessThan500 && (
                 <Image
-                  priority
-                  src="/favicon/apple-touch-icon.png"
-                  height={'50rem'}
-                  width={'50rem'}
-                  alt={'logo'}
-                />
-              ) : (
-                <Image
-                  priority
                   src="/images/logo.png"
-                  height={43}
+                  height={45}
                   width={176}
                   alt={'logo'}
                 />

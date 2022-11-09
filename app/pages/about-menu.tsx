@@ -24,14 +24,19 @@ const AboutMenu: NextPage = () => {
         <title>{siteTitle}</title>
       </Head>
 
-      <Container mt={'5rem'} maxW={'60rem'}>
+      <Container maxW={'60rem'} mt={{ base: '2rem', md: '5rem' }}>
         <Flex justifyContent={'center'}>
           <Box
             maxW={'450px'}
             mr={'3rem'}
             display={{ base: 'none', md: 'block' }}
           >
-            <Image quality={100} src={aboutMenuImg} alt={'about-menu'} />
+            <Image
+              priority
+              quality={75}
+              src={aboutMenuImg}
+              alt={'about-menu'}
+            />
           </Box>
 
           <Box>

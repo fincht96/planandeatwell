@@ -10,7 +10,10 @@ import {
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
 
-const CustomEditable = React.forwardRef(
+const CustomEditable = React.forwardRef<
+  HTMLInputElement,
+  { label: string } & ReturnType<any>
+>(
   (
     {
       previewValue,
@@ -50,13 +53,18 @@ const CustomEditable = React.forwardRef(
                 <Input ref={ref} onChange={onChange} name={name} />
 
                 <ButtonGroup justifyContent="center" size="sm">
-                  <IconButton icon={<CheckIcon />} type="submit" />
+                  <IconButton
+                    icon={<CheckIcon />}
+                    type="submit"
+                    aria-label="submit-button"
+                  />
                   <IconButton
                     icon={<CloseIcon />}
                     onClick={() => {
                       resetForm();
                       setIsEditing(false);
                     }}
+                    aria-label="cancel-button"
                   />
                 </ButtonGroup>
               </Flex>
@@ -72,6 +80,7 @@ const CustomEditable = React.forwardRef(
               size="sm"
               icon={<EditIcon />}
               onClick={() => setIsEditing(true)}
+              aria-label="edit-button"
             />
           </Flex>
         )}

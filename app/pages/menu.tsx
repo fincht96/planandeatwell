@@ -154,7 +154,7 @@ const Menu: NextPage = () => {
         ? updateRecipePlan(recipePlanUuid, { recipeIdList })
         : insertRecipePlan(recipeIdList);
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       return onNavigate(`/recipe-plan/${data.uuid}`);
     },
   });

@@ -1,6 +1,7 @@
 import { Ingredient } from './ingredient.types';
 
 export interface Recipe {
+  id?: number;
   name: string;
   servings: number;
   pricePerServing: number;

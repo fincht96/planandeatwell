@@ -39,4 +39,35 @@ export default class IngredientsService {
       };
     }
   }
+
+  async searchIngredients(searchString: string) {
+    const rawQuery = this.db.raw(
+      `
+    (
+      SELECT 
+        ingredients.id,
+        ingredients.name,
+        CAST(ingredients.price_per_unit as FLOAT) 
+      FROM 
+        ingredients
+      WHERE 
+        position(? in lower(ingredients.name))>0
+      ) as ingredients
+      `,
+      [searchString],
+    );
+
+    try {
+      const result = await this.db.select('*').from(rawQuery).limit(30);
+      return {
+        result: result,
+        error: false,
+      };
+    } catch (e) {
+      return {
+        result: null,
+        error: true,
+      };
+    }
+  }
 }

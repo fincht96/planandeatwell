@@ -8,6 +8,21 @@ const searchIngredientsSchema = Joi.object({
   search: Joi.string().max(100),
 });
 
+const insertIngredientSchema = Joi.object({
+  name: Joi.string().max(200).required(),
+  pricePerUnit: Joi.number().min(0).max(100).required(),
+  productId: Joi.number().min(0).required(),
+}).and('name', 'pricePerUnit', 'productId');
+
+const getIngredientsSchema = Joi.object({
+  orderBy: Joi.string().valid('createdAt'),
+  order: Joi.string().valid('asc', 'desc'),
+}).and('orderBy', 'order');
+
+const removeIngredientSchema = Joi.object({
+  id: Joi.number().min(1).required(),
+});
+
 export default class IngredientsController {
   constructor(
     private readonly ingredientsService: IngredientsService,
@@ -24,14 +39,9 @@ export default class IngredientsController {
           throw new Error('Invalid recipeId provided');
         }
 
-        const { result, error } =
-          await this.ingredientsService.getIngredientsFromRecipe(
-            validator.toInt(recipeId),
-          );
-
-        if (error) {
-          throw new Error(`Unable to get ingredients for recipe: ${recipeId}`);
-        }
+        const result = await this.ingredientsService.getIngredientsFromRecipe(
+          validator.toInt(recipeId),
+        );
 
         return res.status(200).json({
           result,
@@ -50,20 +60,75 @@ export default class IngredientsController {
           throw new Error(error.message);
         }
 
-        const { result, error: searchIngredientsError } =
-          await this.ingredientsService.searchIngredients(search.toLowerCase());
-
-        if (searchIngredientsError) {
-          throw new Error(`Unable to search ingredients`);
-        }
+        const result = await this.ingredientsService.searchIngredients(
+          search.toLowerCase(),
+        );
 
         return res.status(200).json({
           result,
           errors: [],
         });
       } else {
-        throw new Error('Invalid query params provided');
+        const { error, value } = getIngredientsSchema.validate(req.query);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        const ingredients = await this.ingredientsService.getIngredients(value);
+
+        return res.status(200).json({
+          result: ingredients,
+          errors: [],
+        });
       }
+    } catch (e: any) {
+      await this.eventsService.insert('INGREDIENTS', 'ERROR', e.message ?? '');
+      return res.status(400).json({
+        errors: [e?.message],
+      });
+    }
+  }
+
+  async insertIngredient(req: Request, res: Response) {
+    try {
+      const { error, value } = insertIngredientSchema.validate(req.body);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const result = await this.ingredientsService.insertIngredient(value);
+
+      return res.status(200).json({
+        result,
+        errors: [],
+      });
+    } catch (e: any) {
+      await this.eventsService.insert('INGREDIENTS', 'ERROR', e.message ?? '');
+      return res.status(400).json({
+        errors: [e?.message],
+      });
+    }
+  }
+
+  async removeIngredient(req: Request, res: Response) {
+    try {
+      const { error, value } = removeIngredientSchema.validate(req.params);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // remove ingredient from db
+      const removedIngredient = await this.ingredientsService.removeIngredient(
+        value.id,
+      );
+
+      return res.status(200).json({
+        result: removedIngredient,
+        errors: [],
+      });
     } catch (e: any) {
       await this.eventsService.insert('INGREDIENTS', 'ERROR', e.message ?? '');
       return res.status(400).json({

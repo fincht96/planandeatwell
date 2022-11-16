@@ -1,9 +1,37 @@
 import { Knex } from 'knex';
+import { Ingredient } from '../types/ingredient.types';
+// @ts-ignore
+import snakeize from 'snakeize';
+// @ts-ignore
+import camelize from 'camelize';
+
+const toSnakeCase = (str: string) => {
+  const res = str
+    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+    ?.map((x) => x.toLowerCase())
+    .join('_');
+  return res ?? '';
+};
 
 export default class IngredientsService {
   private db: Knex;
   constructor(db: Knex) {
     this.db = db;
+  }
+
+  async getIngredients(orderOptions: {
+    orderBy?: 'createdAt';
+    order?: 'asc' | 'desc';
+  }) {
+    const { orderBy, order } = orderOptions;
+    return this.db
+      .select('*', this.db.raw('CAST(ingredients.price_per_unit as FLOAT)'))
+      .from('ingredients')
+      .modify((qb) => {
+        if (orderBy && order) {
+          qb.orderBy(toSnakeCase(orderBy), order);
+        }
+      });
   }
 
   async getIngredientsFromRecipe(recipeId: number) {
@@ -26,18 +54,7 @@ export default class IngredientsService {
       [recipeId],
     );
 
-    try {
-      const result = await this.db.select('*').from(rawQuery);
-      return {
-        result: result,
-        error: false,
-      };
-    } catch (e) {
-      return {
-        result: null,
-        error: true,
-      };
-    }
+    return this.db.select('*').from(rawQuery);
   }
 
   async searchIngredients(searchString: string) {
@@ -57,17 +74,27 @@ export default class IngredientsService {
       [searchString],
     );
 
-    try {
-      const result = await this.db.select('*').from(rawQuery).limit(30);
-      return {
-        result: result,
-        error: false,
-      };
-    } catch (e) {
-      return {
-        result: null,
-        error: true,
-      };
-    }
+    return this.db.select('*').from(rawQuery).limit(30);
+  }
+
+  async insertIngredient(ingredient: Ingredient) {
+    // convert recipe to snake case
+    const ingredientSnake = snakeize(ingredient);
+    return await this.db.transaction(async (trx) => {
+      const { name, price_per_unit, product_id } = ingredientSnake;
+      // insert ingredient
+      const result = await this.db('ingredients').insert(
+        { name, price_per_unit, product_id },
+        ['*'],
+      );
+      return camelize(result[0]);
+    });
+  }
+
+  async removeIngredient(ingredientId: number): Promise<Ingredient> {
+    const result = await this.db('ingredients')
+      .where('id', ingredientId)
+      .del(['*']);
+    return camelize(result[0]);
   }
 }

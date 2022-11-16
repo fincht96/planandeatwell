@@ -35,6 +35,14 @@ router.get('/ingredients', (req: Request, res: Response) =>
   req.container.resolve('ingredientsController').getIngredients(req, res),
 );
 
+router.post('/ingredient', (req: Request, res: Response) => {
+  req.container.resolve('ingredientsController').insertIngredient(req, res);
+});
+
+router.delete('/ingredient/:id', (req: Request, res: Response) =>
+  req.container.resolve('ingredientsController').removeIngredient(req, res),
+);
+
 /** recipes */
 
 router.get('/recipes', (req: Request, res: Response) =>

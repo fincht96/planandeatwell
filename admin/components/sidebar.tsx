@@ -13,7 +13,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { ReactNode } from 'react';
-import { FiMenu, FiPlus } from 'react-icons/fi';
+import { FiMenu } from 'react-icons/fi';
 
 import Image from 'next/image';
 import { ReactText } from 'react';
@@ -28,8 +28,7 @@ interface LinkItemProps {
 }
 const LinkItems: Array<LinkItemProps> = [
   // { name: 'Home', icon: FiHome },
-  { name: 'New recipe', icon: FiPlus, href: '/newrecipe' },
-  { name: 'All recipes', icon: FiMenu, href: '/allrecipes' },
+  { name: 'Recipes', icon: FiMenu, href: '/recipes' },
   { name: 'Ingredients', icon: FiMenu, href: '/ingredients' },
 ];
 

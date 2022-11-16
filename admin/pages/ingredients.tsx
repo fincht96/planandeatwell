@@ -283,8 +283,8 @@ export default function Ingredients() {
           </form>
 
           <Stack pb={'2rem'}>
-            <Text fontSize={'2xl'} mb={'1rem'}>
-              Ingredients({ingredients.length})
+            <Text fontSize={'2xl'} color={'#4D4D4D'} mb={'1rem'}>
+              Ingredients ({ingredients.length})
             </Text>
 
             {ingredients.map((ingredient: any) => {

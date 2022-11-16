@@ -21,7 +21,11 @@ import Layout from '../components/layout';
 import IngredientsSearchModal from '../components/modal/IngredientsSearchModal';
 import { RecipeWithIngredients } from '../types/recipe.types';
 import { calcPricePerServing } from '../utils/price-per-serving';
-import { insertRecipe } from '../utils/requests/recipes';
+import {
+  deleteRecipe,
+  getRecipes,
+  insertRecipe,
+} from '../utils/requests/recipes';
 import { getSignedUploadUrl } from '../utils/requests/storage';
 
 const IngredientCard = React.forwardRef<any>(
@@ -74,12 +78,61 @@ const IngredientCard = React.forwardRef<any>(
 
 IngredientCard.displayName = 'IngredientCard';
 
+const RecipeCard = ({
+  recipe,
+  onDelete,
+}: {
+  recipe: { id: number; name: string; link: string };
+  onDelete: (recipeId: number) => void;
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  return (
+    <Flex
+      bg={'#ffffff'}
+      border={'#cccccc'}
+      justifyContent={'space-between'}
+      alignItems={'center'}
+      p={'1rem'}
+    >
+      <Flex gap={'1rem'}>
+        <Box>
+          <Text fontSize={'1rem'} fontWeight={100}>
+            id
+          </Text>
+
+          <Text fontSize={'1rem'}>{recipe.id}</Text>
+        </Box>
+
+        <Box>
+          <Text fontSize={'1rem'} fontWeight={100}>
+            Name
+          </Text>
+
+          <Text fontSize={'1rem'}>{recipe.name}</Text>
+        </Box>
+      </Flex>
+      <Button
+        colorScheme="brandSecondary"
+        onClick={() => {
+          setIsLoading(true);
+          onDelete(recipe.id);
+        }}
+        isLoading={isLoading}
+      >
+        <FiTrash2 />
+      </Button>
+    </Flex>
+  );
+};
+
 const aldiRecipeImagePath = 'recipe_images/aldi';
 
-export default function NewRecipe() {
+export default function Recipes() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [previewImage, setPreviewImage] = useState<any>(null);
   const [ingredients, setIngredients] = useState<any>([]); // represents viewable ingredients list
+  const [recipes, setRecipes] = useState<any>([]); // represents viewable recipes list
   const [filename, setFilename] = useState<string>('');
   const [contentType, setContentType] = useState<string>('');
   const [recipe, setRecipe] = useState<any>();
@@ -162,12 +215,51 @@ export default function NewRecipe() {
       reset();
       setPreviewImage(null);
       setIngredients([]);
+      recipesQuery.refetch();
     },
     onError: (error) => {
       toast({
         position: 'top',
         title: 'Error!',
         description: 'An error occurred inserting recipe',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
+
+  const recipesQuery = useQuery(['recipes'], () => getRecipes(false), {
+    refetchOnMount: 'always',
+    staleTime: Infinity,
+    onSuccess: (data: any) => {
+      setRecipes(data);
+    },
+  });
+
+  const deleteRecipeMutation = useMutation({
+    mutationFn: ({ recipeId }: { recipeId: number }) => {
+      return deleteRecipe(recipeId);
+    },
+    onSuccess: async (res: any) => {
+      setRecipes((current) => {
+        return current.filter((recipe) => recipe.id !== res.id);
+      });
+
+      toast({
+        position: 'top',
+        title: 'Success!',
+        description: `Recipe deleted`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+    onError: (error) => {
+      toast({
+        position: 'top',
+        title: 'Error!',
+        description: 'An error occurred deleting recipe',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -253,6 +345,11 @@ export default function NewRecipe() {
     ]);
   };
 
+  // remove recipe from viewable list
+  const onRemoveRecipe = (recipeId: number) => {
+    deleteRecipeMutation.mutate({ recipeId });
+  };
+
   useEffect(() => {
     const newLoadingState =
       isSubmitting ||
@@ -285,7 +382,7 @@ export default function NewRecipe() {
 
         <Container maxW={'auto'}>
           <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-            <Text fontSize="4xl" color={'#4D4D4D'} mb={'2rem'}>
+            <Text fontSize="2xl" color={'#4D4D4D'} mb={'2rem'}>
               New recipe
             </Text>
 
@@ -391,7 +488,7 @@ export default function NewRecipe() {
                 </Stack>
 
                 <Stack>
-                  <Text fontSize={'2xl'} mb={'1rem'}>
+                  <Text fontSize={'2xl'} color={'#4D4D4D'} mb={'1rem'}>
                     Ingredients({ingredients.length})
                   </Text>
 
@@ -452,6 +549,28 @@ export default function NewRecipe() {
               </Box>
             </Flex>
           </form>
+
+          <Box mt={'2rem'}>
+            <Text fontSize="2xl" color={'#4D4D4D'} mb={'2rem'}>
+              Recipes ({recipes.length})
+            </Text>
+
+            <Flex justifyContent={'space-between'} gap={'2rem'}>
+              <Box flex={2}>
+                <Stack pb={'2rem'}>
+                  {recipes.map((recipe: any) => {
+                    return (
+                      <RecipeCard
+                        key={recipe.id}
+                        recipe={recipe}
+                        onDelete={onRemoveRecipe}
+                      />
+                    );
+                  })}
+                </Stack>
+              </Box>
+            </Flex>
+          </Box>
         </Container>
       </main>
     </Layout>

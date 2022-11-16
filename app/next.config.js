@@ -20,6 +20,13 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
+  images: {
+    domains: [
+      'newstack.fra1.digitaloceanspaces.com',
+      'newstack.fra1.cdn.digitaloceanspaces.com',
+    ],
+  },
+
   output: 'standalone',
 };
 

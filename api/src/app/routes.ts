@@ -37,4 +37,10 @@ router.put('/recipe-plan/:id', (req: Request, res: Response) => {
   req.container.resolve('recipePlanController').updateRecipePlan(req, res);
 });
 
+/** storage */
+
+router.get('/signed-upload-url', (req: Request, res: Response) => {
+  req.container.resolve('storageController').getSignedUploadUrl(req, res);
+});
+
 export default router;

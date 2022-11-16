@@ -53,7 +53,7 @@ const Recipe = ({
       <Box flexGrow={1} minH={'25rem'} position={'relative'}>
         <Image
           quality={75}
-          src={imagePath}
+          src={`${process.env.NEXT_PUBLIC_CDN}${imagePath}`}
           layout={'fill'}
           alt={name}
           objectFit={'cover'}

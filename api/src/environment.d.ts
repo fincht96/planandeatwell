@@ -10,6 +10,12 @@ declare global {
       MAIL_PORT: string;
       MAIL_USER: string;
       MAIL_PASS: string;
+      SPACES_KEY: string;
+      SPACES_SECRET: string;
+      SPACES_ENDPOINT: string;
+      SPACES_REGION: string;
+      SPACES_BUCKET: string;
+      CDN_ENDPOINT: string;
     }
   }
 

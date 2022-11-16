@@ -104,6 +104,30 @@ services:
       - ./env/local/app.env
 
   ##########
+  # admin
+  ##########
+
+  admin:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/admin.dev.dockerfile
+    ports:
+      - 3002:3002
+    labels:
+      - "traefik.http.routers.admin.rule=Host(`admin.planandeatwell.localhost`)"
+      - "traefik.http.routers.admin.entrypoints=web"
+      - "traefik.http.services.admin.loadbalancer.server.port=3002" # required to update loadbalancer port, as next js running on different port
+      - "traefik.enable=true"
+
+    volumes:
+      - ./admin:/admin
+      - ./admin/node_modules:/admin/node_modules
+      - ./admin/.next:/admin/.next
+
+    env_file:
+      - ./env/local/admin.env
+
+  ##########
   # api
   ##########
 

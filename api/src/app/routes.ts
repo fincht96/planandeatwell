@@ -1,5 +1,23 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 const router = express.Router();
+
+function checkAuth(req: Request, res: Response, next: NextFunction) {
+  console.log('checking auth');
+  next();
+  // if (req.headers.authtoken) {
+  //   admin
+  //     .auth()
+  //     .verifyIdToken(req.headers.authtoken)
+  //     .then(() => {
+  //       next();
+  //     })
+  //     .catch(() => {
+  //       res.status(403).send('Unauthorized');
+  //     });
+  // } else {
+  //   res.status(403).send('Unauthorized');
+  // }
+}
 
 router.get('/ping', (req: Request, res: Response) => {
   res.sendStatus(200);

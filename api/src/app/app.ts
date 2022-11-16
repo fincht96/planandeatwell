@@ -28,6 +28,8 @@ export default class App {
       'https://planandeatwell.uk',
       'http://app.planandeatwell.localhost',
       'https://app.planandeatwell.uk',
+      'http://admin.planandeatwell.localhost',
+      'https://admin.planandeatwell.uk',
     ];
 
     const app = express();

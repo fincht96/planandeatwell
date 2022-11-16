@@ -52,7 +52,6 @@ const ContentBox = ({
       </Text>
 
       {rows.map((row) => {
-        console.log('row', row);
         return (
           <Box mb={'1rem'} key={row.id}>
             {row.content}
@@ -65,11 +64,6 @@ const ContentBox = ({
       </Box>
 
       <Box>{summary}</Box>
-
-      {/* <Flex justifyContent={'space-between'} alignItems={'center'}>
-        <Box>{summary[0]}</Box>
-        <Box>{summary[1]}</Box>
-      </Flex> */}
     </Box>
   );
 };
@@ -86,8 +80,8 @@ const RecipePlan: NextPage = () => {
     queryKey: [`recipesQuery-${recipePlanUuid}`],
     queryFn: () => getRecipePlan(recipePlanUuid, true),
     refetchOnMount: 'always',
+    staleTime: Infinity,
     enabled: !!recipePlanUuid.length,
-    staleTime: 'Infinity',
   });
 
   const recipePlanMutation = useMutation({

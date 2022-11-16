@@ -160,17 +160,25 @@ const Menu: NextPage = () => {
   });
 
   const recipesQuery = useQuery(['recipes'], () => getRecipes(true), {
-    refetchOnMount: false,
+    refetchOnMount: 'always',
     staleTime: Infinity,
+    enabled: router.isReady,
+    onSuccess: (data: any) => {
+      if (recipePlanUuid) {
+        recipePlanQuery.refetch();
+      }
+    },
   });
 
   const recipePlanQuery = useQuery({
     queryKey: [`recipePlanQuery-${recipePlanUuid}`],
     queryFn: () => getRecipePlan(recipePlanUuid, false),
     staleTime: Infinity,
-    enabled: !!recipePlanUuid,
+    refetchOnMount: 'always',
+    enabled: false,
     onSuccess: (data) => {
-      addRecipesToBasket(data[0].recipes.map((recipe) => recipe.id));
+      const recipeIdList = data[0].recipes.map((recipe) => recipe.id);
+      addRecipesToBasket(recipeIdList);
     },
   });
 
@@ -361,7 +369,7 @@ const Menu: NextPage = () => {
                   .includes(recipe.id);
 
                 return (
-                  <Box key={recipe.name}>
+                  <Box key={recipe.id}>
                     <Recipe
                       id={recipe.id}
                       name={recipe.name}

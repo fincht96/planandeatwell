@@ -30,6 +30,7 @@ const LinkItems: Array<LinkItemProps> = [
   // { name: 'Home', icon: FiHome },
   { name: 'New recipe', icon: FiPlus, href: '/newrecipe' },
   { name: 'All recipes', icon: FiMenu, href: '/allrecipes' },
+  { name: 'Ingredients', icon: FiMenu, href: '/ingredients' },
 ];
 
 const Logo = () => {

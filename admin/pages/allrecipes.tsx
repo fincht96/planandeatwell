@@ -79,8 +79,6 @@ export default function AllRecipes() {
       return deleteRecipe(recipeId);
     },
     onSuccess: async (res: any) => {
-      console.log('res', res);
-
       setRecipes((current) => {
         return current.filter((recipe) => recipe.id !== res.id);
       });
@@ -106,14 +104,9 @@ export default function AllRecipes() {
     },
   });
 
-  // remove ingredient from viewable list
+  // remove recipe from viewable list
   const onRemoveRecipe = (recipeId: number) => {
     deleteRecipeMutation.mutate({ recipeId });
-
-    // call api to delete recipe, will also delete image from DO spaces
-    // update the ui
-    // const index = ingredients.findIndex((ingredient) => ingredient.uid == uid);
-    // remove(index);
   };
 
   return (

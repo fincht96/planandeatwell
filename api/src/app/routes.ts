@@ -23,6 +23,14 @@ router.get('/recipes', (req: Request, res: Response) =>
   req.container.resolve('recipeController').getRecipeList(req, res),
 );
 
+router.post('/recipe', (req: Request, res: Response) =>
+  req.container.resolve('recipeController').insertRecipe(req, res),
+);
+
+router.delete('/recipe/:id', (req: Request, res: Response) =>
+  req.container.resolve('recipeController').removeRecipe(req, res),
+);
+
 /** recipe plan */
 
 router.get('/recipe-plan/:id', (req: Request, res: Response) => {

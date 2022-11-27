@@ -11,6 +11,7 @@ import {
 import App from './app';
 import AppConfig from './configs/app.config';
 import { makeDbConnection } from './db';
+import { initFirebaseAdmin } from './firebase_admin';
 import Mailer from './mailer';
 
 export default class Bootstrap {
@@ -40,13 +41,12 @@ export default class Bootstrap {
   _createContainer() {
     const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
-    // init mailerConfig
-
     container.register({
       appConfig: asClass(AppConfig).singleton(),
       app: asClass(App).singleton(),
       db: asFunction(makeDbConnection).singleton(),
       mailer: asClass(Mailer).singleton(),
+      firebaseAdmin: asFunction(initFirebaseAdmin).singleton(),
     });
 
     // console.log(
@@ -57,7 +57,11 @@ export default class Bootstrap {
     // );
 
     const modules = listModules(
-      [`./services/*.{ts,js}`, `./controllers/*.{ts,js}`],
+      [
+        `./services/*.{ts,js}`,
+        `./controllers/*.{ts,js}`,
+        `./middleware/*.{ts,js}`,
+      ],
       {
         cwd: __dirname,
       },

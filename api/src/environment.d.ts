@@ -1,4 +1,5 @@
 import { AwilixContainer } from 'awilix';
+import { auth } from 'firebase-admin';
 
 // global scope, overrides specific namespaces
 declare global {
@@ -22,6 +23,7 @@ declare global {
   namespace Express {
     interface Request {
       container: AwilixContainer;
+      user: auth.DecodedIdToken;
     }
   }
 }

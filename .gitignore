@@ -3,3 +3,4 @@ node_modules
 api/build
 db
 migrate_db.sh
+*.json

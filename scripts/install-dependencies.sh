@@ -1,5 +1,5 @@
 #!/bin/bash
-dirs=(./api ./app ./www)
+dirs=(./api ./app ./www ./admin)
 
 for file in "${dirs[@]}"
     do 

@@ -1,6 +1,6 @@
 #!/bin/bash
 lockfiles=(package-lock.json yarn.lock)
-dirs=(./api/* ./app/* ./www/*)
+dirs=(./api/* ./app/* ./www/* ./admin/*)
 
 for file in "${dirs[@]}"
     do 

@@ -1,6 +1,6 @@
 #!/bin/bash
 NM="node_modules"
-dirs=(./api/* ./app/* ./www/*)
+dirs=(./api/* ./app/* ./www/* ./admin/*)
 
 for file in "${dirs[@]}"
     do 

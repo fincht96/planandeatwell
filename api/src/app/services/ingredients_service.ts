@@ -28,7 +28,7 @@ export default class IngredientsService {
       .select('*', this.db.raw('CAST(ingredients.price_per_unit as FLOAT)'))
       .from('ingredients')
       .modify((qb) => {
-        if (orderBy && order) {
+        if (!!orderBy && !!order) {
           qb.orderBy(toSnakeCase(orderBy), order);
         }
       });
@@ -83,10 +83,9 @@ export default class IngredientsService {
     return await this.db.transaction(async (trx) => {
       const { name, price_per_unit, product_id } = ingredientSnake;
       // insert ingredient
-      const result = await this.db('ingredients').insert(
-        { name, price_per_unit, product_id },
-        ['*'],
-      );
+      const result = await this.db('ingredients')
+        .insert({ name, price_per_unit, product_id }, ['*'])
+        .transacting(trx);
       return camelize(result[0]);
     });
   }

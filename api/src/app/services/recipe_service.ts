@@ -11,7 +11,7 @@ export default class RecipeService {
     this.db = db;
   }
 
-  async getAll(includeIngredients: boolean = false) {
+  async getAll(includeIngredients = false) {
     const rawQuery = this.db.raw(`
     (
       select *

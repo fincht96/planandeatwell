@@ -6,7 +6,7 @@ export default class RecipePlanService {
     this.db = db;
   }
 
-  async getPlan(uuid: string, includeIngredients: boolean = false) {
+  async getPlan(uuid: string, includeIngredients = false) {
     const result = await this.db('recipe_plans')
       .select('id')
       .where('uuid', uuid);

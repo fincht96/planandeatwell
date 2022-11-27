@@ -61,7 +61,7 @@ export default class IngredientsController {
         }
 
         const result = await this.ingredientsService.searchIngredients(
-          search.toLowerCase(),
+          value.search.toLowerCase(),
         );
 
         return res.status(200).json({

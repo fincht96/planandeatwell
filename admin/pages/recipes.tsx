@@ -14,11 +14,13 @@ import {
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
 import Layout from '../components/layout';
 import IngredientsSearchModal from '../components/modal/IngredientsSearchModal';
+import { useAuth } from '../contexts/auth-context';
 import { RecipeWithIngredients } from '../types/recipe.types';
 import { calcPricePerServing } from '../utils/price-per-serving';
 import {
@@ -137,13 +139,39 @@ export default function Recipes() {
   const [contentType, setContentType] = useState<string>('');
   const [recipe, setRecipe] = useState<any>();
   const toast = useToast();
+  const { currentUser, idToken, authLoading } = useAuth();
+  const router = useRouter();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && !currentUser) {
+      router.push('/login');
+    }
+  }, [authLoading, currentUser, router]);
+
+  useEffect(() => {
+    currentUser
+      ?.getIdTokenResult()
+      .then((decodedToken) => {
+        if (!decodedToken?.claims?.roles?.includes('admin')) {
+          router.push('/login');
+        } else {
+          setIsReady(true);
+        }
+      })
+      .catch((e) => {
+        router.push('/login');
+      });
+  }, [currentUser, router]);
 
   const signedUploadUrlQuery = useQuery({
     queryKey: [`signedUploadUrlQuery`],
     queryFn: () =>
       getSignedUploadUrl(
+        idToken,
         `${aldiRecipeImagePath}/${filename}`,
         contentType,
         'public-read',
@@ -200,7 +228,7 @@ export default function Recipes() {
 
   const insertRecipeMutation = useMutation({
     mutationFn: ({ recipe }: { recipe: RecipeWithIngredients }) => {
-      return insertRecipe(recipe);
+      return insertRecipe(idToken, recipe);
     },
     onSuccess: async (res: any) => {
       toast({
@@ -230,8 +258,9 @@ export default function Recipes() {
   });
 
   const recipesQuery = useQuery(['recipes'], () => getRecipes(false), {
+    enabled: isReady,
     refetchOnMount: 'always',
-    staleTime: Infinity,
+    refetchOnWindowFocus: false,
     onSuccess: (data: any) => {
       setRecipes(data);
     },
@@ -239,7 +268,7 @@ export default function Recipes() {
 
   const deleteRecipeMutation = useMutation({
     mutationFn: ({ recipeId }: { recipeId: number }) => {
-      return deleteRecipe(recipeId);
+      return deleteRecipe(idToken, recipeId);
     },
     onSuccess: async (res: any) => {
       setRecipes((current) => {
@@ -374,204 +403,212 @@ export default function Recipes() {
       </Head>
 
       <main>
-        <IngredientsSearchModal
-          onClose={onClose}
-          isOpen={isOpen}
-          onSubmit={onAddIngredient}
-        />
+        {isReady && (
+          <>
+            <IngredientsSearchModal
+              onClose={onClose}
+              isOpen={isOpen}
+              onSubmit={onAddIngredient}
+            />
 
-        <Container maxW={'auto'}>
-          <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-            <Text fontSize="2xl" color={'#4D4D4D'} mb={'2rem'}>
-              New recipe
-            </Text>
+            <Container maxW={'auto'}>
+              <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+                <Text fontSize="2xl" color={'#4D4D4D'} mb={'2rem'}>
+                  New recipe
+                </Text>
 
-            <Flex justifyContent={'space-between'} gap={'2rem'}>
-              <Box flex={2}>
-                <Stack spacing={'1rem'} maxW={'30rem'} mb={'2rem'}>
-                  <FormControl isInvalid={!!errors.name}>
-                    <Text>Recipe name</Text>
-                    <Input
-                      variant="outline"
-                      autoComplete="off"
-                      bg={'#ffffff'}
-                      id={'name'}
-                      {...register('name', {
-                        required: 'A recipe name is required',
-                        maxLength: {
-                          value: 200,
-                          message: 'Must be less than 200 characters',
-                        },
-                      })}
-                    />
-                    <FormErrorMessage>
-                      {errors.name && `${errors?.name.message}`}
-                    </FormErrorMessage>
-                  </FormControl>
+                <Flex justifyContent={'space-between'} gap={'2rem'}>
+                  <Box flex={2}>
+                    <Stack spacing={'1rem'} maxW={'30rem'} mb={'2rem'}>
+                      <FormControl isInvalid={!!errors.name}>
+                        <Text>Recipe name</Text>
+                        <Input
+                          variant="outline"
+                          autoComplete="off"
+                          bg={'#ffffff'}
+                          id={'name'}
+                          {...register('name', {
+                            required: 'A recipe name is required',
+                            maxLength: {
+                              value: 200,
+                              message: 'Must be less than 200 characters',
+                            },
+                          })}
+                        />
+                        <FormErrorMessage>
+                          {errors.name && `${errors?.name.message}`}
+                        </FormErrorMessage>
+                      </FormControl>
 
-                  <FormControl isInvalid={!!errors.servings}>
-                    <Text># servings</Text>
-                    <Input
-                      variant="outline"
-                      autoComplete="off"
-                      bg={'#ffffff'}
-                      id={'servings'}
-                      {...register('servings', {
-                        required: '# servings is required',
-                        max: {
-                          value: 24,
-                          message: 'Max number of servings is 24',
-                        },
-                        min: {
-                          value: 1,
-                          message: 'Min number of servings is 1',
-                        },
-                        valueAsNumber: true,
-                      })}
-                      type={'number'}
-                    />
-                    <FormErrorMessage>
-                      {errors.servings && `${errors?.servings.message}`}
-                    </FormErrorMessage>
-                  </FormControl>
+                      <FormControl isInvalid={!!errors.servings}>
+                        <Text># servings</Text>
+                        <Input
+                          variant="outline"
+                          autoComplete="off"
+                          bg={'#ffffff'}
+                          id={'servings'}
+                          {...register('servings', {
+                            required: '# servings is required',
+                            max: {
+                              value: 24,
+                              message: 'Max number of servings is 24',
+                            },
+                            min: {
+                              value: 1,
+                              message: 'Min number of servings is 1',
+                            },
+                            valueAsNumber: true,
+                          })}
+                          type={'number'}
+                        />
+                        <FormErrorMessage>
+                          {errors.servings && `${errors?.servings.message}`}
+                        </FormErrorMessage>
+                      </FormControl>
 
-                  <FormControl isInvalid={!!errors.link}>
-                    <Text>Recipe link</Text>
-                    <Input
-                      variant="outline"
-                      autoComplete="off"
-                      bg={'#ffffff'}
-                      id={'link'}
-                      {...register('link', {
-                        required: 'A recipe link is required',
-                        maxLength: {
-                          value: 500,
-                          message: 'Must be less than 500 characters',
-                        },
-                      })}
-                    />
-                    <FormErrorMessage>
-                      {errors.link && `${errors?.link.message}`}
-                    </FormErrorMessage>
-                  </FormControl>
+                      <FormControl isInvalid={!!errors.link}>
+                        <Text>Recipe link</Text>
+                        <Input
+                          variant="outline"
+                          autoComplete="off"
+                          bg={'#ffffff'}
+                          id={'link'}
+                          {...register('link', {
+                            required: 'A recipe link is required',
+                            maxLength: {
+                              value: 500,
+                              message: 'Must be less than 500 characters',
+                            },
+                          })}
+                        />
+                        <FormErrorMessage>
+                          {errors.link && `${errors?.link.message}`}
+                        </FormErrorMessage>
+                      </FormControl>
 
-                  <Box>
-                    <Text>Recipe image</Text>
-                    <FormControl isInvalid={!!errors.file}>
-                      <input
-                        type={'file'}
-                        {...register('file', {
-                          validate: (value) => {
-                            return value.length === 1
-                              ? true
-                              : 'A file is required';
-                          },
-                          onBlur: () => {
-                            clearErrors('file');
-                          },
-                        })}
-                        accept="image/*"
-                        onChange={showPreview}
-                      />
-                      <FormErrorMessage>
-                        {errors.file && `${errors.file.message}`}
-                      </FormErrorMessage>
-                    </FormControl>
-
-                    <Image
-                      sx={{ display: previewImage ? 'block' : 'none' }}
-                      src={previewImage}
-                      width={'200px'}
-                      alt={'uploaded-image-preview'}
-                    />
-                  </Box>
-                </Stack>
-
-                <Stack>
-                  <Text fontSize={'2xl'} color={'#4D4D4D'} mb={'1rem'}>
-                    Ingredients({ingredients.length})
-                  </Text>
-
-                  <Stack pb={'2rem'}>
-                    {ingredients.map((ingredient, index) => {
-                      const error = errors.ingredients?.length
-                        ? errors.ingredients[index] ?? false
-                        : false;
-
-                      return (
-                        <FormControl isInvalid={error} key={ingredient.uid}>
-                          <IngredientCard
-                            ingredient={ingredient}
-                            {...register(`ingredients.${index}.unitQuantity`, {
-                              required: 'A unit quantity is required',
-                              min: {
-                                value: 0.001,
-                                message: 'Unit quantity must be greater than 0',
+                      <Box>
+                        <Text>Recipe image</Text>
+                        <FormControl isInvalid={!!errors.file}>
+                          <input
+                            type={'file'}
+                            {...register('file', {
+                              validate: (value) => {
+                                return value.length === 1
+                                  ? true
+                                  : 'A file is required';
                               },
-                              max: {
-                                value: 50,
-                                message:
-                                  'Unit quantity must not be greater than 50',
+                              onBlur: () => {
+                                clearErrors('file');
                               },
-                              valueAsNumber: true,
                             })}
-                            onDelete={onRemoveIngredient}
+                            accept="image/*"
+                            onChange={showPreview}
                           />
-
                           <FormErrorMessage>
-                            {error.unitQuantity &&
-                              `${error.unitQuantity.message}`}
+                            {errors.file && `${errors.file.message}`}
                           </FormErrorMessage>
                         </FormControl>
-                      );
-                    })}
-                  </Stack>
 
-                  <Button colorScheme="brandSecondary" onClick={onOpen}>
-                    <FiPlus />
-                  </Button>
-                </Stack>
-              </Box>
-              <Box flex={1} minW={'10rem'}>
-                <Box border={'solid 1px #cccccc'} p={'1rem'} bg={'#ffffff'}>
-                  <Text fontSize={'2xl'} mb={'1rem'}>
-                    Publish
-                  </Text>
-                  <Text mb={'1rem'}>Visibility: Public</Text>
-                  <Button
-                    colorScheme={'brandSecondary'}
-                    type="submit"
-                    isLoading={isLoading}
-                  >
-                    Publish
-                  </Button>
-                </Box>
-              </Box>
-            </Flex>
-          </form>
+                        <Image
+                          sx={{ display: previewImage ? 'block' : 'none' }}
+                          src={previewImage}
+                          width={'200px'}
+                          alt={'uploaded-image-preview'}
+                        />
+                      </Box>
+                    </Stack>
 
-          <Box mt={'2rem'}>
-            <Text fontSize="2xl" color={'#4D4D4D'} mb={'2rem'}>
-              Recipes ({recipes.length})
-            </Text>
+                    <Stack>
+                      <Text fontSize={'2xl'} color={'#4D4D4D'} mb={'1rem'}>
+                        Ingredients({ingredients.length})
+                      </Text>
 
-            <Flex justifyContent={'space-between'} gap={'2rem'}>
-              <Box flex={2}>
-                <Stack pb={'2rem'}>
-                  {recipes.map((recipe: any) => {
-                    return (
-                      <RecipeCard
-                        key={recipe.id}
-                        recipe={recipe}
-                        onDelete={onRemoveRecipe}
-                      />
-                    );
-                  })}
-                </Stack>
+                      <Stack pb={'2rem'}>
+                        {ingredients.map((ingredient, index) => {
+                          const error = errors.ingredients?.length
+                            ? errors.ingredients[index] ?? false
+                            : false;
+
+                          return (
+                            <FormControl isInvalid={error} key={ingredient.uid}>
+                              <IngredientCard
+                                ingredient={ingredient}
+                                {...register(
+                                  `ingredients.${index}.unitQuantity`,
+                                  {
+                                    required: 'A unit quantity is required',
+                                    min: {
+                                      value: 0.001,
+                                      message:
+                                        'Unit quantity must be greater than 0',
+                                    },
+                                    max: {
+                                      value: 50,
+                                      message:
+                                        'Unit quantity must not be greater than 50',
+                                    },
+                                    valueAsNumber: true,
+                                  },
+                                )}
+                                onDelete={onRemoveIngredient}
+                              />
+
+                              <FormErrorMessage>
+                                {error.unitQuantity &&
+                                  `${error.unitQuantity.message}`}
+                              </FormErrorMessage>
+                            </FormControl>
+                          );
+                        })}
+                      </Stack>
+
+                      <Button colorScheme="brandSecondary" onClick={onOpen}>
+                        <FiPlus />
+                      </Button>
+                    </Stack>
+                  </Box>
+                  <Box flex={1} minW={'10rem'}>
+                    <Box border={'solid 1px #cccccc'} p={'1rem'} bg={'#ffffff'}>
+                      <Text fontSize={'2xl'} mb={'1rem'}>
+                        Publish
+                      </Text>
+                      <Text mb={'1rem'}>Visibility: Public</Text>
+                      <Button
+                        colorScheme={'brandSecondary'}
+                        type="submit"
+                        isLoading={isLoading}
+                      >
+                        Publish
+                      </Button>
+                    </Box>
+                  </Box>
+                </Flex>
+              </form>
+
+              <Box mt={'2rem'}>
+                <Text fontSize="2xl" color={'#4D4D4D'} mb={'2rem'}>
+                  Recipes ({recipes.length})
+                </Text>
+
+                <Flex justifyContent={'space-between'} gap={'2rem'}>
+                  <Box flex={2}>
+                    <Stack pb={'2rem'}>
+                      {recipes.map((recipe: any) => {
+                        return (
+                          <RecipeCard
+                            key={recipe.id}
+                            recipe={recipe}
+                            onDelete={onRemoveRecipe}
+                          />
+                        );
+                      })}
+                    </Stack>
+                  </Box>
+                </Flex>
               </Box>
-            </Flex>
-          </Box>
-        </Container>
+            </Container>
+          </>
+        )}
       </main>
     </Layout>
   );

@@ -1,12 +1,14 @@
 import camelize from 'camelize-ts';
 import { Ingredient } from '../../types/ingredient.types';
 
-export const insertIngredient = (ingredient: Ingredient) => {
+export const insertIngredient = (token: string, ingredient: Ingredient) => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
+    credentials: 'include',
     body: JSON.stringify(ingredient),
   }).then(async (res) => {
     const json = await res.json();
@@ -41,9 +43,12 @@ export const getIngredients = () => {
   });
 };
 
-export const deleteIngredient = (id: number) => {
+export const deleteIngredient = (token: string, id: number) => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/${id}`, {
     method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   }).then(async (res) => {
     const json = await res.json();
     if (json?.errors.length) {

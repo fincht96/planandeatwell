@@ -1,6 +1,7 @@
 import {
   Box,
   BoxProps,
+  Button,
   CloseButton,
   Drawer,
   DrawerContent,
@@ -20,6 +21,7 @@ import { ReactText } from 'react';
 import { IconType } from 'react-icons';
 
 import NextLink from 'next/link';
+import { useAuth } from '../contexts/auth-context';
 
 interface LinkItemProps {
   name: string;
@@ -84,6 +86,7 @@ interface SidebarProps extends BoxProps {
 }
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const { logout } = useAuth();
   return (
     <Box
       bg={useColorModeValue('white', 'gray.900')}
@@ -103,6 +106,8 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           {link.name}
         </NavItem>
       ))}
+
+      <Button onClick={() => logout()}>Log out</Button>
     </Box>
   );
 };

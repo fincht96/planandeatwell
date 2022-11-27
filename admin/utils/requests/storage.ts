@@ -1,6 +1,5 @@
-import camelize from 'camelize-ts';
-
 export const getSignedUploadUrl = (
+  token: string,
   objectKey: string,
   contentType: string,
   acl: string = 'private',
@@ -12,8 +11,12 @@ export const getSignedUploadUrl = (
     acl,
   });
 
-  url.search = params;
-  return fetch(url).then(async (res) => {
+  url.search = params.toString();
+  return fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(async (res) => {
     const json = await res.json();
     if (json?.errors.length) {
       throw json.errors[0];

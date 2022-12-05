@@ -17,7 +17,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FiLink2 } from 'react-icons/fi';
-import { MdModeEdit } from 'react-icons/md';
 import Editable from '../../components/Editable';
 import Layout from '../../components/layout';
 import {
@@ -208,7 +207,7 @@ const RecipePlan: NextPage = () => {
             />
           </Box>
 
-          <Button
+          {/* <Button
             bg={'#ffffff'}
             border={'solid 1px'}
             borderColor={'brand.500'}
@@ -239,7 +238,7 @@ const RecipePlan: NextPage = () => {
 
               <Text>Edit meal plan</Text>
             </Flex>
-          </Button>
+          </Button> */}
         </Flex>
 
         <Flex gap={'1rem'} mb={'2rem'}>

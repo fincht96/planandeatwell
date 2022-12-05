@@ -12,13 +12,13 @@ import {
 
 const CartMenu = ({
   currentPrice,
-  recipeList,
+  recipeIdList,
   ingredientList,
   servings,
   disabled,
 }: {
   currentPrice: number;
-  recipeList: any;
+  recipeIdList: any;
   ingredientList: any;
   servings: number;
   disabled: boolean;
@@ -89,18 +89,18 @@ const CartMenu = ({
             fontWeight={600}
             textAlign={'center'}
           >
-            Recipes ({recipeList.length})
+            Recipes ({recipeIdList.length})
           </Text>
 
-          {recipeList.map((item: any) => {
+          {recipeIdList.map((recipeId: any) => {
             return (
               <Box
                 p={'0.5rem'}
-                key={item.id}
+                key={recipeId}
                 fontSize={'1rem'}
                 color="gray.normal"
               >
-                {item.name}
+                {recipeId}
               </Box>
             );
           })}
@@ -114,10 +114,11 @@ const CartMenu = ({
             Ingredients ({ingredientList.length})
           </Text>
 
-          {ingredientList.map((item: any) => {
+          {ingredientList.map((ingredient: any) => {
             return (
-              <Box p={'0.5rem'} key={item.id} color="gray.normal">
-                £{item.price} - {item.unitQuantity} x {item.name}
+              <Box p={'0.5rem'} key={ingredient.id} color="gray.normal">
+                £{ingredient.price} - {ingredient.unitQuantity} x{' '}
+                {ingredient.name}
               </Box>
             );
           })}

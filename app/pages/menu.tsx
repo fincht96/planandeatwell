@@ -2,106 +2,37 @@ import {
   Box,
   Button,
   Container,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   Grid,
-  Link,
-  Stack,
-  Text,
+  Input,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Layout from '../components/layout';
-import MenuSummaryBar from '../components/MenuSummaryBar';
+import Recipe from '../components/Recipe';
+import { Event, useEventBus } from '../components/useEventBus';
 import {
-  getRecipePlan,
   insertRecipePlan,
   updateRecipePlan,
 } from '../utils/requests/recipe-plans';
 import { getRecipes } from '../utils/requests/recipes';
 
+import { IoOptions } from 'react-icons/io5';
+import MenuSummaryBar from '../components/MenuSummaryBar';
+
 const roundTo2dp = (val: number) => {
   return Math.round(val * 100) / 100;
-};
-
-const Recipe = ({
-  id,
-  name,
-  pricePerServing,
-  imagePath,
-  showRemove,
-  onClick,
-  link,
-}: {
-  id: number;
-  name: string;
-  pricePerServing: number;
-  imagePath: string;
-  showRemove: Boolean;
-  link: string;
-  onClick: (id: number) => void;
-}) => {
-  return (
-    <Flex
-      flexDirection={'column'}
-      alignItems={'stretch'}
-      justifyContent={'space-between'}
-    >
-      <Box flexGrow={1} minH={'25rem'} position={'relative'}>
-        <Image
-          quality={75}
-          src={`${process.env.NEXT_PUBLIC_CDN}${imagePath}`}
-          layout={'fill'}
-          alt={name}
-          objectFit={'cover'}
-        />
-      </Box>
-
-      <Stack bg={'white'} p={'1rem'} justifyContent={'space-between'}>
-        <Stack spacing={'0rem'}>
-          <Link href={link} isExternal={true} color="brand.500">
-            {name} (4 servings)
-          </Link>
-        </Stack>
-
-        <Flex alignItems={'center'} justifyContent={'space-between'}>
-          <Text color={'#444444'} fontSize={'1rem'}>
-            £{pricePerServing.toFixed(2)} per serving
-          </Text>
-
-          <Box width={'10rem'} ml={'0.7rem'}>
-            {showRemove ? (
-              <Button
-                bg={'#ffffff'}
-                border={'solid 1px'}
-                borderColor={'brand.500'}
-                color={'brand.500'}
-                fontSize={'0.9rem'}
-                fontWeight={600}
-                width={'100%'}
-                onClick={() => onClick(id)}
-              >
-                - Remove Recipe
-              </Button>
-            ) : (
-              <Button
-                colorScheme="brand"
-                fontSize={'0.9rem'}
-                fontWeight={600}
-                width={'100%'}
-                onClick={() => onClick(id)}
-              >
-                + Add Recipe
-              </Button>
-            )}
-          </Box>
-        </Flex>
-      </Stack>
-    </Flex>
-  );
 };
 
 interface Ingredient {
@@ -112,17 +43,80 @@ interface Ingredient {
   price?: number;
 }
 
+const SearchMenu = ({ ...props }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = useRef();
+
+  return (
+    <Box {...props}>
+      <Input placeholder="Search" background={'#ffffff'} mb={'2rem'} />
+
+      <Button
+        ref={btnRef}
+        colorScheme="teal"
+        onClick={onOpen}
+        leftIcon={<IoOptions />}
+      >
+        Filter
+      </Button>
+
+      <Drawer
+        isOpen={isOpen}
+        placement="left"
+        onClose={onClose}
+        finalFocusRef={btnRef}
+      >
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Create your account</DrawerHeader>
+
+          <DrawerBody>
+            <Input placeholder="Type here..." />
+          </DrawerBody>
+
+          <DrawerFooter>
+            <Button variant="outline" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorScheme="blue">Save</Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </Box>
+  );
+};
+
 const Menu: NextPage = () => {
+  const { subscribe, unsubscribe, post } = useEventBus();
+
+  const limit = 10;
+  const [offset, setOffset] = useState(0);
+  const [totalCountRecipes, setTotalCountRecipes] = useState(0);
+  const showMore = useMemo(() => {
+    return (
+      offset * limit + limit - 1 <= totalCountRecipes || totalCountRecipes === 0
+    );
+  }, [offset, limit, totalCountRecipes]);
+
   const router = useRouter();
-  const [recipeBasket, setRecipeBasket] = useState<
-    Array<{ id: number; name: string }>
-  >([]);
+  const [recipeBasket, setRecipeBasket] = useState<Array<number>>([]);
   const [exactIngredientsBasket, setExactIngredientsBasket] = useState<
     Array<Ingredient>
   >([]);
-  // const [ingredientsBasket, setIngredientsBasket] = useState<Array<Ingredient>>(
-  //   [],
-  // );
+
+  const [recipes, setRecipes] = useState<Array<any>>([]);
+
+  // const recipesHashTable = useMemo(() => {
+  //   const table = recipes.reduce((recipeLookup, recipe) => {
+  //     return {
+  //       ...recipeLookup,
+  //       [recipe.id]: recipe,
+  //     };
+  //   }, {});
+
+  //   return [...new Set(table)];
+  // }, [recipes]);
 
   const ingredientsBasket = useMemo(() => {
     return exactIngredientsBasket.map((ingredient) => {
@@ -159,153 +153,197 @@ const Menu: NextPage = () => {
     },
   });
 
-  const recipesQuery = useQuery(['recipes'], () => getRecipes(true), {
-    refetchOnMount: 'always',
-    staleTime: Infinity,
-    enabled: router.isReady,
-    onSuccess: (data: any) => {
-      if (recipePlanUuid) {
-        recipePlanQuery.refetch();
-      }
-    },
-  });
+  // useEffect(() => {
+  //   console.log('recipesLookup', recipesLookup);
+  // }, [recipesLookup]);
 
-  const recipePlanQuery = useQuery({
-    queryKey: [`recipePlanQuery-${recipePlanUuid}`],
-    queryFn: () => getRecipePlan(recipePlanUuid, false),
-    staleTime: Infinity,
-    refetchOnMount: 'always',
-    enabled: false,
-    onSuccess: (data) => {
-      const recipeIdList = data[0].recipes.map((recipe) => recipe.id);
-      addRecipesToBasket(recipeIdList);
+  const recipesQuery = useQuery(
+    ['recipes', offset, limit],
+    () =>
+      getRecipes({
+        includeIngredients: true,
+        offset,
+        limit,
+      }),
+    {
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+      enabled: router.isReady,
+      onSuccess: (data: any) => {
+        setRecipes((current) => [...current, ...data.recipes]);
+        setTotalCountRecipes(data.totalCount);
+        // if (recipePlanUuid) {
+        //   recipePlanQuery.refetch();
+        // }
+      },
     },
-  });
+  );
+
+  // const recipePlanQuery = useQuery({
+  //   queryKey: [`recipePlanQuery-${recipePlanUuid}`],
+  //   queryFn: () => getRecipePlan(recipePlanUuid, false),
+  //   staleTime: Infinity,
+  //   refetchOnMount: 'always',
+  //   enabled: false,
+  //   onSuccess: (data) => {
+  //     const recipeIdList = data[0].recipes.map((recipe) => recipe.id);
+
+  //   },
+  // });
+
+  const updateRecipesInBasket = useCallback(
+    (recipeId: number) => {
+      const recipeIdInBasket = recipeBasket.includes(recipeId);
+
+      post({
+        name: recipeIdInBasket
+          ? 'remove-recipe-ingredients'
+          : 'add-recipe-ingredients',
+        data: `${recipeId}`,
+      });
+
+      setRecipeBasket((currentRecipeBasket: Array<number>) => {
+        return recipeIdInBasket
+          ? currentRecipeBasket.filter((basketId) => basketId !== recipeId)
+          : [...currentRecipeBasket, recipeId];
+      });
+    },
+    [post, recipeBasket],
+  );
+
+  const removeRecipeIngredientsFromBasket = useCallback(
+    (recipeId: number) => {
+      // get recipe ingredients to be removed
+      const ingredientsToRemove = recipes.find(
+        (recipe) => recipe.id === recipeId,
+      )?.ingredientsList;
+
+      // subtract ingredients from ingredients basket
+      const newExactIngredientsBasket = exactIngredientsBasket.reduce(
+        (newExactIngredientsBasket, basketIngredient) => {
+          const ingredientToRemove = ingredientsToRemove.find(
+            (ingredient: Ingredient) => ingredient.id === basketIngredient.id,
+          );
+
+          if (ingredientToRemove) {
+            const updatedIngredient = {
+              ...basketIngredient,
+              unitQuantity: (basketIngredient.unitQuantity -=
+                ingredientToRemove.unitQuantity),
+            };
+
+            return updatedIngredient.unitQuantity <= 0.0001
+              ? newExactIngredientsBasket
+              : [...newExactIngredientsBasket, updatedIngredient];
+          }
+
+          return [...newExactIngredientsBasket, { ...basketIngredient }];
+        },
+        Array<Ingredient>(),
+      );
+
+      setExactIngredientsBasket(newExactIngredientsBasket);
+    },
+    [recipes, exactIngredientsBasket],
+  );
+
+  const addRecipeIngredientsToBasket = useCallback(
+    (recipeId: number) => {
+      // get recipe ingredients to be added
+      const ingredientsToAdd = recipes.find(
+        (recipe) => recipe.id === recipeId,
+      )?.ingredientsList;
+
+      // add ingredients to ingredients basket
+      const newExactIngredientsBasket = ingredientsToAdd.reduce(
+        (newExactIngredientsBasket, ingredientToAdd) => {
+          const existingIngredient = newExactIngredientsBasket.find(
+            (ingredient) => ingredient.id === ingredientToAdd.id,
+          );
+
+          // if no existing ingredient found simply append
+          if (!existingIngredient) {
+            return [...newExactIngredientsBasket, { ...ingredientToAdd }];
+          }
+
+          // update existing ingredient
+          else {
+            const updatedIngredient = {
+              ...existingIngredient,
+              unitQuantity: (existingIngredient.unitQuantity +=
+                ingredientToAdd.unitQuantity),
+            };
+
+            return newExactIngredientsBasket.map((ingredient) => {
+              if (updatedIngredient.id === ingredient.id) {
+                return updatedIngredient;
+              }
+              return ingredient;
+            });
+          }
+        },
+        exactIngredientsBasket,
+      );
+
+      setExactIngredientsBasket(newExactIngredientsBasket);
+    },
+    [exactIngredientsBasket, recipes],
+  );
 
   const onNavigate = (pathname: string) => {
     // display loading
     router.push(pathname, undefined, { shallow: true });
   };
 
-  const onRecipeClick: (id: number) => void = async (id) => {
-    const operation = recipeBasket.map((recipe) => recipe.id).includes(id)
-      ? 'remove recipe'
-      : 'add recipe';
+  const onRecipeClick = (id: number) => {
+    post({ name: 'recipe-clicked', data: `${id}` });
+  };
 
-    const recipe = recipesQuery.data.find((recipe) => recipe.id === id);
-
-    const {
-      ingredientsList,
-      imagePath,
-      link,
-      pricePerServing,
-      ...recipeTrunc
-    } = recipe;
-
-    // update recipe basket
-    setRecipeBasket(
-      operation === 'add recipe'
-        ? (current) => [...current, recipeTrunc]
-        : (current) => current.filter((el) => el.id !== id),
-    );
-
-    // get ingredients of recipe
-    const recipeIngredients = recipe.ingredientsList;
-
-    const newExactIngredientsBasket = recipeIngredients.reduce(
-      (prev: Array<Ingredient>, currentIngredient: Ingredient) => {
-        let newIngredientsBasket = Array<Ingredient>();
-
-        // find match in ingredients basket
-        const match = exactIngredientsBasket.find(
-          (el) => el.id === currentIngredient.id,
-        );
-
-        // if match found remove existing element and combine with
-        if (match) {
-          newIngredientsBasket = prev.filter(
-            (el) => el.id !== currentIngredient.id,
-          );
-
-          const updatedIngredient = { ...match };
-
-          // add recipe to basket
-          if (operation === 'add recipe') {
-            updatedIngredient.unitQuantity += currentIngredient.unitQuantity;
-          }
-          // remove recipe from basket
-          else {
-            updatedIngredient.unitQuantity -= currentIngredient.unitQuantity;
-          }
-
-          updatedIngredient.unitQuantity = roundTo2dp(
-            updatedIngredient.unitQuantity,
-          );
-
-          newIngredientsBasket =
-            updatedIngredient.unitQuantity <= 0
-              ? newIngredientsBasket
-              : [...newIngredientsBasket, updatedIngredient];
+  // add/remove recipe id to recipe basket
+  useEffect(() => {
+    const recipeClickedSubscriber = {
+      notify(event: Event) {
+        if (event.name === 'recipe-clicked') {
+          const id = parseInt(event.data);
+          updateRecipesInBasket(id);
         }
-
-        // if no match found, simply append to ingredients basket
-        else {
-          newIngredientsBasket = [...prev, currentIngredient];
-        }
-
-        newIngredientsBasket = newIngredientsBasket.map((ingredient) => ({
-          ...ingredient,
-          price: roundTo2dp(ingredient.unitQuantity * ingredient.pricePerUnit),
-        }));
-
-        return newIngredientsBasket;
       },
-      exactIngredientsBasket,
-    );
+    };
 
-    setExactIngredientsBasket(newExactIngredientsBasket);
-  };
+    subscribe(recipeClickedSubscriber);
+    return () => unsubscribe(recipeClickedSubscriber);
+  }, [subscribe, unsubscribe, post, updateRecipesInBasket]);
 
-  const addRecipesToBasket = (recipeIdList: Array<number>) => {
-    // get recipes from recipeList
-    const recipes = recipeIdList.map((recipeId) => {
-      return recipesQuery.data.find((recipe) => recipe.id === recipeId);
-    });
+  // remove recipe ingredients from basket
+  useEffect(() => {
+    const recipeRemovedSubscriber = {
+      notify(event: Event) {
+        if (event.name === 'remove-recipe-ingredients') {
+          const id = parseInt(event.data);
+          removeRecipeIngredientsFromBasket(id);
+        }
+      },
+    };
 
-    // create an array of all recipes with duplicates
-    const allIngredients = recipes.reduce((allIngredients, recipe) => {
-      return [...allIngredients, ...recipe.ingredientsList];
-    }, []);
+    subscribe(recipeRemovedSubscriber);
+    return () => unsubscribe(recipeRemovedSubscriber);
+  }, [subscribe, unsubscribe, removeRecipeIngredientsFromBasket]);
 
-    // get all unique ingredients in recipe
-    const uniqueIngredientsIds: Array<Ingredient> = Array.from(
-      new Set<Ingredient>(allIngredients.map((ing) => ing.id)),
-    );
+  // add recipe ingredients to basket
+  useEffect(() => {
+    const recipeInsertSubscriber = {
+      notify(event: Event) {
+        if (event.name === 'add-recipe-ingredients') {
+          const id = parseInt(event.data);
+          addRecipeIngredientsToBasket(id);
+        }
+      },
+    };
 
-    // group each unique element and create new array
-    const exactIngredientsInBasket = uniqueIngredientsIds.map((uIngId) => {
-      const likeIngs = allIngredients.filter((ing) => ing.id === uIngId);
-
-      return likeIngs.reduce(
-        (prev, current) => {
-          return {
-            ...prev,
-            ...current,
-            unitQuantity: roundTo2dp(
-              (prev.unitQuantity += current.unitQuantity),
-            ),
-          };
-        },
-        { unitQuantity: 0 },
-      );
-    });
-
-    setRecipeBasket(
-      recipes.map((recipe) => ({ id: recipe.id, name: recipe.name })),
-    );
-
-    setExactIngredientsBasket(exactIngredientsInBasket);
-  };
+    subscribe(recipeInsertSubscriber);
+    return () => unsubscribe(recipeInsertSubscriber);
+  }, [subscribe, unsubscribe, addRecipeIngredientsToBasket]);
 
   const totalBasketPrice: number = useMemo(() => {
     return roundTo2dp(
@@ -326,76 +364,56 @@ const Menu: NextPage = () => {
   return (
     <Layout>
       <Head>
-        <title>Aldi Menu | Plan and Eat Well</title>
+        <title>Menu | Plan and Eat Well</title>
       </Head>
 
       <Container mt={'5rem'} w={'95vw'} maxW={'1600px'} pt={'1rem'} pb={'5rem'}>
-        <Text
-          fontSize={{ base: '1.2rem', md: '1.5rem' }}
-          fontWeight={800}
-          mb={'2rem'}
-          color={'#444444'}
-        >
-          Aldi Recipe Collection
-        </Text>
-        {recipesQuery.isLoading ? (
-          <>Loading</>
-        ) : (
-          <>
-            <Flex mb={'2rem'} gap={'1rem'} overflowX={'auto'}>
-              <Button
-                colorScheme="brand"
-                fontSize={'1rem'}
-                fontWeight={400}
-                minW={'content'}
-                height={'2rem'}
-                padding={'0rem 1rem'}
-                m={0}
-              >
-                All recipes ({recipesQuery.data.length})
-              </Button>
+        <SearchMenu mb={'4rem'} />
+        <Grid templateColumns="repeat(auto-fill, minMax(275px,1fr));" gap={6}>
+          {recipes.map((recipe) => {
+            const recipeInBasket = recipeBasket.includes(recipe.id);
+            return (
+              <Recipe
+                id={recipe.id}
+                name={recipe.name}
+                pricePerServing={recipe.pricePerServing}
+                imagePath={recipe.imagePath}
+                onClick={onRecipeClick}
+                showRemove={recipeInBasket}
+                link={recipe.link}
+                key={recipe.id}
+              />
+            );
+          })}
+        </Grid>
 
-              {/* <Button fontSize={'0.9rem'} fontWeight={400} minW={'content'}>
-                Vegetarian (2)
-              </Button> */}
-            </Flex>
-            <Grid
-              templateColumns="repeat(auto-fill, minMax(275px,1fr));"
-              gap={6}
+        {showMore && (
+          <Flex justifyContent={'center'}>
+            <Button
+              onClick={() => {
+                setOffset((current) => current + limit);
+              }}
+              mt={10}
+              colorScheme="brand"
+              fontSize={{ base: '0.9rem', md: '1.1rem' }}
+              fontWeight={600}
+              padding={'1.5rem 1rem'}
             >
-              {recipesQuery.data?.map((recipe) => {
-                const recipeInBasket = recipeBasket
-                  .map((recipe) => recipe.id)
-                  .includes(recipe.id);
-
-                return (
-                  <Box key={recipe.id}>
-                    <Recipe
-                      id={recipe.id}
-                      name={recipe.name}
-                      pricePerServing={recipe.pricePerServing}
-                      imagePath={recipe.imagePath}
-                      onClick={onRecipeClick}
-                      showRemove={recipeInBasket}
-                      link={recipe.link}
-                    />
-                  </Box>
-                );
-              })}
-            </Grid>
-          </>
+              Show more
+            </Button>
+          </Flex>
         )}
       </Container>
 
       <MenuSummaryBar
         currentPrice={totalBasketPrice}
         ingredientList={ingredientsBasket}
-        recipeList={recipeBasket}
+        recipeIdList={recipeBasket}
         servings={recipeBasket.length * 4}
         onComplete={() => {
           recipePlanMutation.mutate({
             updateExisting: !!recipePlanUuid,
-            recipeIdList: recipeBasket.map((recipe) => recipe.id),
+            recipeIdList: recipeBasket,
           });
         }}
       />

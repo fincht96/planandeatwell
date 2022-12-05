@@ -45,7 +45,7 @@ from
       json_agg(
         jsonb_build_object(
           'name', ings.ingredient_name, 'id', 
-          ings.ingredient_id, 'quantity', 
+          ings.ingredient_id, 'unit_quantity', 
           ings.ingredient_quantity, 'price_per_unit', 
           ings.price_per_unit
         )

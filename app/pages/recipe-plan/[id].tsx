@@ -107,13 +107,13 @@ const RecipePlan: NextPage = () => {
     id: number;
     name: string;
     price: number;
-    quantity: number;
+    unitQuantity: number;
   }> = useMemo(() => {
     return !recipeQuery.isLoading && !recipeQuery.error
       ? recipeQuery.data[0].ingredients.map((ing) => {
-          const quantity = Math.ceil(ing.quantity);
-          const price = ing.pricePerUnit * quantity;
-          return { ...ing, quantity, price };
+          const unitQuantity = Math.ceil(ing.unitQuantity);
+          const price = ing.pricePerUnit * unitQuantity;
+          return { ...ing, unitQuantity, price };
         })
       : [];
   }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
@@ -317,7 +317,7 @@ const RecipePlan: NextPage = () => {
                     color={'#444444'}
                     fontSize={{ base: '0.9rem', md: '1rem' }}
                   >
-                    {ingredient.quantity}x {ingredient.name}
+                    {ingredient.unitQuantity}x {ingredient.name}
                   </Text>
 
                   <Text

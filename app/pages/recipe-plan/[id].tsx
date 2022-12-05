@@ -108,13 +108,13 @@ const RecipePlan: NextPage = () => {
     id: number;
     name: string;
     price: number;
-    quantity: number;
+    unitQuantity: number;
   }> = useMemo(() => {
     return !recipeQuery.isLoading && !recipeQuery.error
       ? recipeQuery.data[0].ingredients.map((ing) => {
-          const quantity = Math.ceil(ing.quantity);
-          const price = ing.pricePerUnit * quantity;
-          return { ...ing, quantity, price };
+          const unitQuantity = Math.ceil(ing.unitQuantity);
+          const price = ing.pricePerUnit * unitQuantity;
+          return { ...ing, unitQuantity, price };
         })
       : [];
   }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
@@ -268,30 +268,6 @@ const RecipePlan: NextPage = () => {
               <Text>Copy Link</Text>
             </Flex>
           </Button>
-          {/* <Button
-            bg={'#ffffff'}
-            border={'solid 1px'}
-            borderColor={'#cccccc'}
-            color={'#4d4d4d'}
-            fontSize={{ base: '0.9rem', md: '1rem' }}
-            fontWeight={400}
-            minW={'content'}
-          >
-            <Flex
-              justifyContent={'space-between'}
-              gap={'0.5rem'}
-              alignItems={'center'}
-            >
-              <Icon
-                as={SiMinutemailer}
-                width={{ base: '1.5rem' }}
-                height={{ base: '1.5rem' }}
-                color={'#4d4d4d'}
-              />
-
-              <Text>Email recipe plan</Text>
-            </Flex>
-          </Button> */}
         </Flex>
 
         <Grid
@@ -315,14 +291,14 @@ const RecipePlan: NextPage = () => {
               content: (
                 <Flex justifyContent={'space-between'} gap={'1rem'}>
                   <Text
-                    color={'#444444'}
+                    color={'gray.dark'}
                     fontSize={{ base: '0.9rem', md: '1rem' }}
                   >
-                    {ingredient.quantity}x {ingredient.name}
+                    {ingredient.unitQuantity}x {ingredient.name}
                   </Text>
 
                   <Text
-                    color={'#444444'}
+                    color={'gray.dark'}
                     fontSize={{ base: '0.9rem', md: '1rem' }}
                   >
                     £{ingredient.price.toFixed(2)}
@@ -365,7 +341,7 @@ const RecipePlan: NextPage = () => {
                 content: (
                   <Flex justifyContent={'space-between'} gap={'1rem'}>
                     <Text
-                      color={'#444444'}
+                      color={'gray.dark'}
                       as={Link}
                       sx={{ textDecoration: 'underline' }}
                       _hover={{ color: 'brand.500' }}
@@ -377,7 +353,7 @@ const RecipePlan: NextPage = () => {
                     </Text>
 
                     <Text
-                      color={'#444444'}
+                      color={'gray.dark'}
                       fontSize={{ base: '0.9rem', md: '1rem' }}
                     >
                       {recipe.servings} servings

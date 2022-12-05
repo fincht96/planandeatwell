@@ -39,6 +39,7 @@ export default class App {
     app.use(
       cors({
         origin: whitelist,
+        exposedHeaders: ['x-total-count'],
       }),
     );
     app.use(helmet());

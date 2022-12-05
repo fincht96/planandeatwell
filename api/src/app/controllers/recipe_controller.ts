@@ -1,10 +1,15 @@
 import { Request, Response } from 'express';
 import EventsService from '../services/events_service';
 import RecipeService from '../services/recipe_service';
-import validator from 'validator';
 import Joi from 'joi';
 import StorageService from '../services/storage_service';
 import AppConfig from '../configs/app.config';
+
+const getRecipeListSchema = Joi.object({
+  limit: Joi.number().min(1).max(100).required(),
+  offset: Joi.number().min(0).required(),
+  includeIngredients: Joi.bool().required(),
+}).and('limit', 'offset');
 
 const insertRecipeSchema = Joi.object({
   name: Joi.string().max(200).required(),
@@ -43,23 +48,17 @@ export default class RecipeController {
 
   async getRecipeList(req: Request, res: Response) {
     try {
-      const includeIngredients: string = req.query.includeIngredients + '';
+      const { error, value } = getRecipeListSchema.validate(req.query);
 
-      if (
-        req.query?.includeIngredients &&
-        !validator.isBoolean(includeIngredients)
-      ) {
-        throw new Error('Invalid argument provided');
+      if (error) {
+        throw new Error(error.message);
       }
 
-      const result = await this.recipeService.getAll(
-        req.query?.includeIngredients
-          ? validator.toBoolean(includeIngredients)
-          : false,
-      );
+      const result = await this.recipeService.getAll(value);
+      res.setHeader('x-total-count', result.count);
 
       return res.status(200).json({
-        result,
+        result: result.recipes,
         errors: [],
       });
     } catch (e: any) {

@@ -4,6 +4,7 @@ import { Recipe, RecipeWithIngredients } from '../types/recipe.types';
 import snakeize from 'snakeize';
 // @ts-ignore
 import camelize from 'camelize';
+import { count } from 'console';
 
 export default class RecipeService {
   private db: Knex;
@@ -11,7 +12,15 @@ export default class RecipeService {
     this.db = db;
   }
 
-  async getAll(includeIngredients = false) {
+  async getAll({
+    includeIngredients = false,
+    offset,
+    limit,
+  }: {
+    includeIngredients: boolean;
+    offset: number;
+    limit: number;
+  }) {
     const rawQuery = this.db.raw(`
     (
       select *
@@ -47,11 +56,16 @@ export default class RecipeService {
       ) as recipes) as recipes
   `);
 
-    const found = includeIngredients
-      ? await this.db.select('*').from(rawQuery)
-      : await this.db('recipes').select('*');
+    const recipes = includeIngredients
+      ? await this.db.select('*').from(rawQuery).offset(offset).limit(limit)
+      : await this.db('recipes').select('*').offset(offset).limit(limit);
 
-    return found;
+    const results = includeIngredients
+      ? await this.db.count('*').from(rawQuery)
+      : await this.db.count('*').from('recipes');
+
+    const { count } = <{ count: string }>results[0];
+    return { recipes, count: parseInt(count) };
   }
 
   async insertRecipe(recipeWithIngredients: RecipeWithIngredients) {

@@ -92,15 +92,15 @@ const CartMenu = ({
             Recipes ({recipeList.length})
           </Text>
 
-          {recipeList.map((item: any) => {
+          {recipeList.map((recipe: any) => {
             return (
               <Box
                 p={'0.5rem'}
-                key={item.id}
+                key={recipe.id}
                 fontSize={'1rem'}
                 color="gray.normal"
               >
-                {item.name}
+                {recipe.name}
               </Box>
             );
           })}
@@ -114,10 +114,11 @@ const CartMenu = ({
             Ingredients ({ingredientList.length})
           </Text>
 
-          {ingredientList.map((item: any) => {
+          {ingredientList.map((ingredient: any) => {
             return (
-              <Box p={'0.5rem'} key={item.id} color="gray.normal">
-                £{item.price} - {item.unitQuantity} x {item.name}
+              <Box p={'0.5rem'} key={ingredient.id} color="gray.normal">
+                £{ingredient.price} - {ingredient.unitQuantity} x{' '}
+                {ingredient.name}
               </Box>
             );
           })}

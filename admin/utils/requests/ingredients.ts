@@ -8,7 +8,6 @@ export const insertIngredient = (token: string, ingredient: Ingredient) => {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    credentials: 'include',
     body: JSON.stringify(ingredient),
   }).then(async (res) => {
     const json = await res.json();

@@ -42,7 +42,7 @@ const Recipe = ({
         </Stack>
 
         <Flex alignItems={'center'} justifyContent={'space-between'}>
-          <Text color={'#444444'} fontSize={'1rem'}>
+          <Text color={'gray.dark'} fontSize={'1rem'}>
             £{pricePerServing.toFixed(2)} per serving
           </Text>
 

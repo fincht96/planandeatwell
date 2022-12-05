@@ -314,14 +314,14 @@ const RecipePlan: NextPage = () => {
               content: (
                 <Flex justifyContent={'space-between'} gap={'1rem'}>
                   <Text
-                    color={'#444444'}
+                    color={'gray.dark'}
                     fontSize={{ base: '0.9rem', md: '1rem' }}
                   >
                     {ingredient.unitQuantity}x {ingredient.name}
                   </Text>
 
                   <Text
-                    color={'#444444'}
+                    color={'gray.dark'}
                     fontSize={{ base: '0.9rem', md: '1rem' }}
                   >
                     £{ingredient.price.toFixed(2)}
@@ -364,7 +364,7 @@ const RecipePlan: NextPage = () => {
                 content: (
                   <Flex justifyContent={'space-between'} gap={'1rem'}>
                     <Text
-                      color={'#444444'}
+                      color={'gray.dark'}
                       as={Link}
                       sx={{ textDecoration: 'underline' }}
                       _hover={{ color: 'brand.500' }}
@@ -376,7 +376,7 @@ const RecipePlan: NextPage = () => {
                     </Text>
 
                     <Text
-                      color={'#444444'}
+                      color={'gray.dark'}
                       fontSize={{ base: '0.9rem', md: '1rem' }}
                     >
                       {recipe.servings} servings

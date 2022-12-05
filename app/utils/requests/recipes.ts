@@ -1,5 +1,4 @@
 import camelize from 'camelize-ts';
-// import snakeize from 'snakeize';
 
 export const getRecipes = ({
   includeIngredients,
@@ -30,6 +29,5 @@ export const getRecipes = ({
       recipes: camelize(json.result),
       totalCount: parseInt(totalCount ?? '0'),
     };
-    // return camelize(json.result);
   });
 };

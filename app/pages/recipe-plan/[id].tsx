@@ -17,6 +17,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FiLink2 } from 'react-icons/fi';
+import { MdModeEdit } from 'react-icons/md';
 import Editable from '../../components/Editable';
 import Layout from '../../components/layout';
 import {
@@ -207,7 +208,7 @@ const RecipePlan: NextPage = () => {
             />
           </Box>
 
-          {/* <Button
+          <Button
             bg={'#ffffff'}
             border={'solid 1px'}
             borderColor={'brand.500'}
@@ -238,7 +239,7 @@ const RecipePlan: NextPage = () => {
 
               <Text>Edit meal plan</Text>
             </Flex>
-          </Button> */}
+          </Button>
         </Flex>
 
         <Flex gap={'1rem'} mb={'2rem'}>
@@ -267,30 +268,6 @@ const RecipePlan: NextPage = () => {
               <Text>Copy Link</Text>
             </Flex>
           </Button>
-          {/* <Button
-            bg={'#ffffff'}
-            border={'solid 1px'}
-            borderColor={'#cccccc'}
-            color={'#4d4d4d'}
-            fontSize={{ base: '0.9rem', md: '1rem' }}
-            fontWeight={400}
-            minW={'content'}
-          >
-            <Flex
-              justifyContent={'space-between'}
-              gap={'0.5rem'}
-              alignItems={'center'}
-            >
-              <Icon
-                as={SiMinutemailer}
-                width={{ base: '1.5rem' }}
-                height={{ base: '1.5rem' }}
-                color={'#4d4d4d'}
-              />
-
-              <Text>Email recipe plan</Text>
-            </Flex>
-          </Button> */}
         </Flex>
 
         <Grid

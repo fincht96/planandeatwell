@@ -11,13 +11,13 @@ import CartMenu from './CartMenu';
 export default function MenuSummaryBar({
   currentPrice,
   ingredientList,
-  recipeIdList,
+  recipeList,
   servings,
   onComplete,
 }: {
   currentPrice: number;
   ingredientList: any;
-  recipeIdList: any;
+  recipeList: any;
   servings: any;
   onComplete: any;
 }) {
@@ -40,9 +40,9 @@ export default function MenuSummaryBar({
         <CartMenu
           currentPrice={currentPrice}
           ingredientList={ingredientList}
-          recipeIdList={recipeIdList}
+          recipeList={recipeList}
           servings={servings}
-          disabled={!recipeIdList.length}
+          disabled={!recipeList.length}
         />
 
         <Button
@@ -51,7 +51,7 @@ export default function MenuSummaryBar({
           fontWeight={600}
           ml={'1rem'}
           padding={'1.5rem 1.5rem'}
-          disabled={!recipeIdList.length}
+          disabled={!recipeList.length}
           onClick={onComplete}
         >
           Complete

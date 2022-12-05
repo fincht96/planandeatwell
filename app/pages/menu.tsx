@@ -23,6 +23,7 @@ import Layout from '../components/layout';
 import Recipe from '../components/Recipe';
 import { Event, useEventBus } from '../components/useEventBus';
 import {
+  getRecipePlan,
   insertRecipePlan,
   updateRecipePlan,
 } from '../utils/requests/recipe-plans';
@@ -90,7 +91,7 @@ const SearchMenu = ({ ...props }) => {
 const Menu: NextPage = () => {
   const { subscribe, unsubscribe, post } = useEventBus();
 
-  const limit = 10;
+  const limit = 2;
   const [offset, setOffset] = useState(0);
   const [totalCountRecipes, setTotalCountRecipes] = useState(0);
   const showMore = useMemo(() => {
@@ -100,23 +101,12 @@ const Menu: NextPage = () => {
   }, [offset, limit, totalCountRecipes]);
 
   const router = useRouter();
-  const [recipeBasket, setRecipeBasket] = useState<Array<number>>([]);
+  const [recipeBasket, setRecipeBasket] = useState<Array<any>>([]);
   const [exactIngredientsBasket, setExactIngredientsBasket] = useState<
     Array<Ingredient>
   >([]);
 
   const [recipes, setRecipes] = useState<Array<any>>([]);
-
-  // const recipesHashTable = useMemo(() => {
-  //   const table = recipes.reduce((recipeLookup, recipe) => {
-  //     return {
-  //       ...recipeLookup,
-  //       [recipe.id]: recipe,
-  //     };
-  //   }, {});
-
-  //   return [...new Set(table)];
-  // }, [recipes]);
 
   const ingredientsBasket = useMemo(() => {
     return exactIngredientsBasket.map((ingredient) => {
@@ -153,10 +143,6 @@ const Menu: NextPage = () => {
     },
   });
 
-  // useEffect(() => {
-  //   console.log('recipesLookup', recipesLookup);
-  // }, [recipesLookup]);
-
   const recipesQuery = useQuery(
     ['recipes', offset, limit],
     () =>
@@ -168,48 +154,54 @@ const Menu: NextPage = () => {
     {
       refetchOnMount: 'always',
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
+      staleTime: 0,
       enabled: router.isReady,
       onSuccess: (data: any) => {
         setRecipes((current) => [...current, ...data.recipes]);
         setTotalCountRecipes(data.totalCount);
-        // if (recipePlanUuid) {
-        //   recipePlanQuery.refetch();
-        // }
       },
     },
   );
 
-  // const recipePlanQuery = useQuery({
-  //   queryKey: [`recipePlanQuery-${recipePlanUuid}`],
-  //   queryFn: () => getRecipePlan(recipePlanUuid, false),
-  //   staleTime: Infinity,
-  //   refetchOnMount: 'always',
-  //   enabled: false,
-  //   onSuccess: (data) => {
-  //     const recipeIdList = data[0].recipes.map((recipe) => recipe.id);
-
-  //   },
-  // });
+  const recipePlanQuery = useQuery({
+    queryKey: [`recipePlanQuery`, recipePlanUuid],
+    queryFn: () => getRecipePlan(recipePlanUuid, true),
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
+    enabled: router.isReady && !!recipePlanUuid.length,
+    onSuccess: (data) => {
+      const recipes = data[0].recipes ?? [];
+      const ingredients = data[0].ingredients ?? [];
+      setRecipeBasket(recipes);
+      setExactIngredientsBasket(ingredients);
+    },
+  });
 
   const updateRecipesInBasket = useCallback(
     (recipeId: number) => {
-      const recipeIdInBasket = recipeBasket.includes(recipeId);
+      const recipeInBasket = recipeBasket.find(
+        (recipe) => recipe.id === recipeId,
+      );
 
       post({
-        name: recipeIdInBasket
+        name: recipeInBasket
           ? 'remove-recipe-ingredients'
           : 'add-recipe-ingredients',
         data: `${recipeId}`,
       });
 
-      setRecipeBasket((currentRecipeBasket: Array<number>) => {
-        return recipeIdInBasket
-          ? currentRecipeBasket.filter((basketId) => basketId !== recipeId)
-          : [...currentRecipeBasket, recipeId];
+      const { ingredientsList, ...recipe } = recipes.find(
+        (recipe) => recipe.id === recipeId,
+      );
+
+      setRecipeBasket((currentRecipeBasket: Array<any>) => {
+        return recipeInBasket
+          ? currentRecipeBasket.filter((recipe) => recipe.id !== recipeId)
+          : [...currentRecipeBasket, recipe];
       });
     },
-    [post, recipeBasket],
+    [post, recipeBasket, recipes],
   );
 
   const removeRecipeIngredientsFromBasket = useCallback(
@@ -371,7 +363,9 @@ const Menu: NextPage = () => {
         <SearchMenu mb={'4rem'} />
         <Grid templateColumns="repeat(auto-fill, minMax(275px,1fr));" gap={6}>
           {recipes.map((recipe) => {
-            const recipeInBasket = recipeBasket.includes(recipe.id);
+            const recipeInBasket = recipeBasket
+              .map((recipe) => recipe.id)
+              .includes(recipe.id);
             return (
               <Recipe
                 id={recipe.id}
@@ -393,7 +387,7 @@ const Menu: NextPage = () => {
               onClick={() => {
                 setOffset((current) => current + limit);
               }}
-              mt={10}
+              mt={2}
               colorScheme="brand"
               fontSize={{ base: '0.9rem', md: '1.1rem' }}
               fontWeight={600}
@@ -408,12 +402,12 @@ const Menu: NextPage = () => {
       <MenuSummaryBar
         currentPrice={totalBasketPrice}
         ingredientList={ingredientsBasket}
-        recipeIdList={recipeBasket}
+        recipeList={recipeBasket}
         servings={recipeBasket.length * 4}
         onComplete={() => {
           recipePlanMutation.mutate({
             updateExisting: !!recipePlanUuid,
-            recipeIdList: recipeBasket,
+            recipeIdList: recipeBasket.map((recipe) => recipe.id),
           });
         }}
       />

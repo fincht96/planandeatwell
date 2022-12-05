@@ -12,13 +12,13 @@ import {
 
 const CartMenu = ({
   currentPrice,
-  recipeIdList,
+  recipeList,
   ingredientList,
   servings,
   disabled,
 }: {
   currentPrice: number;
-  recipeIdList: any;
+  recipeList: any;
   ingredientList: any;
   servings: number;
   disabled: boolean;
@@ -89,18 +89,18 @@ const CartMenu = ({
             fontWeight={600}
             textAlign={'center'}
           >
-            Recipes ({recipeIdList.length})
+            Recipes ({recipeList.length})
           </Text>
 
-          {recipeIdList.map((recipeId: any) => {
+          {recipeList.map((recipe: any) => {
             return (
               <Box
                 p={'0.5rem'}
-                key={recipeId}
+                key={recipe.id}
                 fontSize={'1rem'}
                 color="gray.normal"
               >
-                {recipeId}
+                {recipe.name}
               </Box>
             );
           })}

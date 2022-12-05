@@ -91,7 +91,7 @@ const SearchMenu = ({ ...props }) => {
 const Menu: NextPage = () => {
   const { subscribe, unsubscribe, post } = useEventBus();
 
-  const limit = 2;
+  const limit = 10;
   const [offset, setOffset] = useState(0);
   const [totalCountRecipes, setTotalCountRecipes] = useState(0);
   const showMore = useMemo(() => {
@@ -381,7 +381,7 @@ const Menu: NextPage = () => {
           })}
         </Grid>
 
-        {showMore && (
+        {showMore && !!recipes.length && (
           <Flex justifyContent={'center'}>
             <Button
               onClick={() => {

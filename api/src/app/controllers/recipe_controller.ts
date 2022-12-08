@@ -8,7 +8,7 @@ import AppConfig from '../configs/app.config';
 const getRecipeListSchema = Joi.object({
   limit: Joi.number().min(1).max(100).required(),
   offset: Joi.number().min(0).required(),
-  includeIngredients: Joi.bool().required(),
+  includeIngredientsWithRecipes: Joi.bool().required(),
 }).and('limit', 'offset');
 
 const insertRecipeSchema = Joi.object({
@@ -54,7 +54,7 @@ export default class RecipeController {
         throw new Error(error.message);
       }
 
-      const result = await this.recipeService.getAll(value);
+      const result = await this.recipeService.get(value);
       res.setHeader('x-total-count', result.count);
 
       return res.status(200).json({

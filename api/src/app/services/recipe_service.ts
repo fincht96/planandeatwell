@@ -4,7 +4,6 @@ import { Recipe, RecipeWithIngredients } from '../types/recipe.types';
 import snakeize from 'snakeize';
 // @ts-ignore
 import camelize from 'camelize';
-import { count } from 'console';
 
 export default class RecipeService {
   private db: Knex;
@@ -12,14 +11,16 @@ export default class RecipeService {
     this.db = db;
   }
 
-  async getAll({
-    includeIngredients = false,
+  async get({
+    includeIngredientsWithRecipes = false,
     offset,
     limit,
+    recipeIds,
   }: {
-    includeIngredients: boolean;
-    offset: number;
-    limit: number;
+    includeIngredientsWithRecipes: boolean;
+    offset?: number;
+    limit?: number;
+    recipeIds?: Array<number>;
   }) {
     const rawQuery = this.db.raw(`
     (
@@ -28,6 +29,8 @@ export default class RecipeService {
         select 
           recipes.id, 
           recipes.name,
+          recipes.servings,
+          recipes.created_at,
           CAST(recipes.price_per_serving as FLOAT),
           recipes.image_path,
           recipes.link,
@@ -50,19 +53,45 @@ export default class RecipeService {
                 recipe_ingredients.recipe_id = recipes.id
             ) as ingredients
           )  as ingredients_list
-        
-
           from recipes
       ) as recipes) as recipes
   `);
 
-    const recipes = includeIngredients
-      ? await this.db.select('*').from(rawQuery).offset(offset).limit(limit)
-      : await this.db('recipes').select('*').offset(offset).limit(limit);
+    const recipes = await this.db.select('*').modify((queryBuilder) => {
+      if (includeIngredientsWithRecipes) {
+        queryBuilder.from(rawQuery);
+      }
 
-    const results = includeIngredients
-      ? await this.db.count('*').from(rawQuery)
-      : await this.db.count('*').from('recipes');
+      if (!includeIngredientsWithRecipes) {
+        queryBuilder.from('recipes');
+      }
+
+      if (offset) {
+        queryBuilder.offset(offset);
+      }
+
+      if (limit) {
+        queryBuilder.limit(limit);
+      }
+
+      if (recipeIds && recipeIds.length > 0) {
+        queryBuilder.where('recipes.id', 'IN', [...recipeIds]);
+      }
+    });
+
+    const results = await this.db.count('*').modify((queryBuilder) => {
+      if (includeIngredientsWithRecipes) {
+        queryBuilder.from(rawQuery);
+      }
+
+      if (!includeIngredientsWithRecipes) {
+        queryBuilder.from('recipes');
+      }
+
+      if (recipeIds && recipeIds.length > 0) {
+        queryBuilder.where('recipes.id', 'IN', [...recipeIds]);
+      }
+    });
 
     const { count } = <{ count: string }>results[0];
     return { recipes, count: parseInt(count) };

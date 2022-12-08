@@ -143,11 +143,11 @@ const Menu: NextPage = () => {
     },
   });
 
-  const recipesQuery = useQuery(
+  const recipesQuery = useQuery(  // are we no longer using this?
     ['recipes', offset, limit],
     () =>
       getRecipes({
-        includeIngredients: true,
+        includeIngredientsWithRecipes: true,
         offset,
         limit,
       }),
@@ -163,7 +163,7 @@ const Menu: NextPage = () => {
     },
   );
 
-  const recipePlanQuery = useQuery({
+  const recipePlanQuery = useQuery({ // are we no longer using this?
     queryKey: [`recipePlanQuery`, recipePlanUuid],
     queryFn: () => getRecipePlan(recipePlanUuid, true),
     staleTime: 0,

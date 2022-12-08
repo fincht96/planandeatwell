@@ -2,10 +2,11 @@ import camelize from 'camelize-ts';
 
 export const getRecipePlan = (
   recipePlanUuid: string,
-  includeIngredients: boolean = false,
+  includeAggregatedIngredients: boolean = false,
+  includeIngredientsWithRecipes: boolean = false
 ) => {
   return fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/recipe-plan/${recipePlanUuid}?includeIngredients=${includeIngredients}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/recipe-plan/${recipePlanUuid}?includeAggregatedIngredients=${includeAggregatedIngredients}&includeIngredientsWithRecipes=${includeIngredientsWithRecipes}`,
   ).then(async (res) => {
     const json = await res.json();
     if (json?.errors.length) {

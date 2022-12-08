@@ -58,13 +58,7 @@ export default class RecipeService {
   `);
 
     const recipes = await this.db.select('*').modify((queryBuilder) => {
-      if (includeIngredientsWithRecipes) {
-        queryBuilder.from(rawQuery);
-      }
-
-      if (!includeIngredientsWithRecipes) {
-        queryBuilder.from('recipes');
-      }
+      queryBuilder.from(includeIngredientsWithRecipes ? rawQuery : 'recipes');
 
       if (offset) {
         queryBuilder.offset(offset);
@@ -80,13 +74,7 @@ export default class RecipeService {
     });
 
     const results = await this.db.count('*').modify((queryBuilder) => {
-      if (includeIngredientsWithRecipes) {
-        queryBuilder.from(rawQuery);
-      }
-
-      if (!includeIngredientsWithRecipes) {
-        queryBuilder.from('recipes');
-      }
+      queryBuilder.from(includeIngredientsWithRecipes ? rawQuery : 'recipes');
 
       if (recipeIds && recipeIds.length > 0) {
         queryBuilder.where('recipes.id', 'IN', [...recipeIds]);

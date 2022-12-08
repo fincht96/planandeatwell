@@ -143,7 +143,7 @@ const Menu: NextPage = () => {
     },
   });
 
-  const recipesQuery = useQuery(  // are we no longer using this?
+  useQuery( 
     ['recipes', offset, limit],
     () =>
       getRecipes({
@@ -163,14 +163,14 @@ const Menu: NextPage = () => {
     },
   );
 
-  const recipePlanQuery = useQuery({ // are we no longer using this?
+   useQuery({
     queryKey: [`recipePlanQuery`, recipePlanUuid],
     queryFn: () => getRecipePlan(recipePlanUuid, true),
     staleTime: 0,
     refetchOnMount: 'always',
     refetchOnWindowFocus: false,
     enabled: router.isReady && !!recipePlanUuid.length,
-    onSuccess: (data) => {
+    onSuccess: (data: Array<any>) => {
       const recipes = data[0].recipes ?? [];
       const ingredients = data[0].ingredients ?? [];
       setRecipeBasket(recipes);

@@ -1,17 +1,17 @@
 import camelize from 'camelize-ts';
 
 export const getRecipes = ({
-  includeIngredients,
+  includeIngredientsWithRecipes,
   offset,
   limit,
 }: {
-  includeIngredients: boolean;
+  includeIngredientsWithRecipes: boolean;
   offset: number;
   limit: number;
 }) => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/recipes`);
   const params = new URLSearchParams({
-    includeIngredients: includeIngredients.toString(),
+    includeIngredientsWithRecipes: includeIngredientsWithRecipes.toString(),
     offset: offset.toString(),
     limit: limit.toString(),
   });

@@ -37,9 +37,9 @@ export const deleteRecipe = (token: string, id: number) => {
   });
 };
 
-export const getRecipes = (includeIngredients: boolean) => {
+export const getRecipes = (includeIngredientsWithRecipes: boolean) => {
   return fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/recipes?includeIngredients=${includeIngredients}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/recipes?includeIngredientsWithRecipes=${includeIngredientsWithRecipes}`,
   ).then(async (res) => {
     const json = await res.json();
     if (json?.errors.length) {

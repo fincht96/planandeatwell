@@ -4,11 +4,13 @@ import {
   Container,
   Flex,
   FormControl,
+  FormLabel,
   FormErrorMessage,
   Input,
   Stack,
   Text,
   useToast,
+  Select
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
@@ -21,10 +23,12 @@ import {
   getIngredients,
   insertIngredient,
 } from '../utils/requests/ingredients';
+import { getCategories } from '../utils/requests/categories';
 
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/auth-context';
 import { Ingredient } from '../types/ingredient.types';
+import { Category } from '../types/category.types';
 
 const IngredientCard = ({
   ingredient,
@@ -87,6 +91,7 @@ IngredientCard.displayName = 'IngredientCard';
 export default function Ingredients() {
   const { currentUser, idToken, authLoading } = useAuth();
   const [ingredients, setIngredients] = useState<Array<Ingredient>>([]);
+  const [categories, setCategories] = useState<Array<Category>>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
   const router = useRouter();
@@ -102,7 +107,7 @@ export default function Ingredients() {
   useEffect(() => {
     currentUser
       ?.getIdTokenResult()
-      .then((decodedToken) => {
+      .then((decodedToken: any) => {
         if (!decodedToken?.claims?.roles?.includes('admin')) {
           router.push('/login');
         } else {
@@ -129,6 +134,21 @@ export default function Ingredients() {
     },
   );
 
+  const categoriesQuery = useQuery(
+    [`categories`],
+    () => {
+      return getCategories();
+    },
+    {
+      enabled: isReady,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      onSuccess: (data: Array<Category>) => {
+        setCategories(data);
+      },
+    },
+  );
+
   const insertIngredientMutation = useMutation({
     mutationFn: ({ ingredient }: { ingredient: Ingredient }) => {
       return insertIngredient(idToken, ingredient);
@@ -146,11 +166,11 @@ export default function Ingredients() {
       reset();
       ingredientsQuery.refetch();
     },
-    onError: (error) => {
+    onError: (error: string) => {
       toast({
         position: 'top',
         title: 'Error!',
-        description: 'An error occurred inserting ingredient',
+        description: `An error occurred inserting ingredient: ${error}`,
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -176,11 +196,11 @@ export default function Ingredients() {
         isClosable: true,
       });
     },
-    onError: (error) => {
+    onError: (error: string) => {
       toast({
         position: 'top',
         title: 'Error!',
-        description: 'An error occurred deleting ingredient',
+        description: `An error occurred deleting ingredient: ${error}`,
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -207,7 +227,7 @@ export default function Ingredients() {
   } = useForm();
 
   // submit ingredient
-  const onSubmit = (data) => {
+  const onSubmit = (data: any): void => {
     insertIngredientMutation.mutate({ ingredient: data });
   };
 
@@ -229,7 +249,7 @@ export default function Ingredients() {
                 <Box flex={2}>
                   <Stack spacing={'1rem'} maxW={'30rem'} mb={'2rem'}>
                     <FormControl isInvalid={!!errors.name}>
-                      <Text>Name</Text>
+                      <FormLabel>Name</FormLabel>
                       <Input
                         variant="outline"
                         autoComplete="off"
@@ -249,7 +269,7 @@ export default function Ingredients() {
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.pricePerUnit}>
-                      <Text>Price per unit</Text>
+                      <FormLabel>Price per unit</FormLabel>
                       <Input
                         variant="outline"
                         autoComplete="off"
@@ -258,7 +278,7 @@ export default function Ingredients() {
                         type={'number'}
                         step="any"
                         {...register('pricePerUnit', {
-                          required: 'pricePerUnit is required',
+                          required: 'Price per unit is required',
                           max: {
                             value: 100,
                             message: 'Max price is 100',
@@ -277,7 +297,7 @@ export default function Ingredients() {
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.productId}>
-                      <Text>Product id</Text>
+                      <FormLabel>Product id</FormLabel>
                       <Input
                         variant="outline"
                         autoComplete="off"
@@ -296,6 +316,30 @@ export default function Ingredients() {
                       />
                       <FormErrorMessage>
                         {errors.productId && `${errors?.productId.message}`}
+                      </FormErrorMessage>
+                    </FormControl>
+
+                    <FormControl isInvalid={!!errors.categoryId}>
+                      <FormLabel>Category name</FormLabel>
+                        <Select 
+                          autoComplete="off"
+                          id={'categoryId'}
+                          placeholder='Select category name' 
+                          variant='outline' bg={'#ffffff'} 
+                          {...register("categoryId", {
+                            required: 'Category name is required',
+                            valueAsNumber: true,
+                          })}>
+                          {
+                            categories.map((category) => {
+                              return (
+                                <option key={category.id} value={category.id}>{category.name}</option>
+                              )
+                            })
+                          }
+                        </Select>
+                      <FormErrorMessage>
+                        {errors.categoryId && `${errors?.categoryId.message}`}
                       </FormErrorMessage>
                     </FormControl>
                   </Stack>

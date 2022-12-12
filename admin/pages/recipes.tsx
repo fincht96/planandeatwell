@@ -155,7 +155,7 @@ export default function Recipes() {
   useEffect(() => {
     currentUser
       ?.getIdTokenResult()
-      .then((decodedToken) => {
+      .then((decodedToken: any) => {
         if (!decodedToken?.claims?.roles?.includes('admin')) {
           router.push('/login');
         } else {
@@ -184,11 +184,11 @@ export default function Recipes() {
       const namedFile = new File([file], filename, { type: contentType });
       imageUploadMutation.mutate({ url, body: namedFile });
     },
-    onError: (err: any) => {
+    onError: (error: string) => {
       toast({
         position: 'top',
         title: 'Error!',
-        description: 'An error occurred creating signed upload url',
+        description: `An error occurred creating signed upload url: ${error}`,
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -214,11 +214,11 @@ export default function Recipes() {
         },
       });
     },
-    onError: (error) => {
+    onError: (error: string) => {
       toast({
         position: 'top',
         title: 'Error!',
-        description: 'An error occurred uploading image',
+        description: `An error occurred uploading image: ${error}`,
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -245,11 +245,11 @@ export default function Recipes() {
       setIngredients([]);
       recipesQuery.refetch();
     },
-    onError: (error) => {
+    onError: (error: string) => {
       toast({
         position: 'top',
         title: 'Error!',
-        description: 'An error occurred inserting recipe',
+        description: `An error occurred inserting recipe: ${error}`,
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -284,11 +284,11 @@ export default function Recipes() {
         isClosable: true,
       });
     },
-    onError: (error) => {
+    onError: (error: string) => {
       toast({
         position: 'top',
         title: 'Error!',
-        description: 'An error occurred deleting recipe',
+        description: `An error occurred deleting recipe: ${error}`,
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -317,7 +317,7 @@ export default function Recipes() {
   );
 
   // submit recipe
-  const onSubmit = (data) => {
+  const onSubmit = (data: any): void => {
     const ingredientsFull = data.ingredients.map((ingredient, index) => {
       return {
         ...ingredient,

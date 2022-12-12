@@ -28,21 +28,13 @@ import {
   updateRecipePlan,
 } from '../utils/requests/recipe-plans';
 import { getRecipes } from '../utils/requests/recipes';
-
+import { IngredientDecorated } from '../types/ingredientDecorated.types';
 import { IoOptions } from 'react-icons/io5';
 import MenuSummaryBar from '../components/MenuSummaryBar';
 
 const roundTo2dp = (val: number) => {
   return Math.round(val * 100) / 100;
 };
-
-interface Ingredient {
-  id: number;
-  name: string;
-  pricePerUnit: number;
-  unitQuantity: number;
-  price?: number;
-}
 
 const SearchMenu = ({ ...props }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -103,7 +95,7 @@ const Menu: NextPage = () => {
   const router = useRouter();
   const [recipeBasket, setRecipeBasket] = useState<Array<any>>([]);
   const [exactIngredientsBasket, setExactIngredientsBasket] = useState<
-    Array<Ingredient>
+    Array<IngredientDecorated>
   >([]);
 
   const [recipes, setRecipes] = useState<Array<any>>([]);
@@ -215,7 +207,7 @@ const Menu: NextPage = () => {
       const newExactIngredientsBasket = exactIngredientsBasket.reduce(
         (newExactIngredientsBasket, basketIngredient) => {
           const ingredientToRemove = ingredientsToRemove.find(
-            (ingredient: Ingredient) => ingredient.id === basketIngredient.id,
+            (ingredient: IngredientDecorated) => ingredient.id === basketIngredient.id,
           );
 
           if (ingredientToRemove) {
@@ -232,7 +224,7 @@ const Menu: NextPage = () => {
 
           return [...newExactIngredientsBasket, { ...basketIngredient }];
         },
-        Array<Ingredient>(),
+        Array<IngredientDecorated>(),
       );
 
       setExactIngredientsBasket(newExactIngredientsBasket);
@@ -243,7 +235,7 @@ const Menu: NextPage = () => {
   const addRecipeIngredientsToBasket = useCallback(
     (recipeId: number) => {
       // get recipe ingredients to be added
-      const ingredientsToAdd = recipes.find(
+      const ingredientsToAdd: Array<IngredientDecorated> = recipes.find(
         (recipe) => recipe.id === recipeId,
       )?.ingredientsList;
 

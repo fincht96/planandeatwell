@@ -4,14 +4,7 @@ import { Ingredient } from '../types/ingredient.types';
 import snakeize from 'snakeize';
 // @ts-ignore
 import camelize from 'camelize';
-
-const toSnakeCase = (str: string) => {
-  const res = str
-    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
-    ?.map((x) => x.toLowerCase())
-    .join('_');
-  return res ?? '';
-};
+import { toSnakeCase } from '../utils/convertToSnakeCase';
 
 export default class IngredientsService {
   private db: Knex;
@@ -81,10 +74,10 @@ export default class IngredientsService {
     // convert recipe to snake case
     const ingredientSnake = snakeize(ingredient);
     return await this.db.transaction(async (trx) => {
-      const { name, price_per_unit, product_id } = ingredientSnake;
+      const { name, price_per_unit, product_id, category_id } = ingredientSnake;
       // insert ingredient
       const result = await this.db('ingredients')
-        .insert({ name, price_per_unit, product_id }, ['*'])
+        .insert({ name, price_per_unit, product_id, category_id }, ['*'])
         .transacting(trx);
       return camelize(result[0]);
     });

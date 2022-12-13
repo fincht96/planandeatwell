@@ -21,6 +21,6 @@ Relevant material for working with knex migrations: https://gist.github.com/Nige
 
 -------------------------------------------------------------------------------------------------------------------------
 # How to connect to db in prod 
-1. Use this url: postgres://<postgresusername>:<postgrespassword>@<vps_ip>:15291/planandeatwell_pgdb_prod
+1. Use this url: postgres://<postgresusername>:<postgrespassword>@<vps_ip>:<vps_port>/planandeatwell_pgdb_prod
 2. where <postgresusername> and <postgrespassword> can be found on the dokku container and <vps_ip> is the IP address of the dokku container
 3. dokku postgres:link planandeatwell_pgdb_prod planandeatwell_api_prod

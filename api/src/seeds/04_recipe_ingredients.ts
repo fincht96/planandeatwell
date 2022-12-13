@@ -6,7 +6,7 @@ export async function seed(knex: Knex): Promise<void> {
   await knex.raw('ALTER SEQUENCE recipe_ingredients_id_seq RESTART WITH 1');
 
   // Inserts seed entries
-  const res = await knex('recipe_ingredients').insert([
+  await knex('recipe_ingredients').insert([
     // recipe 1
     {
       recipe_id: 1,

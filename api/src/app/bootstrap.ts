@@ -26,7 +26,8 @@ export default class Bootstrap {
       const environment = this.instance.resolve('appConfig').environment;
 
       if (environment === 'development') {
-        await this.instance.resolve('db').migrate.latest();
+        // leaving this commented out for now as the default should be manual migration to latest as opposed to automated with every server refresh
+        // await this.instance.resolve('db').migrate.latest();
       }
 
       await this.instance.resolve('mailer').init();

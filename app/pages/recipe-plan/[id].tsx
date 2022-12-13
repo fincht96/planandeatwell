@@ -26,6 +26,8 @@ import {
   updateRecipePlan,
 } from '../../utils/requests/recipe-plans';
 import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
+import { groupObjects } from '../../utils/groupObjects';
+import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 
 const ContentBox = ({
   title,
@@ -124,17 +126,12 @@ const RecipePlan: NextPage = () => {
       : [];
   }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
 
-  const ingredients: Array<{
-    id: number;
-    name: string;
-    price: number;
-    unitQuantity: number;
-  }> = useMemo(() => {
+  const ingredients: Array<IngredientDecorated> = useMemo(() => {
     return !recipeQuery.isLoading && !recipeQuery.error
-      ? recipeQuery.data[0].ingredients.map((ing) => {
-          const unitQuantity = Math.ceil(ing.unitQuantity);
-          const price = ing.pricePerUnit * unitQuantity;
-          return { ...ing, unitQuantity, price };
+      ? recipeQuery.data[0].ingredients.map((ingredient: IngredientDecorated) => {
+          const unitQuantity = Math.ceil(ingredient.unitQuantity);
+          const price = ingredient.pricePerUnit * unitQuantity;
+          return { ...ingredient, unitQuantity, price };
         })
       : [];
   }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
@@ -196,7 +193,6 @@ const RecipePlan: NextPage = () => {
             >
               {ingredient.unitQuantity}x {ingredient.name}
             </Text>
-  
             <Text
               color={'gray.dark'}
               fontSize={{ base: '0.9rem', md: '1rem' }}
@@ -246,9 +242,48 @@ const RecipePlan: NextPage = () => {
       });
     }
 
-    // if (ingredientView === 'CATEGORY') {
-    //   //group by category
-    // }
+    if (ingredientView === 'CATEGORY') {
+      const ingredientsGroupedByCategoryArray = groupObjects(ingredients, 'categoryName');
+
+      return ingredientsGroupedByCategoryArray.map(([categoryName, groupedIngredients]) => {
+        return {
+          id: categoryName,
+          content: (
+            <Flex justifyContent={'space-between'} gap={'1rem'}>
+              <Text
+                color={'gray.dark'}
+                fontSize={{ base: '0.9rem', md: '1rem' }}
+                as='b'
+              >
+                {categoryName} 
+              </Text>
+            </Flex>
+          ),
+          subContent: (
+            <Flex flexDirection={'column'} gap={'1rem'} >
+              {groupedIngredients.map((ingredient: IngredientDecorated) => {
+                return (
+                  <Flex key={ingredient.id} justifyContent={'space-between'}>
+                    <Text
+                      color={'gray.dark'}
+                      fontSize={{ base: '0.9rem', md: '1rem' }}
+                      >
+                      {ingredient.unitQuantity}x {ingredient.name}
+                    </Text>
+                    <Text
+                      color={'gray.dark'}
+                      fontSize={{ base: '0.9rem', md: '1rem' }}
+                    >
+                      £{ingredient.price.toFixed(2)}
+                  </Text>
+                </Flex>
+                )
+              })}
+            </Flex>
+          )
+        }
+      });
+    }
   }
 
   const handleSelectChange = (event: any) => {

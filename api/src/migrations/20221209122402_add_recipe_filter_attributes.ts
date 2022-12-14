@@ -3,12 +3,12 @@ import { Knex } from 'knex';
 export async function up(knex: Knex): Promise<void> {
   return knex.raw(`
         -- meal_type column
-        CREATE TYPE MEAL AS ENUM ('breakfast','brunch', 'lunch', 'dinner', 'dessert', 'sides');
+        CREATE TYPE MEAL AS ENUM ('breakfast', 'brunch', 'lunch', 'dinner', 'dessert', 'sides');
         ALTER TABLE recipes 
         ADD meal_type MEAL[];
 
         -- lifestyle_type column
-        CREATE TYPE LIFESTYLE AS ENUM ('vegetarian','vegan', 'meat', 'pescatarian');
+        CREATE TYPE LIFESTYLE AS ENUM ('vegetarian', 'vegan', 'meat', 'pescatarian');
         ALTER TABLE recipes 
         ADD lifestyle_type LIFESTYLE[];
 

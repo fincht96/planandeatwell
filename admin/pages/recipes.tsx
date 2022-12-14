@@ -20,15 +20,23 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
 import Layout from '../components/layout';
 import IngredientsSearchModal from '../components/modal/IngredientsSearchModal';
+import FilterCheckBox from '../components/recipes/FilterCheckBox';
 import { useAuth } from '../contexts/auth-context';
 import { RecipeWithIngredients } from '../types/recipe.types';
-import { calcPricePerServing } from '../utils/price-per-serving';
+import { calcPricePerServing } from '../utils/calcPricePerServing';
+import { convertBoolObjToStringArray } from '../utils/convertBoolObjToStringArray';
+import {
+  freeFromDefaults,
+  lifestyleDefaults,
+  mealDefaults,
+} from '../utils/filterDefaults';
 import {
   deleteRecipe,
   getRecipes,
   insertRecipe,
 } from '../utils/requests/recipes';
 import { getSignedUploadUrl } from '../utils/requests/storage';
+import { toTitleCase } from '../utils/toTitleCase';
 
 const IngredientCard = React.forwardRef<any>(
   ({ ingredient, id, onChange, name, onDelete }, ref) => {
@@ -138,13 +146,18 @@ export default function Recipes() {
   const [filename, setFilename] = useState<string>('');
   const [contentType, setContentType] = useState<string>('');
   const [recipe, setRecipe] = useState<any>();
+  const [offset, setOffset] = useState(0);
+  const [totalCountRecipes, setTotalCountRecipes] = useState(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isReady, setIsReady] = useState(false);
   const toast = useToast();
   const { currentUser, idToken, authLoading } = useAuth();
   const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const limit = 10;
+  const showMore = recipes.length < totalCountRecipes;
 
-  const [isReady, setIsReady] = useState(false);
+  console.log('showMore', showMore);
 
   useEffect(() => {
     if (!authLoading && !currentUser) {
@@ -257,14 +270,29 @@ export default function Recipes() {
     },
   });
 
-  const recipesQuery = useQuery(['recipes'], () => getRecipes(false), {
-    enabled: isReady,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: false,
-    onSuccess: (data: any) => {
-      setRecipes(data);
+  const recipesQuery = useQuery(
+    ['recipes', offset, limit],
+    () =>
+      getRecipes({
+        includeIngredients: false,
+        offset,
+        limit,
+      }),
+    {
+      enabled: isReady,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      onSuccess: (data: any) => {
+        setRecipes((current) => {
+          if (offset === 0) {
+            return data.recipes;
+          }
+          return [...current, ...data.recipes];
+        });
+        setTotalCountRecipes(data.totalCount);
+      },
     },
-  });
+  );
 
   const deleteRecipeMutation = useMutation({
     mutationFn: ({ recipeId }: { recipeId: number }) => {
@@ -274,6 +302,8 @@ export default function Recipes() {
       setRecipes((current) => {
         return current.filter((recipe) => recipe.id !== res.id);
       });
+
+      setTotalCountRecipes((current) => current - 1);
 
       toast({
         position: 'top',
@@ -306,6 +336,7 @@ export default function Recipes() {
     getValues,
     reset,
     setValue,
+    setError,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm();
 
@@ -318,6 +349,10 @@ export default function Recipes() {
 
   // submit recipe
   const onSubmit = (data) => {
+    const meals = convertBoolObjToStringArray(data.meals);
+    const lifestyles = convertBoolObjToStringArray(data.lifestyles);
+    const freeFroms = convertBoolObjToStringArray(data.freeFroms);
+
     const ingredientsFull = data.ingredients.map((ingredient, index) => {
       return {
         ...ingredient,
@@ -328,8 +363,11 @@ export default function Recipes() {
     const pricePerServing = calcPricePerServing(ingredientsFull, data.servings);
     const { file, ...newRecipe }: { file: any } = {
       ...data,
+      meals,
+      lifestyles,
+      freeFroms,
       pricePerServing,
-      ingredients: ingredientsFull.map((ingredient, index) => {
+      ingredients: ingredientsFull.map((ingredient) => {
         const { id, unitQuantity } = ingredient;
         return {
           id,
@@ -518,6 +556,61 @@ export default function Recipes() {
                       </Box>
                     </Stack>
 
+                    <Box>
+                      <Text>Meal type</Text>
+                      <Flex flexWrap={'wrap'}>
+                        {Object.keys(mealDefaults.meals).map((meal: string) => {
+                          return (
+                            <FilterCheckBox
+                              key={meal}
+                              label={toTitleCase(meal)}
+                              id={meal}
+                              isChecked={watch(`meals.${meal}`)}
+                              {...register(`meals.${meal}`)}
+                            />
+                          );
+                        })}
+                      </Flex>
+                    </Box>
+
+                    <Box>
+                      <Text>Lifestyle type</Text>
+                      <Flex flexWrap={'wrap'}>
+                        {Object.keys(lifestyleDefaults.lifestyles).map(
+                          (lifestyle: string) => {
+                            return (
+                              <FilterCheckBox
+                                key={lifestyle}
+                                label={toTitleCase(lifestyle)}
+                                id={lifestyle}
+                                isChecked={watch(`lifestyles.${lifestyle}`)}
+                                {...register(`lifestyles.${lifestyle}`)}
+                              />
+                            );
+                          },
+                        )}
+                      </Flex>
+                    </Box>
+
+                    <Box>
+                      <Text>Free From type</Text>
+                      <Flex flexWrap={'wrap'}>
+                        {Object.keys(freeFromDefaults.freeFroms).map(
+                          (freeFrom: string) => {
+                            return (
+                              <FilterCheckBox
+                                key={freeFrom}
+                                label={toTitleCase(freeFrom)}
+                                id={freeFrom}
+                                isChecked={watch(`freeFroms.${freeFrom}`)}
+                                {...register(`freeFroms.${freeFrom}`)}
+                              />
+                            );
+                          },
+                        )}
+                      </Flex>
+                    </Box>
+
                     <Stack>
                       <Text fontSize={'2xl'} color={'#4D4D4D'} mb={'1rem'}>
                         Ingredients({ingredients.length})
@@ -605,6 +698,23 @@ export default function Recipes() {
                     </Stack>
                   </Box>
                 </Flex>
+
+                {showMore && !!recipes.length && (
+                  <Flex justifyContent={'center'}>
+                    <Button
+                      onClick={() => {
+                        setOffset((current) => current + limit);
+                      }}
+                      mt={2}
+                      colorScheme="brand"
+                      fontSize={{ base: '0.9rem', md: '1.1rem' }}
+                      fontWeight={600}
+                      padding={'1.5rem 1rem'}
+                    >
+                      Show more
+                    </Button>
+                  </Flex>
+                )}
               </Box>
             </Container>
           </>

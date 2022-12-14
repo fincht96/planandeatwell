@@ -38,14 +38,14 @@ export const deleteRecipe = (token: string, id: number) => {
 };
 
 export const getRecipes = ({
-  includeIngredients,
+  includeIngredientsWithRecipes,
   offset,
   limit,
   meals,
   lifestyles,
   freeFroms,
 }: {
-  includeIngredients: boolean;
+  includeIngredientsWithRecipes: boolean;
   offset: number;
   limit: number;
   meals?: string | undefined;
@@ -54,7 +54,7 @@ export const getRecipes = ({
 }) => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/recipes`);
   const params = new URLSearchParams({
-    includeIngredients: includeIngredients.toString(),
+    includeIngredientsWithRecipes: includeIngredientsWithRecipes.toString(),
     offset: offset.toString(),
     limit: limit.toString(),
     ...(meals && { meals }),

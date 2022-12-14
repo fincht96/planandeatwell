@@ -10,7 +10,6 @@ import MenuSummaryBar from '../components/MenuSummaryBar';
 import Recipe from '../components/Recipe';
 import { useEventBus } from '../hooks/useEventBus';
 import { Event } from '../types/eventBus.types';
-import { Ingredient } from '../types/ingredient.types';
 import { Order, OrderBy, SortBy } from '../types/order.types';
 import {
   queryParamToString,
@@ -24,6 +23,8 @@ import {
 import { getRecipes } from '../utils/requests/recipes';
 import { roundTo2dp } from '../utils/roundTo2dp';
 import { orderToSortBy, sortByToOrder } from '../utils/sortByConversions';
+
+import { IngredientDecorated } from '../types/ingredientDecorated.types';
 
 const Menu: NextPage = () => {
   const { subscribe, unsubscribe, post } = useEventBus();
@@ -55,7 +56,7 @@ const Menu: NextPage = () => {
   const [totalCountRecipes, setTotalCountRecipes] = useState(0);
   const [recipeBasket, setRecipeBasket] = useState<Array<any>>([]);
   const [exactIngredientsBasket, setExactIngredientsBasket] = useState<
-    Array<Ingredient>
+    Array<IngredientDecorated>
   >([]);
   const ingredientsBasket = useMemo(() => {
     return exactIngredientsBasket.map((ingredient) => {
@@ -107,7 +108,8 @@ const Menu: NextPage = () => {
       const newExactIngredientsBasket = exactIngredientsBasket.reduce(
         (newExactIngredientsBasket, basketIngredient) => {
           const ingredientToRemove = ingredientsToRemove.find(
-            (ingredient: Ingredient) => ingredient.id === basketIngredient.id,
+            (ingredient: IngredientDecorated) =>
+              ingredient.id === basketIngredient.id,
           );
 
           if (ingredientToRemove) {
@@ -124,7 +126,7 @@ const Menu: NextPage = () => {
 
           return [...newExactIngredientsBasket, { ...basketIngredient }];
         },
-        Array<Ingredient>(),
+        Array<IngredientDecorated>(),
       );
 
       setExactIngredientsBasket(newExactIngredientsBasket);
@@ -135,7 +137,7 @@ const Menu: NextPage = () => {
   const addRecipeIngredientsToBasket = useCallback(
     (recipeId: number) => {
       // get recipe ingredients to be added
-      const ingredientsToAdd = recipes.find(
+      const ingredientsToAdd: Array<IngredientDecorated> = recipes.find(
         (recipe) => recipe.id === recipeId,
       )?.ingredientsList;
 
@@ -216,7 +218,7 @@ const Menu: NextPage = () => {
         searchTerm,
       } = recipeQueryParams;
       return getRecipes({
-        includeIngredients: true,
+        includeIngredientsWithRecipes: true,
         offset,
         limit,
         meals: meals.toString(),

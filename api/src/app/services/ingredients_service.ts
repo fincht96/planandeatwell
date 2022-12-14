@@ -74,10 +74,10 @@ export default class IngredientsService {
     // convert recipe to snake case
     const ingredientSnake = snakeize(ingredient);
     return await this.db.transaction(async (trx) => {
-      const { name, price_per_unit, product_id } = ingredientSnake;
+      const { name, price_per_unit, product_id, category_id } = ingredientSnake;
       // insert ingredient
       const result = await this.db('ingredients')
-        .insert({ name, price_per_unit, product_id }, ['*'])
+        .insert({ name, price_per_unit, product_id, category_id }, ['*'])
         .transacting(trx);
       return camelize(result[0]);
     });

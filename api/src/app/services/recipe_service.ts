@@ -13,6 +13,15 @@ export default class RecipeService {
     this.db = db;
   }
 
+  private matchingRecipeIds =
+    ({ recipeIds }: { recipeIds: Array<number> }) =>
+    (queryBuilder: Knex.QueryBuilder) => {
+      if (recipeIds.length) {
+        queryBuilder.where('recipes.id', 'IN', [...recipeIds]);
+      }
+      return queryBuilder;
+    };
+
   private recipeQueryFilters =
     ({
       meals,
@@ -81,7 +90,7 @@ export default class RecipeService {
       return queryBuilder;
     };
 
-  private getRecipesQuery = (includeIngredients: boolean) => {
+  private getRecipesQuery = (includeIngredientsWithRecipes: boolean) => {
     const rawQuery = this.db.raw(`
     (
       select *
@@ -89,13 +98,14 @@ export default class RecipeService {
         select 
           recipes.id, 
           recipes.name,
+          recipes.servings,
+          recipes.created_at,
           CAST(recipes.price_per_serving as FLOAT),
           recipes.image_path,
           recipes.link,
           recipes.meal_type,
           recipes.lifestyle_type,
           recipes.free_from_type,
-          recipes.created_at,
           (
             select 
               json_agg(ingredients) 
@@ -118,33 +128,40 @@ export default class RecipeService {
           from recipes
       ) as recipes) as recipes
   `);
-    return this.db.select('*').from(includeIngredients ? rawQuery : 'recipes');
+    return this.db
+      .select('*')
+      .from(includeIngredientsWithRecipes ? rawQuery : 'recipes');
   };
 
-  async getAll({
-    includeIngredients = false,
-    offset,
-    limit,
-    meals,
-    lifestyles,
-    freeFroms,
+  async get({
+    includeIngredientsWithRecipes = false,
+    offset = 0,
+    limit = 10,
+    meals = [],
+    lifestyles = [],
+    freeFroms = [],
     order = 'any',
     orderBy = 'relevance',
     searchTerm = '',
+    recipeIds = [],
   }: {
-    includeIngredients: boolean;
-    offset: number;
-    limit: number;
-    meals: Array<
+    includeIngredientsWithRecipes: boolean;
+    offset?: number;
+    limit?: number;
+    meals?: Array<
       'breakfast' | 'brunch' | 'lunch' | 'dinner' | 'sides' | 'dessert'
     >;
-    lifestyles: Array<'vegetarian' | 'vegan' | 'meat' | 'pescatarian'>;
-    freeFroms: Array<'dairyFree' | 'glutenFree'>;
-    order: 'asc' | 'desc' | 'any';
-    orderBy: 'relevance' | 'price' | 'createdAt';
-    searchTerm: string;
+    lifestyles?: Array<'vegetarian' | 'vegan' | 'meat' | 'pescatarian'>;
+    freeFroms?: Array<'dairyFree' | 'glutenFree'>;
+    order?: 'asc' | 'desc' | 'any';
+    orderBy?: 'relevance' | 'price' | 'createdAt';
+    searchTerm?: string;
+    recipeIds?: Array<number>;
   }) {
-    const recipesQueryBuilder = this.getRecipesQuery(includeIngredients)
+    const recipesQueryBuilder = this.getRecipesQuery(
+      includeIngredientsWithRecipes,
+    )
+      .modify(this.matchingRecipeIds({ recipeIds }))
       .modify(
         this.recipeQueryFilters({
           meals,
@@ -169,6 +186,7 @@ export default class RecipeService {
     const countBuilder = this.db
       .count('*')
       .from('recipes')
+      .modify(this.matchingRecipeIds({ recipeIds }))
       .modify(
         this.recipeQueryFilters({
           meals,

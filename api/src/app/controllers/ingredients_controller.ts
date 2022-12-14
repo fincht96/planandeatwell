@@ -12,7 +12,8 @@ const insertIngredientSchema = Joi.object({
   name: Joi.string().max(200).required(),
   pricePerUnit: Joi.number().min(0).max(100).required(),
   productId: Joi.number().min(0).required(),
-}).and('name', 'pricePerUnit', 'productId');
+  categoryId: Joi.number().min(1).required(),
+}).and('name', 'pricePerUnit', 'productId', 'categoryId');
 
 const getIngredientsSchema = Joi.object({
   orderBy: Joi.string().valid('createdAt'),

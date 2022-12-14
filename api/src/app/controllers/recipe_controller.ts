@@ -8,7 +8,7 @@ import AppConfig from '../configs/app.config';
 const getRecipeListSchema = Joi.object({
   limit: Joi.number().min(1).max(100).required(),
   offset: Joi.number().min(0).required(),
-  includeIngredients: Joi.bool().required(),
+  includeIngredientsWithRecipes: Joi.bool().required(),
   meals: Joi.array().items(
     Joi.string().valid(
       'breakfast',
@@ -26,6 +26,7 @@ const getRecipeListSchema = Joi.object({
   order: Joi.string().valid('asc', 'desc', 'any'),
   orderBy: Joi.string().valid('relevance', 'price', 'createdAt'),
   searchTerm: Joi.string().min(2).max(200),
+  recipeIds: Joi.array().items(Joi.number()),
 })
   .and('limit', 'offset')
   .and('order', 'orderBy');
@@ -111,7 +112,7 @@ export default class RecipeController {
         throw new Error(error.message);
       }
 
-      const result = await this.recipeService.getAll(value);
+      const result = await this.recipeService.get(value);
       res.setHeader('x-total-count', result.count);
 
       return res.status(200).json({

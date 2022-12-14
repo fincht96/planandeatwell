@@ -13,6 +13,11 @@ const updateRecipePlanSchema = Joi.object({
   recipeIdList: Joi.array().items(Joi.number()).min(1),
 }).or('name', 'recipeIdList');
 
+const getRecipePlanQuerySchema = Joi.object({
+  includeAggregatedIngredients: Joi.boolean().required(),
+  includeIngredientsWithRecipes: Joi.boolean().required(),
+});
+
 export default class RecipePlanController {
   constructor(
     private readonly recipePlanService: RecipePlanService,
@@ -21,27 +26,25 @@ export default class RecipePlanController {
 
   async getRecipePlan(req: Request, res: Response) {
     try {
+      const { error, value } = getRecipePlanQuerySchema.validate(req.query);
+      const { includeAggregatedIngredients, includeIngredientsWithRecipes } =
+        value;
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
       // validate params
       const recipePlanUuid = req.params.id + '';
-      const includeIngredients = req.query.includeIngredients + '';
 
       if (!validator.isUUID(recipePlanUuid)) {
         throw new Error('Invalid recipe plan UUID argument');
       }
 
-      if (
-        req.query?.includeIngredients &&
-        !validator.isBoolean(includeIngredients)
-      ) {
-        throw new Error('Invalid argument provided');
-      }
-
-      // get all recipes and optional ingredients
       const plan = await this.recipePlanService.getPlan(
         recipePlanUuid,
-        req.query?.includeIngredients
-          ? validator.toBoolean(includeIngredients)
-          : false,
+        includeAggregatedIngredients,
+        includeIngredientsWithRecipes,
       );
 
       return res.status(200).json({
@@ -95,7 +98,6 @@ export default class RecipePlanController {
     try {
       // validate params
       const recipePlanUuid = req.params.id + '';
-      // const includeIngredients = req.query.includeIngredients + '';
 
       if (!validator.isUUID(recipePlanUuid)) {
         throw new Error('Invalid recipe plan UUID argument');

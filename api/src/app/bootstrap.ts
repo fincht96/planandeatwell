@@ -23,11 +23,10 @@ export default class Bootstrap {
 
   async run(callback: any) {
     try {
-      const environment = this.instance.resolve('appConfig').environment;
-
-      if (environment === 'development') {
-        await this.instance.resolve('db').migrate.latest();
-      }
+      // const environment = this.instance.resolve('appConfig').environment;
+      // if (environment === 'development') {
+      //   await this.instance.resolve('db').migrate.latest();
+      // }
 
       await this.instance.resolve('mailer').init();
 

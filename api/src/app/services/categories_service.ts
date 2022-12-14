@@ -1,5 +1,5 @@
 import { Knex } from 'knex';
-import { toSnakeCase } from '../utils/convertToSnakeCase';
+import { toSnakeCase } from '../utils/toSnakeCase';
 
 export default class CategoriesService {
   private db: Knex;

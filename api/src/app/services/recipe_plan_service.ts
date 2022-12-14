@@ -110,13 +110,12 @@ export default class RecipePlanService {
         .select('recipe_id')
         .where('recipe_plan_id', planId);
 
-      const recipeIdsForMealPlan = response.map((r) => r.recipe_id);
+      const recipeIdsForMealPlan = response.map((r) => parseInt(r.recipe_id));
 
       const {
         recipes,
       }: {
         recipes: Array<any>;
-        count: number;
       } = await this.recipeService.get({
         includeIngredientsWithRecipes,
         recipeIds: recipeIdsForMealPlan,

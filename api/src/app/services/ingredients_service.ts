@@ -4,7 +4,7 @@ import { Ingredient } from '../types/ingredient.types';
 import snakeize from 'snakeize';
 // @ts-ignore
 import camelize from 'camelize';
-import { toSnakeCase } from '../utils/convertToSnakeCase';
+import { toSnakeCase } from '../utils/toSnakeCase';
 
 export default class IngredientsService {
   private db: Knex;

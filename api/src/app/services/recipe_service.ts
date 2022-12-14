@@ -4,6 +4,8 @@ import { Recipe, RecipeWithIngredients } from '../types/recipe.types';
 import snakeize from 'snakeize';
 // @ts-ignore
 import camelize from 'camelize';
+import { toSnakeCase } from '../utils/toSnakeCase';
+import { orderByToRecipeColumn } from '../utils/orderByToRecipeColumn';
 
 export default class RecipeService {
   private db: Knex;
@@ -11,17 +13,84 @@ export default class RecipeService {
     this.db = db;
   }
 
-  async get({
-    includeIngredientsWithRecipes = false,
-    offset,
-    limit,
-    recipeIds,
-  }: {
-    includeIngredientsWithRecipes: boolean;
-    offset?: number;
-    limit?: number;
-    recipeIds?: Array<number>;
-  }) {
+  private matchingRecipeIds =
+    ({ recipeIds }: { recipeIds: Array<number> }) =>
+    (queryBuilder: Knex.QueryBuilder) => {
+      if (recipeIds.length) {
+        queryBuilder.where('recipes.id', 'IN', [...recipeIds]);
+      }
+      return queryBuilder;
+    };
+
+  private recipeQueryFilters =
+    ({
+      meals,
+      lifestyles,
+      freeFroms,
+    }: {
+      meals: Array<
+        'breakfast' | 'brunch' | 'lunch' | 'dinner' | 'sides' | 'dessert'
+      >;
+      lifestyles: Array<'vegetarian' | 'vegan' | 'meat' | 'pescatarian'>;
+      freeFroms: Array<'dairyFree' | 'glutenFree'>;
+    }) =>
+    (queryBuilder: Knex.QueryBuilder) => {
+      const freeFromsSnakeCase = <Array<'dairy_free' | 'gluten_free'>>(
+        freeFroms.map((freeFrom) => toSnakeCase(freeFrom))
+      );
+
+      if (meals.length) {
+        queryBuilder.where(
+          this.db.raw(`meal_type && ARRAY['${meals.join("','")}']::MEAL[]`),
+        );
+      }
+      if (lifestyles.length) {
+        queryBuilder.where(
+          this.db.raw(
+            `lifestyle_type && ARRAY['${lifestyles.join("','")}']::LIFESTYLE[]`,
+          ),
+        );
+      }
+      if (freeFroms.length) {
+        queryBuilder.where(
+          this.db.raw(
+            `free_from_type && ARRAY['${freeFromsSnakeCase.join(
+              "','",
+            )}']::FREE_FROM[]`,
+          ),
+        );
+      }
+      return queryBuilder;
+    };
+
+  private recipeQuerySearch =
+    ({ searchTerm }: { searchTerm: string }) =>
+    (queryBuilder: Knex.QueryBuilder) => {
+      if (searchTerm.length) {
+        queryBuilder.whereRaw(`name ILIKE ?`, [`%${searchTerm}%`]);
+      }
+      return queryBuilder;
+    };
+
+  private recipeQueryOrdering =
+    ({
+      order,
+      orderBy,
+    }: {
+      order: 'asc' | 'desc' | 'any';
+      orderBy: 'relevance' | 'price' | 'createdAt';
+    }) =>
+    (queryBuilder: Knex.QueryBuilder) => {
+      const col = orderByToRecipeColumn(orderBy);
+      if (order.length && orderBy.length) {
+        const colOrder = order === 'any' ? 'asc' : order;
+        queryBuilder.orderBy(col, colOrder);
+      }
+
+      return queryBuilder;
+    };
+
+  private getRecipesQuery = (includeIngredientsWithRecipes: boolean) => {
     const rawQuery = this.db.raw(`
     (
       select *
@@ -34,6 +103,9 @@ export default class RecipeService {
           CAST(recipes.price_per_serving as FLOAT),
           recipes.image_path,
           recipes.link,
+          recipes.meal_type,
+          recipes.lifestyle_type,
+          recipes.free_from_type,
           (
             select 
               json_agg(ingredients) 
@@ -56,36 +128,93 @@ export default class RecipeService {
           from recipes
       ) as recipes) as recipes
   `);
+    return this.db
+      .select('*')
+      .from(includeIngredientsWithRecipes ? rawQuery : 'recipes');
+  };
 
-    const recipes = await this.db.select('*').modify((queryBuilder) => {
-      queryBuilder.from(includeIngredientsWithRecipes ? rawQuery : 'recipes');
+  async get({
+    includeIngredientsWithRecipes = false,
+    offset = 0,
+    limit = 10,
+    meals = [],
+    lifestyles = [],
+    freeFroms = [],
+    order = 'any',
+    orderBy = 'relevance',
+    searchTerm = '',
+    recipeIds = [],
+  }: {
+    includeIngredientsWithRecipes: boolean;
+    offset?: number;
+    limit?: number;
+    meals?: Array<
+      'breakfast' | 'brunch' | 'lunch' | 'dinner' | 'sides' | 'dessert'
+    >;
+    lifestyles?: Array<'vegetarian' | 'vegan' | 'meat' | 'pescatarian'>;
+    freeFroms?: Array<'dairyFree' | 'glutenFree'>;
+    order?: 'asc' | 'desc' | 'any';
+    orderBy?: 'relevance' | 'price' | 'createdAt';
+    searchTerm?: string;
+    recipeIds?: Array<number>;
+  }) {
+    const recipesQueryBuilder = this.getRecipesQuery(
+      includeIngredientsWithRecipes,
+    )
+      .modify(this.matchingRecipeIds({ recipeIds }))
+      .modify(
+        this.recipeQueryFilters({
+          meals,
+          lifestyles,
+          freeFroms,
+        }),
+      )
+      .modify(
+        this.recipeQuerySearch({
+          searchTerm,
+        }),
+      )
+      .modify(
+        this.recipeQueryOrdering({
+          order,
+          orderBy,
+        }),
+      )
+      .offset(offset)
+      .limit(limit);
 
-      if (offset) {
-        queryBuilder.offset(offset);
-      }
+    const countBuilder = this.db
+      .count('*')
+      .from('recipes')
+      .modify(this.matchingRecipeIds({ recipeIds }))
+      .modify(
+        this.recipeQueryFilters({
+          meals,
+          lifestyles,
+          freeFroms,
+        }),
+      )
+      .modify(
+        this.recipeQuerySearch({
+          searchTerm,
+        }),
+      );
 
-      if (limit) {
-        queryBuilder.limit(limit);
-      }
-
-      if (recipeIds && recipeIds.length > 0) {
-        queryBuilder.where('recipes.id', 'IN', [...recipeIds]);
-      }
-    });
-
-    const results = await this.db.count('*').modify((queryBuilder) => {
-      queryBuilder.from(includeIngredientsWithRecipes ? rawQuery : 'recipes');
-
-      if (recipeIds && recipeIds.length > 0) {
-        queryBuilder.where('recipes.id', 'IN', [...recipeIds]);
-      }
-    });
-
-    const { count } = <{ count: string }>results[0];
-    return { recipes, count: parseInt(count) };
+    const recipesResult = await recipesQueryBuilder;
+    const countResult = await countBuilder;
+    const { count } = <{ count: string }>countResult[0];
+    return { recipes: recipesResult, count };
   }
 
-  async insertRecipe(recipeWithIngredients: RecipeWithIngredients) {
+  async insertRecipe(
+    recipeWithIngredients: RecipeWithIngredients & {
+      meals: Array<
+        'breakfast' | 'brunch' | 'lunch' | 'dinner' | 'sides' | 'dessert'
+      >;
+      lifestyles: Array<'vegetarian' | 'vegan' | 'meat' | 'pescatarian'>;
+      freeFroms: Array<'dairyFree' | 'glutenFree'>;
+    },
+  ) {
     // convert recipe to snake case
     const recipeWithIngredientsSnake = snakeize(recipeWithIngredients);
 
@@ -97,10 +226,30 @@ export default class RecipeService {
         image_path,
         link,
         ingredients,
+        meals,
+        lifestyles,
+        free_froms,
       } = recipeWithIngredientsSnake;
+
+      const freeFromsSnakeCase = <Array<'dairy_free' | 'gluten_free'>>(
+        free_froms.map((freeFrom: string) => toSnakeCase(freeFrom))
+      );
+
       // insert recipe
       const result = await this.db('recipes')
-        .insert({ name, servings, price_per_serving, image_path, link }, ['id'])
+        .insert(
+          {
+            name,
+            servings,
+            price_per_serving,
+            image_path,
+            link,
+            meal_type: [...meals],
+            lifestyle_type: [...lifestyles],
+            free_from_type: [...freeFromsSnakeCase],
+          },
+          ['id'],
+        )
         .transacting(trx);
 
       // insert recipe_plan_recipes with associated recipe_plan.id

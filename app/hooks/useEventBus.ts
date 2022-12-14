@@ -1,13 +1,5 @@
 import { useCallback, useRef } from 'react';
-
-export interface Event {
-  name: string;
-  data: string;
-}
-
-export interface Subscriber {
-  notify: (event: Event) => void;
-}
+import { Event, Subscriber } from '../types/eventBus.types';
 
 export const useEventBus = () => {
   const eventQueue = useRef<Array<Event>>([]);

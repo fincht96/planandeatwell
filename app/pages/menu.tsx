@@ -1,105 +1,63 @@
-import {
-  Box,
-  Button,
-  Container,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  Flex,
-  Grid,
-  Input,
-  useDisclosure,
-} from '@chakra-ui/react';
+import { Button, Container, Flex, Grid, Text } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Layout from '../components/layout';
+import SearchMenu from '../components/menu/SearchMenu';
+import MenuSummaryBar from '../components/MenuSummaryBar';
 import Recipe from '../components/Recipe';
-import { Event, useEventBus } from '../components/useEventBus';
+import { useEventBus } from '../hooks/useEventBus';
+import { Event } from '../types/eventBus.types';
+import { Order, OrderBy, SortBy } from '../types/order.types';
+import {
+  queryParamToString,
+  queryParamToStringArray,
+} from '../utils/queryParamConversions';
 import {
   getRecipePlan,
   insertRecipePlan,
   updateRecipePlan,
 } from '../utils/requests/recipe-plans';
 import { getRecipes } from '../utils/requests/recipes';
+import { roundTo2dp } from '../utils/roundTo2dp';
+import { orderToSortBy, sortByToOrder } from '../utils/sortByConversions';
+
 import { IngredientDecorated } from '../types/ingredientDecorated.types';
-import { IoOptions } from 'react-icons/io5';
-import MenuSummaryBar from '../components/MenuSummaryBar';
-
-const roundTo2dp = (val: number) => {
-  return Math.round(val * 100) / 100;
-};
-
-const SearchMenu = ({ ...props }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = useRef();
-
-  return (
-    <Box {...props}>
-      <Input placeholder="Search" background={'#ffffff'} mb={'2rem'} />
-
-      <Button
-        ref={btnRef}
-        colorScheme="teal"
-        onClick={onOpen}
-        leftIcon={<IoOptions />}
-      >
-        Filter
-      </Button>
-
-      <Drawer
-        isOpen={isOpen}
-        placement="left"
-        onClose={onClose}
-        finalFocusRef={btnRef}
-      >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Create your account</DrawerHeader>
-
-          <DrawerBody>
-            <Input placeholder="Type here..." />
-          </DrawerBody>
-
-          <DrawerFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue">Save</Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    </Box>
-  );
-};
 
 const Menu: NextPage = () => {
   const { subscribe, unsubscribe, post } = useEventBus();
-
-  const limit = 10;
-  const [offset, setOffset] = useState(0);
-  const [totalCountRecipes, setTotalCountRecipes] = useState(0);
-  const showMore = useMemo(() => {
-    return (
-      offset * limit + limit - 1 <= totalCountRecipes || totalCountRecipes === 0
-    );
-  }, [offset, limit, totalCountRecipes]);
-
   const router = useRouter();
+  const [recipes, setRecipes] = useState<Array<any>>([]);
+  const [recipePlanQueryParams, setRecipePlanQueryParams] = useState<{
+    uuid: string;
+  }>({ uuid: '' });
+  const [recipeQueryParams, setRecipeQueryParams] = useState<{
+    limit: number;
+    offset: number;
+    meals: Array<string>;
+    lifestyles: Array<string>;
+    freeFroms: Array<string>;
+    order: Order;
+    orderBy: OrderBy;
+    searchTerm: string;
+  }>({
+    limit: 10,
+    offset: 0,
+    meals: [],
+    lifestyles: [],
+    freeFroms: [],
+    order: 'any',
+    orderBy: 'relevance',
+    searchTerm: '',
+  });
+  const [queryParamsInitialised, setQueryParamsInitialised] = useState(false);
+  const [totalCountRecipes, setTotalCountRecipes] = useState(0);
   const [recipeBasket, setRecipeBasket] = useState<Array<any>>([]);
   const [exactIngredientsBasket, setExactIngredientsBasket] = useState<
     Array<IngredientDecorated>
   >([]);
-
-  const [recipes, setRecipes] = useState<Array<any>>([]);
-
   const ingredientsBasket = useMemo(() => {
     return exactIngredientsBasket.map((ingredient) => {
       const unitQuantity = Math.ceil(ingredient.unitQuantity);
@@ -112,63 +70,6 @@ const Menu: NextPage = () => {
       };
     });
   }, [exactIngredientsBasket]);
-
-  const recipePlanUuid =
-    typeof router.query.recipe_plan_uuid === 'string'
-      ? router.query.recipe_plan_uuid
-      : '';
-
-  const recipePlanMutation = useMutation({
-    mutationFn: ({
-      updateExisting,
-      recipeIdList,
-    }: {
-      updateExisting: boolean;
-      recipeIdList: Array<number>;
-    }) => {
-      return updateExisting
-        ? updateRecipePlan(recipePlanUuid, { recipeIdList })
-        : insertRecipePlan(recipeIdList);
-    },
-    onSuccess: (data: any) => {
-      return onNavigate(`/recipe-plan/${data.uuid}`);
-    },
-  });
-
-  useQuery( 
-    ['recipes', offset, limit],
-    () =>
-      getRecipes({
-        includeIngredientsWithRecipes: true,
-        offset,
-        limit,
-      }),
-    {
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: false,
-      staleTime: 0,
-      enabled: router.isReady,
-      onSuccess: (data: any) => {
-        setRecipes((current) => [...current, ...data.recipes]);
-        setTotalCountRecipes(data.totalCount);
-      },
-    },
-  );
-
-   useQuery({
-    queryKey: [`recipePlanQuery`, recipePlanUuid],
-    queryFn: () => getRecipePlan(recipePlanUuid, true),
-    staleTime: 0,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: false,
-    enabled: router.isReady && !!recipePlanUuid.length,
-    onSuccess: (data: Array<any>) => {
-      const recipes = data[0].recipes ?? [];
-      const ingredients = data[0].ingredients ?? [];
-      setRecipeBasket(recipes);
-      setExactIngredientsBasket(ingredients);
-    },
-  });
 
   const updateRecipesInBasket = useCallback(
     (recipeId: number) => {
@@ -207,7 +108,8 @@ const Menu: NextPage = () => {
       const newExactIngredientsBasket = exactIngredientsBasket.reduce(
         (newExactIngredientsBasket, basketIngredient) => {
           const ingredientToRemove = ingredientsToRemove.find(
-            (ingredient: IngredientDecorated) => ingredient.id === basketIngredient.id,
+            (ingredient: IngredientDecorated) =>
+              ingredient.id === basketIngredient.id,
           );
 
           if (ingredientToRemove) {
@@ -275,14 +177,92 @@ const Menu: NextPage = () => {
     [exactIngredientsBasket, recipes],
   );
 
-  const onNavigate = (pathname: string) => {
-    // display loading
-    router.push(pathname, undefined, { shallow: true });
-  };
+  const showMore = recipes.length < totalCountRecipes;
 
-  const onRecipeClick = (id: number) => {
-    post({ name: 'recipe-clicked', data: `${id}` });
-  };
+  const totalBasketPrice: number = useMemo(() => {
+    return roundTo2dp(
+      ingredientsBasket.reduce((prev, current) => {
+        return prev + current.price;
+      }, 0),
+    );
+  }, [ingredientsBasket]);
+
+  const recipePlanMutation = useMutation({
+    mutationFn: ({
+      updateExisting,
+      recipeIdList,
+    }: {
+      updateExisting: boolean;
+      recipeIdList: Array<number>;
+    }) => {
+      return updateExisting
+        ? updateRecipePlan(recipePlanQueryParams.uuid, { recipeIdList })
+        : insertRecipePlan(recipeIdList);
+    },
+    onSuccess: (data: any) => {
+      return onNavigate(`/recipe-plan/${data.uuid}`);
+    },
+  });
+
+  useQuery(
+    ['recipes', recipeQueryParams],
+    () => {
+      const {
+        offset,
+        limit,
+        meals,
+        lifestyles,
+        freeFroms,
+        order,
+        orderBy,
+        searchTerm,
+      } = recipeQueryParams;
+      return getRecipes({
+        includeIngredientsWithRecipes: true,
+        offset,
+        limit,
+        meals: meals.toString(),
+        lifestyles: lifestyles.toString(),
+        freeFroms: freeFroms.toString(),
+        order,
+        orderBy,
+        searchTerm,
+      });
+    },
+    {
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      staleTime: 0,
+      enabled: queryParamsInitialised,
+      onSuccess: (data: any) => {
+        setRecipes((current) => {
+          if (recipeQueryParams.offset === 0) {
+            return data.recipes;
+          }
+          return [...current, ...data.recipes];
+        });
+        setTotalCountRecipes(data.totalCount);
+      },
+    },
+  );
+
+  useQuery({
+    queryKey: ['recipePlanQuery', recipePlanQueryParams.uuid],
+    queryFn: () => {
+      const uuid = recipePlanQueryParams.uuid;
+      return getRecipePlan(uuid, true);
+    },
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
+    enabled: router.isReady && !!recipePlanQueryParams.uuid.length,
+    onSuccess: (data) => {
+      const recipes = data[0].recipes ?? [];
+      const ingredients = data[0].ingredients ?? [];
+      setRecipeBasket(recipes);
+      setExactIngredientsBasket(ingredients);
+    },
+  });
 
   // add/remove recipe id to recipe basket
   useEffect(() => {
@@ -309,7 +289,6 @@ const Menu: NextPage = () => {
         }
       },
     };
-
     subscribe(recipeRemovedSubscriber);
     return () => unsubscribe(recipeRemovedSubscriber);
   }, [subscribe, unsubscribe, removeRecipeIngredientsFromBasket]);
@@ -324,26 +303,49 @@ const Menu: NextPage = () => {
         }
       },
     };
-
     subscribe(recipeInsertSubscriber);
     return () => unsubscribe(recipeInsertSubscriber);
   }, [subscribe, unsubscribe, addRecipeIngredientsToBasket]);
 
-  const totalBasketPrice: number = useMemo(() => {
-    return roundTo2dp(
-      ingredientsBasket.reduce((prev, current) => {
-        return prev + current.price;
-      }, 0),
-    );
-  }, [ingredientsBasket]);
+  // initializes recipeQueryParams and recipePlanQueryParams
+  useEffect(() => {
+    if (router.isReady && !queryParamsInitialised) {
+      const meals = queryParamToStringArray(router.query['meals']);
+      const lifestyles = queryParamToStringArray(router.query['lifestyles']);
+      const freeFroms = queryParamToStringArray(router.query['freeFroms']);
+      const order = queryParamToString<Order>(router.query['order']);
+      const orderBy = queryParamToString<OrderBy>(router.query['orderBy']);
+      const searchTerm = queryParamToString(router.query['searchTerm']);
+      const uuid = queryParamToString(router.query['recipe_plan_uuid']);
 
-  const totalBasketPriceExact: number = useMemo(() => {
-    return roundTo2dp(
-      exactIngredientsBasket.reduce((prev, current) => {
-        return prev + current.price;
-      }, 0),
-    );
-  }, [exactIngredientsBasket]);
+      setRecipeQueryParams((current) => {
+        return {
+          ...current,
+          meals,
+          lifestyles,
+          freeFroms,
+          order,
+          orderBy,
+          searchTerm,
+        };
+      });
+
+      setRecipePlanQueryParams((current) => ({
+        ...current,
+        uuid,
+      }));
+      setQueryParamsInitialised(true);
+    }
+  }, [router.isReady, queryParamsInitialised, router.query]);
+
+  const onNavigate = (pathname: string) => {
+    router.push(pathname, undefined, { shallow: true });
+  };
+
+  // on recipe clicked notifies event bus
+  const onRecipeClick = (id: number) => {
+    post({ name: 'recipe-clicked', data: `${id}` });
+  };
 
   return (
     <Layout>
@@ -352,7 +354,90 @@ const Menu: NextPage = () => {
       </Head>
 
       <Container mt={'5rem'} w={'95vw'} maxW={'1600px'} pt={'1rem'} pb={'5rem'}>
-        <SearchMenu mb={'4rem'} />
+        <SearchMenu
+          mb={'2rem'}
+          mealsFilters={recipeQueryParams.meals}
+          lifestyleFilters={recipeQueryParams.lifestyles}
+          freeFromFilters={recipeQueryParams.freeFroms}
+          sortBy={orderToSortBy(
+            recipeQueryParams.order,
+            recipeQueryParams.orderBy,
+          )}
+          searchTerm={recipeQueryParams.searchTerm}
+          onSearch={({ searchTerm }: { searchTerm: string }) => {
+            setRecipeQueryParams((current) => {
+              return {
+                ...current,
+                offset: 0,
+                searchTerm,
+              };
+            });
+
+            const { searchTerm: oldSearchTerm, ...unchangedQueryParams } =
+              router.query;
+            router.push({
+              query: {
+                ...unchangedQueryParams,
+                ...(searchTerm.length && { searchTerm }),
+              },
+            });
+          }}
+          onFiltersChange={(filters: {
+            meals: Array<string>;
+            lifestyles: Array<string>;
+            freeFroms: Array<string>;
+          }) => {
+            setRecipeQueryParams((current) => {
+              return {
+                ...current,
+                meals: filters.meals,
+                lifestyles: filters.lifestyles,
+                freeFroms: filters.freeFroms,
+                offset: 0,
+              };
+            });
+
+            const newMeals = filters.meals.toString();
+            const newLifestyles = filters.lifestyles.toString();
+            const newFreeFroms = filters.freeFroms.toString();
+
+            const { meals, lifestyles, freeFroms, ...unchangedQueryParams } =
+              router.query;
+
+            router.push({
+              query: {
+                ...unchangedQueryParams,
+                ...(newMeals.length && { meals: newMeals }),
+                ...(newLifestyles.length && { lifestyles: newLifestyles }),
+                ...(newFreeFroms.length && { freeFroms: newFreeFroms }),
+              },
+            });
+          }}
+          onSortByChange={(sortBy: SortBy) => {
+            const orderAndOrderBy = sortByToOrder(sortBy);
+            setRecipeQueryParams((current) => {
+              return {
+                ...current,
+                ...orderAndOrderBy,
+                offset: 0,
+              };
+            });
+            router.push({
+              query: {
+                ...router.query,
+                ...orderAndOrderBy,
+              },
+            });
+          }}
+        />
+
+        <Text fontSize={'1rem'} color="gray.dark" fontWeight={600} mb={'2rem'}>
+          Results
+          <Text as={'span'} fontWeight={400}>
+            ({totalCountRecipes})
+          </Text>
+        </Text>
+
         <Grid templateColumns="repeat(auto-fill, minMax(275px,1fr));" gap={6}>
           {recipes.map((recipe) => {
             const recipeInBasket = recipeBasket
@@ -377,7 +462,12 @@ const Menu: NextPage = () => {
           <Flex justifyContent={'center'}>
             <Button
               onClick={() => {
-                setOffset((current) => current + limit);
+                setRecipeQueryParams((current) => {
+                  return {
+                    ...current,
+                    offset: current.offset + current.limit,
+                  };
+                });
               }}
               mt={2}
               colorScheme="brand"
@@ -398,7 +488,7 @@ const Menu: NextPage = () => {
         servings={recipeBasket.length * 4}
         onComplete={() => {
           recipePlanMutation.mutate({
-            updateExisting: !!recipePlanUuid,
+            updateExisting: !!recipePlanQueryParams.uuid.length,
             recipeIdList: recipeBasket.map((recipe) => recipe.id),
           });
         }}

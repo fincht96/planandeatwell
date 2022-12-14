@@ -15,6 +15,7 @@ export async function seed(knex: Knex): Promise<void> {
       link: 'https://www.aldi.co.uk/greek-fajitas-/p/000000460308800',
       meal_type: ['dinner', 'lunch'],
       lifestyle_type: ['vegetarian'],
+      free_from_type: ['dairy_free'],
     },
     {
       name: 'Vegan Pesto Pasta',
@@ -33,6 +34,7 @@ export async function seed(knex: Knex): Promise<void> {
       link: 'https://www.aldi.co.uk/fish-pie/p/000000093912700',
       meal_type: ['dinner', 'lunch'],
       lifestyle_type: ['pescatarian'],
+      free_from_type: ['gluten_free'],
     },
   ]);
 }

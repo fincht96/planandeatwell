@@ -9,7 +9,26 @@ const getRecipeListSchema = Joi.object({
   limit: Joi.number().min(1).max(100).required(),
   offset: Joi.number().min(0).required(),
   includeIngredients: Joi.bool().required(),
-}).and('limit', 'offset');
+  meals: Joi.array().items(
+    Joi.string().valid(
+      'breakfast',
+      'brunch',
+      'lunch',
+      'dinner',
+      'sides',
+      'dessert',
+    ),
+  ),
+  lifestyles: Joi.array().items(
+    Joi.string().valid('vegetarian', 'vegan', 'meat', 'pescatarian'),
+  ),
+  freeFroms: Joi.array().items(Joi.string().valid('dairyFree', 'glutenFree')),
+  order: Joi.string().valid('asc', 'desc', 'any'),
+  orderBy: Joi.string().valid('relevance', 'price', 'createdAt'),
+  searchTerm: Joi.string().min(2).max(200),
+})
+  .and('limit', 'offset')
+  .and('order', 'orderBy');
 
 const insertRecipeSchema = Joi.object({
   name: Joi.string().max(200).required(),
@@ -25,6 +44,22 @@ const insertRecipeSchema = Joi.object({
       }),
     )
     .min(1),
+  meals: Joi.array()
+    .items(
+      Joi.string().valid(
+        'breakfast',
+        'brunch',
+        'lunch',
+        'dinner',
+        'sides',
+        'dessert',
+      ),
+    )
+    .required(),
+  lifestyles: Joi.array().items(
+    Joi.string().valid('vegetarian', 'vegan', 'meat', 'pescatarian'),
+  ),
+  freeFroms: Joi.array().items(Joi.string().valid('dairyFree', 'glutenFree')),
 }).and(
   'name',
   'servings',
@@ -32,6 +67,7 @@ const insertRecipeSchema = Joi.object({
   'imagePath',
   'link',
   'ingredients',
+  'meals',
 );
 
 const removeRecipeSchema = Joi.object({
@@ -48,7 +84,28 @@ export default class RecipeController {
 
   async getRecipeList(req: Request, res: Response) {
     try {
-      const { error, value } = getRecipeListSchema.validate(req.query);
+      let meals: Array<string> = [];
+      let lifestyles: Array<string> = [];
+      let freeFroms: Array<string> = [];
+
+      if (req.query?.meals) {
+        meals = `${req.query.meals}`.split(',');
+      }
+
+      if (req.query?.lifestyles) {
+        lifestyles = `${req.query.lifestyles}`.split(',');
+      }
+
+      if (req.query?.freeFroms) {
+        freeFroms = `${req.query.freeFroms}`.split(',');
+      }
+
+      const { error, value } = getRecipeListSchema.validate({
+        ...req.query,
+        meals,
+        lifestyles,
+        freeFroms,
+      });
 
       if (error) {
         throw new Error(error.message);

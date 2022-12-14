@@ -13,6 +13,8 @@ export async function seed(knex: Knex): Promise<void> {
       price_per_serving: 2.0,
       image_path: '/recipe_images/aldi/greek-fajitas.jpg',
       link: 'https://www.aldi.co.uk/greek-fajitas-/p/000000460308800',
+      meal_type: ['dinner', 'lunch'],
+      lifestyle_type: ['vegetarian'],
     },
     {
       name: 'Vegan Pesto Pasta',
@@ -20,6 +22,8 @@ export async function seed(knex: Knex): Promise<void> {
       price_per_serving: 1.43,
       image_path: '/recipe_images/aldi/vegan-pesto-pasta.jpg',
       link: 'https://www.aldi.co.uk/vegan-pesto-pasta/p/000000481143300',
+      meal_type: ['dinner', 'lunch'],
+      lifestyle_type: ['vegan'],
     },
     {
       name: 'Fish Pie',
@@ -27,6 +31,8 @@ export async function seed(knex: Knex): Promise<void> {
       price_per_serving: 3.01,
       image_path: '/recipe_images/aldi/fish-pie.jpg',
       link: 'https://www.aldi.co.uk/fish-pie/p/000000093912700',
+      meal_type: ['dinner', 'lunch'],
+      lifestyle_type: ['pescatarian'],
     },
   ]);
 }

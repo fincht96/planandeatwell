@@ -4,14 +4,7 @@ import { Ingredient } from '../types/ingredient.types';
 import snakeize from 'snakeize';
 // @ts-ignore
 import camelize from 'camelize';
-
-const toSnakeCase = (str: string) => {
-  const res = str
-    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
-    ?.map((x) => x.toLowerCase())
-    .join('_');
-  return res ?? '';
-};
+import { toSnakeCase } from '../utils/toSnakeCase';
 
 export default class IngredientsService {
   private db: Knex;

@@ -310,25 +310,29 @@ const Recipe: NextPage = ({ recipe }: any) => {
 };
 
 export async function getStaticPaths() {
-  // get all ids of all recipes in our database for next so next knows how many pages to generate
-  const { recipes } = await getRecipes({
-    includeIngredientsWithRecipes: false,
-    offset: 0,
-    limit: 100, // build endpoint to give us this value
-    order: 'any',
-    orderBy: 'relevance',
-  });
+  if (process.env.NEXT_PUBLIC_ENV === 'development') {
+    const paths: Array<any> = [];
+    return { paths, fallback: 'blocking' };
+  } else {
+    const { recipes } = await getRecipes({
+      includeIngredientsWithRecipes: false,
+      offset: 0,
+      limit: 100,
+      order: 'any',
+      orderBy: 'relevance',
+    });
 
-  const paths = recipes.map((recipe: any) => {
+    const paths: Array<any> = recipes.map((recipe: any) => {
+      return {
+        params: { recipeId: recipe.id.toString() },
+      };
+    });
+
     return {
-      params: { recipeId: recipe.id.toString() },
+      paths,
+      fallback: 'blocking',
     };
-  });
-
-  return {
-    paths,
-    fallback: false,
-  };
+  }
 }
 
 export async function getStaticProps(context: any) {
@@ -349,7 +353,7 @@ export async function getStaticProps(context: any) {
   return {
     props: {
       recipe: recipe,
-      revalidate: 60,
+      revalidate: process.env.NEXT_PUBLIC_ENV === 'development' ? 0 : 600,
     },
   };
 }

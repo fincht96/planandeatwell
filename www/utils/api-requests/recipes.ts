@@ -36,9 +36,9 @@ export const getRecipes = ({
 }) => {
   let baseUrl;
 
-  // if server else
+  // if server-side request then run use the docker bridge url
   if (!(typeof window != 'undefined' && window.document)) {
-    baseUrl = 'http://api:4000';
+    baseUrl = `${process.env.NEXT_PUBLIC_API_URL_DOCKER_SERVICE}`;
   } else {
     baseUrl = `${process.env.NEXT_PUBLIC_API_URL}`;
   }

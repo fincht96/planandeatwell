@@ -21,7 +21,7 @@ const Recipe = ({
       <Box>
         <Link
           href={`${process.env.NEXT_PUBLIC_WWW_BASE_URL}recipes/${id}`}
-          target={'_blank'}
+          isExternal
         >
           <Image
             src={`${process.env.NEXT_PUBLIC_CDN}${imagePath}`}
@@ -29,7 +29,6 @@ const Recipe = ({
             width="100%"
             height="100%"
             layout="responsive"
-            objectFit="cover"
             priority
           />
         </Link>
@@ -71,8 +70,7 @@ const Recipe = ({
           <Box mr={'0.3rem'}>
             <Link
               href={`${process.env.NEXT_PUBLIC_WWW_BASE_URL}recipes/${id}`}
-              target={'_blank'}
-              rel="noreferrer"
+              isExternal
             >
               <Text>View recipe</Text>
             </Link>

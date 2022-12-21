@@ -1,20 +1,20 @@
-import { Container } from "@chakra-ui/react";
-import Head from "next/head";
-import Layout from "../components/layout";
-import { Text, Link } from "@chakra-ui/react";
-import { forwardRef, Box, TextProps } from "@chakra-ui/react";
+import { Container } from '@chakra-ui/react';
+import Head from 'next/head';
+import Layout from '../components/layout';
+import { Text, Link } from '@chakra-ui/react';
+import { forwardRef, Box, TextProps } from '@chakra-ui/react';
 
-const Title = forwardRef<TextProps, "h1">((props, ref) => (
-  <Text color="gray.dark" fontSize={"36px"} ref={ref} as={"h1"} {...props} />
+const Title = forwardRef<TextProps, 'h1'>((props, ref) => (
+  <Text color="gray.dark" fontSize={'36px'} ref={ref} as={'h1'} {...props} />
 ));
 
-const Heading = forwardRef<TextProps, "h3">((props, ref) => (
-  <Text fontSize={"24px"} ref={ref} as={"h3"} {...props} />
+const Heading = forwardRef<TextProps, 'h3'>((props, ref) => (
+  <Text fontSize={'24px'} ref={ref} as={'h3'} {...props} />
 ));
 
-const MainText = forwardRef<TextProps, "p">((props, ref) => (
+const MainText = forwardRef<TextProps, 'p'>((props, ref) => (
   <Text
-    fontSize={"16"}
+    fontSize={'16'}
     color="gray.normal"
     fontWeight={400}
     ref={ref}
@@ -31,9 +31,9 @@ export default function TermsAndConditions() {
 
       <Container
         maxW="1200px"
-        mt={"5rem"}
+        mt={'5rem'}
         mb={20}
-        sx={{ position: "relative" }}
+        sx={{ position: 'relative' }}
       >
         <Box mb={5}>
           <Title mb={2}>Terms and Conditions</Title>

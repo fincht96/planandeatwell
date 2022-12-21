@@ -31,6 +31,7 @@ const Recipe = ({
           layout={'fill'}
           alt={name}
           objectFit={'cover'}
+          priority
         />
       </Box>
 

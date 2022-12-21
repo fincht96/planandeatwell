@@ -1,4 +1,4 @@
-import { registerEmail } from '../util/api-requests/email_requests';
+import { registerEmail } from '../utils/api-requests/email_requests';
 import { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import {
@@ -10,8 +10,8 @@ import {
   Button,
   Text,
 } from '@chakra-ui/react';
-import { ApiResp } from '../util/api-requests/response_type';
-import { capitalizeFirstLetter } from '../util/helper/capitalize_first_letter';
+import { ApiResp } from '../utils/api-requests/response_type';
+import { capitalizeFirstLetter } from '../utils/helper/capitalize_first_letter';
 import * as ga from '../lib/gtag';
 
 type Inputs = {

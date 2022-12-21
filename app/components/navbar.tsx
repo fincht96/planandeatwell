@@ -46,7 +46,10 @@ export default function WithSubnavigation() {
           flex={{ base: 1.5 }}
           justify={{ base: 'center', md: 'start' }}
         >
-          <NextLink href={'https://planandeatwell.uk'} passHref={true}>
+          <NextLink
+            href={`${process.env.NEXT_PUBLIC_WWW_BASE_URL}`}
+            passHref={true}
+          >
             <Link>
               {!!isLessThan500 && (
                 <Box position={'relative'} width={55} height={55}>

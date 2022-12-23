@@ -43,7 +43,7 @@ const Menu: CustomNextPage = () => {
     orderBy: OrderBy;
     searchTerm: string;
   }>({
-    limit: 10,
+    limit: 8,
     offset: 0,
     meals: [],
     lifestyles: [],

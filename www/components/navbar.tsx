@@ -10,10 +10,8 @@ import {
   Link,
   Popover,
   PopoverTrigger,
-  PopoverContent,
   useColorModeValue,
   useDisclosure,
-  useMediaQuery,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import Image from 'next/image';
@@ -22,8 +20,6 @@ import ChakraNextLink from './NextChakraLink';
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
-  const [isLessThan900px] = useMediaQuery('(max-width: 900px)');
-  const [isLessThan500px] = useMediaQuery('(max-width: 500px)');
 
   return (
     <Box sx={{ position: 'fixed', top: '0px', width: '100%', zIndex: '3' }}>
@@ -39,11 +35,12 @@ export default function WithSubnavigation() {
         align={'center'}
       >
         <Flex alignItems={'center'} flex={{ base: 1.5 }} justify={'start'}>
-          <Box
+          <ChakraNextLink
             position={'relative'}
             w={{ base: '11rem', md: '15rem' }}
             h={{ base: '2.2rem', sm: '3rem' }}
             p={0}
+            href={'/'}
           >
             <Image
               quality={75}
@@ -52,9 +49,9 @@ export default function WithSubnavigation() {
               alt={'logo'}
               objectFit={'contain'}
             />
-          </Box>
+          </ChakraNextLink>
 
-          <Flex display={isLessThan900px ? 'none' : 'flex'} ml={'1rem'}>
+          <Flex display={{ base: 'none', lg: 'flex' }} ml={'1rem'}>
             <DesktopNav />
           </Flex>
         </Flex>
@@ -67,7 +64,7 @@ export default function WithSubnavigation() {
             fontWeight={400}
             alignContent={'center'}
             as={Link}
-            href={'http://app.planandeatwell.localhost/sign-in'}
+            href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-in`}
             _hover={{
               textDecoration: 'none',
               background: 'gray.100',
@@ -87,17 +84,17 @@ export default function WithSubnavigation() {
               textDecoration: 'none',
               backgroundColor: 'brand.600',
             }}
-            href={'http://app.planandeatwell.localhost/sign-up'}
+            href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-up`}
             padding={{ base: '0.5rem', md: '1.2rem' }}
-            display={isLessThan500px ? 'none' : 'flex'}
+            display={{ base: 'none', md: 'flex' }}
           >
             Get started
           </Button>
 
           <Flex
-            flex={isLessThan900px ? 1 : 'auto'}
             ml={{ base: -2 }}
-            display={isLessThan900px ? 'flex' : 'none'}
+            flex={{ base: 1, md: 'auto' }}
+            display={{ base: 'flex', md: 'none' }}
           >
             <IconButton
               onClick={onToggle}
@@ -173,7 +170,7 @@ const MobileNavItem = ({ label, children, href, toggleShowNav }: NavItem) => {
     <Stack spacing={4} onClick={children ? onToggle : toggleShowNav}>
       <Flex
         py={2}
-        as={Link}
+        as={ChakraNextLink}
         href={href ?? '#'}
         justify={'space-between'}
         align={'center'}
@@ -234,7 +231,7 @@ const NAV_ITEMS: Array<NavItem> = [
     href: '/#how-it-works',
   },
   {
-    label: 'Contact',
-    href: '/#contact',
+    label: 'Recipes',
+    href: '/recipes',
   },
 ];

@@ -1,15 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    webpack: config => {
+  webpack: (config) => {
     config.watchOptions = {
       poll: 1000,
       aggregateTimeout: 300,
-    }
-    return config
+    };
+    return config;
   },
   reactStrictMode: true,
   swcMinify: true,
-  output: 'standalone'
-}
+  output: 'standalone',
+  images: {
+    domains: [
+      'newstack.fra1.digitaloceanspaces.com',
+      'newstack.fra1.cdn.digitaloceanspaces.com',
+    ],
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

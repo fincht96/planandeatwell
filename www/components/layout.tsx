@@ -1,19 +1,21 @@
-import { ReactNode } from "react";
-import Head from "next/head";
-import styles from "../styles/layout.module.css";
-import Navbar from "../components/navbar";
-import { Container } from "@chakra-ui/react";
-import Footer from "./sections/Footer";
+import { ReactNode } from 'react';
+import Head from 'next/head';
+import styles from '../styles/layout.module.css';
+import Navbar from './navbar';
+import { Container } from '@chakra-ui/react';
+import Footer from './sections/Footer';
+import { Box } from '@chakra-ui/react';
 
 interface layoutArg {
   children: ReactNode;
+  excludeFooter?: boolean;
 }
 
-export const siteTitle = "Plan and Eat Well";
+export const siteTitle = 'Plan and Eat Well';
 
-export default function Layout({ children }: layoutArg) {
+export default function Layout({ children, excludeFooter }: layoutArg) {
   return (
-    <div>
+    <Box>
       <Head>
         <link rel="icon" href="/favicon.ico" />
         <meta
@@ -30,13 +32,15 @@ export default function Layout({ children }: layoutArg) {
         <Navbar />
       </header>
 
-      <Container p={0} maxW={"100%"} w={"100%"}>
+      <Container p={0} maxW={'100%'} w={'100%'}>
         {children}
       </Container>
 
-      <footer>
-        <Footer />
-      </footer>
-    </div>
+      {!!excludeFooter ? null : (
+        <footer>
+          <Footer />
+        </footer>
+      )}
+    </Box>
   );
 }

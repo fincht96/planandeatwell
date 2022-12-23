@@ -88,6 +88,13 @@ export default class RecipeController {
       let meals: Array<string> = [];
       let lifestyles: Array<string> = [];
       let freeFroms: Array<string> = [];
+      let recipeIds: Array<number> = [];
+
+      if (req.query?.recipeIds) {
+        recipeIds = `${req.query.recipeIds}`
+          .split(',')
+          .map((recipeId) => parseInt(recipeId));
+      }
 
       if (req.query?.meals) {
         meals = `${req.query.meals}`.split(',');
@@ -106,6 +113,7 @@ export default class RecipeController {
         meals,
         lifestyles,
         freeFroms,
+        recipeIds,
       });
 
       if (error) {

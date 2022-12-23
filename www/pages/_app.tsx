@@ -12,6 +12,9 @@ import CookieConsent, { getCookieConsentValue } from 'react-cookie-consent';
 import { GA_TRACKING_ID, pageview } from '../lib/gtag';
 import ChakraNextLink from '../components/NextChakraLink';
 import { useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -54,10 +57,11 @@ function MyApp({ Component, pageProps }: AppProps) {
           </Script>
         </>
       )}
-
-      <ChakraProvider theme={theme}>
-        <Component {...pageProps} />
-      </ChakraProvider>
+      <QueryClientProvider client={queryClient}>
+        <ChakraProvider theme={theme}>
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </QueryClientProvider>
 
       <CookieConsent
         style={{ background: '#808080' }}

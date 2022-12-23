@@ -7,12 +7,11 @@ import {
   Grid,
   Icon,
   Link,
+  Select,
   Text,
   useToast,
-  Select
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -21,19 +20,20 @@ import { FiLink2 } from 'react-icons/fi';
 import { MdModeEdit } from 'react-icons/md';
 import Editable from '../../components/Editable';
 import Layout from '../../components/layout';
+import { CustomNextPage } from '../../types/CustomNextPage';
+import { IngredientDecorated } from '../../types/ingredientDecorated.types';
+import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
+import { groupObjects } from '../../utils/groupObjects';
 import {
   getRecipePlan,
   updateRecipePlan,
 } from '../../utils/requests/recipe-plans';
-import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
-import { groupObjects } from '../../utils/groupObjects';
-import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 
 const ContentBox = ({
   title,
   rows,
   summary,
-  ingredientsViewSelectComponent
+  ingredientsViewSelectComponent,
 }: {
   title: any;
   rows: Array<any>;
@@ -59,20 +59,14 @@ const ContentBox = ({
             {title}
           </Text>
         </Box>
-        <Box>
-          {ingredientsViewSelectComponent}
-        </Box>
+        <Box>{ingredientsViewSelectComponent}</Box>
       </Flex>
       <Box>
         {rows.map((row) => {
           return (
             <Box mb={'1rem'} key={row.id}>
-              <Box>
-                {row.content}
-              </Box>
-              <Box>
-                {row.subContent}
-              </Box>
+              <Box>{row.content}</Box>
+              <Box>{row.subContent}</Box>
             </Box>
           );
         })}
@@ -80,23 +74,22 @@ const ContentBox = ({
       <Box my={'1rem'}>
         <Divider />
       </Box>
-      <Box>
-        {summary}
-      </Box>
+      <Box>{summary}</Box>
     </Box>
   );
 };
 
 type PermittedIngredientsViewStates = 'ALL' | 'RECIPE' | 'CATEGORY';
 
-const RecipePlan: NextPage = () => {
+const RecipePlan: CustomNextPage = () => {
   const toast = useToast();
   const router = useRouter();
   const recipePlanUuid =
     typeof router.query.id === 'string' ? router.query.id : '';
 
   const [recipePlanName, setRecipePlanName] = useState<string>('');
-  const [ingredientView, setIngredientView] = useState<PermittedIngredientsViewStates>('ALL');
+  const [ingredientView, setIngredientView] =
+    useState<PermittedIngredientsViewStates>('ALL');
 
   const recipeQuery: any = useQuery({
     queryKey: [`recipesQuery-${recipePlanUuid}`],
@@ -128,11 +121,13 @@ const RecipePlan: NextPage = () => {
 
   const ingredients: Array<IngredientDecorated> = useMemo(() => {
     return !recipeQuery.isLoading && !recipeQuery.error
-      ? recipeQuery.data[0].ingredients.map((ingredient: IngredientDecorated) => {
-          const unitQuantity = Math.ceil(ingredient.unitQuantity);
-          const price = ingredient.pricePerUnit * unitQuantity;
-          return { ...ingredient, unitQuantity, price };
-        })
+      ? recipeQuery.data[0].ingredients.map(
+          (ingredient: IngredientDecorated) => {
+            const unitQuantity = Math.ceil(ingredient.unitQuantity);
+            const price = ingredient.pricePerUnit * unitQuantity;
+            return { ...ingredient, unitQuantity, price };
+          },
+        )
       : [];
   }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
 
@@ -187,16 +182,10 @@ const RecipePlan: NextPage = () => {
         id: ingredient.id,
         content: (
           <Flex justifyContent={'space-between'} gap={'1rem'}>
-            <Text
-              color={'gray.dark'}
-              fontSize={{ base: '0.9rem', md: '1rem' }}
-            >
+            <Text color={'gray.dark'} fontSize={{ base: '0.9rem', md: '1rem' }}>
               {ingredient.unitQuantity}x {ingredient.name}
             </Text>
-            <Text
-              color={'gray.dark'}
-              fontSize={{ base: '0.9rem', md: '1rem' }}
-            >
+            <Text color={'gray.dark'} fontSize={{ base: '0.9rem', md: '1rem' }}>
               £{ingredient.price.toFixed(2)}
             </Text>
           </Flex>
@@ -206,7 +195,6 @@ const RecipePlan: NextPage = () => {
 
     if (ingredientView === 'RECIPE') {
       return recipes?.map((recipe: any) => {
-
         const ingredients = recipe.ingredientsList;
 
         return {
@@ -216,75 +204,81 @@ const RecipePlan: NextPage = () => {
               <Text
                 color={'gray.dark'}
                 fontSize={{ base: '0.9rem', md: '1rem' }}
-                as='b'
+                as="b"
               >
                 {recipe.name}
               </Text>
             </Flex>
           ),
           subContent: (
-            <Flex flexDirection={'column'} gap={'1rem'} >
+            <Flex flexDirection={'column'} gap={'1rem'}>
               {ingredients.map((ingredient: any) => {
                 return (
                   <Flex key={ingredient.id}>
                     <Text
-                    color={'gray.dark'}
-                    fontSize={{ base: '0.9rem', md: '1rem' }}
-                  >
-                     {convertDecimalToFraction(ingredient.unitQuantity, true)} - {ingredient.name}
-                  </Text>
-                </Flex>
-                )
+                      color={'gray.dark'}
+                      fontSize={{ base: '0.9rem', md: '1rem' }}
+                    >
+                      {convertDecimalToFraction(ingredient.unitQuantity, true)}{' '}
+                      - {ingredient.name}
+                    </Text>
+                  </Flex>
+                );
               })}
             </Flex>
-          )
-        }
+          ),
+        };
       });
     }
 
     if (ingredientView === 'CATEGORY') {
-      const ingredientsGroupedByCategoryArray = groupObjects(ingredients, 'categoryName');
+      const ingredientsGroupedByCategoryArray = groupObjects(
+        ingredients,
+        'categoryName',
+      );
 
-      return ingredientsGroupedByCategoryArray.map(([categoryName, groupedIngredients]) => {
-        return {
-          id: categoryName,
-          content: (
-            <Flex justifyContent={'space-between'} gap={'1rem'}>
-              <Text
-                color={'gray.dark'}
-                fontSize={{ base: '0.9rem', md: '1rem' }}
-                as='b'
-              >
-                {categoryName} 
-              </Text>
-            </Flex>
-          ),
-          subContent: (
-            <Flex flexDirection={'column'} gap={'1rem'} >
-              {groupedIngredients.map((ingredient: IngredientDecorated) => {
-                return (
-                  <Flex key={ingredient.id} justifyContent={'space-between'}>
-                    <Text
-                      color={'gray.dark'}
-                      fontSize={{ base: '0.9rem', md: '1rem' }}
+      return ingredientsGroupedByCategoryArray.map(
+        ([categoryName, groupedIngredients]) => {
+          return {
+            id: categoryName,
+            content: (
+              <Flex justifyContent={'space-between'} gap={'1rem'}>
+                <Text
+                  color={'gray.dark'}
+                  fontSize={{ base: '0.9rem', md: '1rem' }}
+                  as="b"
+                >
+                  {categoryName}
+                </Text>
+              </Flex>
+            ),
+            subContent: (
+              <Flex flexDirection={'column'} gap={'1rem'}>
+                {groupedIngredients.map((ingredient: IngredientDecorated) => {
+                  return (
+                    <Flex key={ingredient.id} justifyContent={'space-between'}>
+                      <Text
+                        color={'gray.dark'}
+                        fontSize={{ base: '0.9rem', md: '1rem' }}
                       >
-                      {ingredient.unitQuantity}x {ingredient.name}
-                    </Text>
-                    <Text
-                      color={'gray.dark'}
-                      fontSize={{ base: '0.9rem', md: '1rem' }}
-                    >
-                      £{ingredient.price.toFixed(2)}
-                  </Text>
-                </Flex>
-                )
-              })}
-            </Flex>
-          )
-        }
-      });
+                        {ingredient.unitQuantity}x {ingredient.name}
+                      </Text>
+                      <Text
+                        color={'gray.dark'}
+                        fontSize={{ base: '0.9rem', md: '1rem' }}
+                      >
+                        £{ingredient.price.toFixed(2)}
+                      </Text>
+                    </Flex>
+                  );
+                })}
+              </Flex>
+            ),
+          };
+        },
+      );
     }
-  }
+  };
 
   const handleSelectChange = (event: any) => {
     if (!event.target.value) {
@@ -301,7 +295,7 @@ const RecipePlan: NextPage = () => {
     }
   }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error, setValue]);
 
-  const rowData = generateRowData(); 
+  const rowData = generateRowData();
 
   return (
     <Layout>
@@ -309,7 +303,7 @@ const RecipePlan: NextPage = () => {
         <title>Recipe Plan | Plan and Eat Well</title>
       </Head>
 
-      <Container my={'2rem'} w={'95vw'} maxW={'1100px'} pt={'4rem'}>
+      <Container my={'2rem'} maxW={'1100px'}>
         <Flex
           justifyContent={'space-between'}
           alignItems={'center'}
@@ -374,7 +368,7 @@ const RecipePlan: NextPage = () => {
             fontWeight={400}
             minW={'min-content'}
             onClick={() => {
-              onNavigate('/menu', {
+              onNavigate('/create-plan/menu', {
                 supermarket: 'aldi',
                 servings: 4,
                 recipe_plan_uuid: recipePlanUuid,
@@ -400,18 +394,18 @@ const RecipePlan: NextPage = () => {
         <Grid
           templateColumns={{
             base: '1fr',
-            md: '1fr 0.5fr',
+            lg: '1fr 0.5fr',
           }}
           gap={6}
         >
           <ContentBox
-            ingredientsViewSelectComponent={(
-              <Select size='sm' onChange={handleSelectChange}>
-                <option value='ALL'>All</option>
-                <option value='RECIPE'>Recipes</option>
-                <option value='CATEGORY'>Categories</option>
+            ingredientsViewSelectComponent={
+              <Select size="sm" onChange={handleSelectChange}>
+                <option value="ALL">All</option>
+                <option value="RECIPE">Recipes</option>
+                <option value="CATEGORY">Categories</option>
               </Select>
-            )}
+            }
             title={
               <Text as={'span'}>
                 Ingredients{' '}
@@ -424,26 +418,26 @@ const RecipePlan: NextPage = () => {
             summary={
               ingredientView !== 'RECIPE' && (
                 <Flex justifyContent={'space-between'} alignItems={'center'}>
-                <Text
-                  fontWeight={'600'}
-                  color={'#4d4d4d'}
-                  fontSize={{ base: '0.9rem', md: '1rem' }}
-                >
-                  Total price
-                </Text>
-                <Text
-                  fontWeight={'600'}
-                  color={'#4d4d4d'}
-                  fontSize={{ base: '0.9rem', md: '1rem' }}
-                >
-                  £{totalPrice.toFixed(2)}
-                </Text>
-              </Flex>
+                  <Text
+                    fontWeight={'600'}
+                    color={'#4d4d4d'}
+                    fontSize={{ base: '0.9rem', md: '1rem' }}
+                  >
+                    Total price
+                  </Text>
+                  <Text
+                    fontWeight={'600'}
+                    color={'#4d4d4d'}
+                    fontSize={{ base: '0.9rem', md: '1rem' }}
+                  >
+                    £{totalPrice.toFixed(2)}
+                  </Text>
+                </Flex>
               )
             }
           />
 
-          <Box>
+          <Box gridRow={{ base: 1, lg: 'auto' }}>
             <ContentBox
               title={
                 <Text as={'span'}>
@@ -503,5 +497,7 @@ const RecipePlan: NextPage = () => {
     </Layout>
   );
 };
+
+RecipePlan.requireAuth = true;
 
 export default RecipePlan;

@@ -1,5 +1,4 @@
 import { Box, Button, Container, Flex, Icon, Text } from '@chakra-ui/react';
-import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -7,11 +6,12 @@ import { BiRecycle } from 'react-icons/bi';
 import { CgBowl } from 'react-icons/cg';
 import { FcTodoList } from 'react-icons/fc';
 import { TbLeaf } from 'react-icons/tb';
-import Layout, { siteTitle } from '../components/layout';
-import aboutMenuImg from '../public/images/about-menu.png';
-import styles from '../styles/About.module.css';
+import Layout, { siteTitle } from '../../components/layout';
+import aboutMenuImg from '../../public/images/about-menu.png';
+import styles from '../../styles/About.module.css';
+import { CustomNextPage } from '../../types/CustomNextPage';
 
-const AboutMenu: NextPage = () => {
+const AboutMenu: CustomNextPage = () => {
   const router = useRouter();
 
   const onNavigate = (pathname: string, query: any) => {
@@ -24,12 +24,12 @@ const AboutMenu: NextPage = () => {
         <title>{siteTitle}</title>
       </Head>
 
-      <Container maxW={'60rem'} mt={{ base: '2rem', md: '5rem' }}>
+      <Container maxW={'60rem'}>
         <Flex justifyContent={'center'}>
           <Box
             maxW={'450px'}
             mr={'3rem'}
-            display={{ base: 'none', md: 'block' }}
+            display={{ base: 'none', lg: 'block' }}
           >
             <Image
               priority
@@ -39,12 +39,12 @@ const AboutMenu: NextPage = () => {
             />
           </Box>
 
-          <Box>
+          <Box minW={'250px'}>
             <Text
               fontSize={{ base: '1.25rem', md: '1.5rem' }}
               color="gray.dark"
               fontWeight={600}
-              mt={'5rem'}
+              mt={{ base: '2rem', lg: '5rem' }}
               mb={'1rem'}
             >
               Your culinary adventure waits...
@@ -128,7 +128,7 @@ const AboutMenu: NextPage = () => {
                 fontSize={{ base: '1.1rem', md: '1.2rem' }}
                 fontWeight={600}
                 padding={'1.5rem 1rem'}
-                onClick={() => onNavigate('/menu', router.query)}
+                onClick={() => onNavigate('/create-plan/menu', router.query)}
               >
                 See the menu
               </Button>
@@ -139,5 +139,7 @@ const AboutMenu: NextPage = () => {
     </Layout>
   );
 };
+
+AboutMenu.requireAuth = true;
 
 export default AboutMenu;

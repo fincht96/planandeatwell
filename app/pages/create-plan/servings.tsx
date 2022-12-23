@@ -1,10 +1,10 @@
 import { CheckIcon } from '@chakra-ui/icons';
 import { Box, Button, Flex, Grid, Text } from '@chakra-ui/react';
-import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import Layout, { siteTitle } from '../components/layout';
-import StepLayout from '../components/StepLayout';
+import Layout, { siteTitle } from '../../components/layout';
+import StepLayout from '../../components/StepLayout';
+import { CustomNextPage } from '../../types/CustomNextPage';
 
 const Serving = ({
   disabled = false,
@@ -70,7 +70,7 @@ const Serving = ({
   );
 };
 
-const Servings: NextPage = () => {
+const Servings: CustomNextPage = () => {
   const router = useRouter();
 
   const onNavigate = (pathname: string, query: any) => {
@@ -112,7 +112,7 @@ const Servings: NextPage = () => {
               title={'Regular'}
               bulletPoints={['2 servings per recipe']}
               onClick={() =>
-                onNavigate('/about-menu', {
+                onNavigate('/create-plan/about-menu', {
                   ...router.query,
                   servings: '2',
                 })
@@ -122,7 +122,10 @@ const Servings: NextPage = () => {
               title={'Large'}
               bulletPoints={['4 servings per recipe']}
               onClick={() =>
-                onNavigate('/about-menu', { ...router.query, servings: '4' })
+                onNavigate('/create-plan/about-menu', {
+                  ...router.query,
+                  servings: '4',
+                })
               }
             />
           </Grid>
@@ -131,5 +134,7 @@ const Servings: NextPage = () => {
     </Layout>
   );
 };
+
+Servings.requireAuth = true;
 
 export default Servings;

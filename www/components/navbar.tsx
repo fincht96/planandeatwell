@@ -94,7 +94,7 @@ export default function WithSubnavigation() {
           <Flex
             ml={{ base: -2 }}
             flex={{ base: 1, md: 'auto' }}
-            display={{ base: 'flex', md: 'none' }}
+            display={{ base: 'flex', lg: 'none' }}
           >
             <IconButton
               onClick={onToggle}
@@ -151,7 +151,11 @@ const DesktopNav = () => {
 
 const MobileNav = ({ toggleShowNav }: any) => {
   return (
-    <Stack bg={useColorModeValue('white', 'gray.800')} p={4}>
+    <Stack
+      bg={useColorModeValue('white', 'gray.800')}
+      p={4}
+      display={{ base: 'flex', lg: 'none' }}
+    >
       {NAV_ITEMS.map((navItem) => (
         <MobileNavItem
           key={navItem.label}

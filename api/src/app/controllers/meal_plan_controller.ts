@@ -1,32 +1,32 @@
 import { Request, Response } from 'express';
 import EventsService from '../services/events_service';
-import RecipePlanService from '../services/recipe_plan_service';
+import MealPlanService from '../services/meal_plan_service';
 import validator from 'validator';
 import Joi from 'joi';
 
-const insertRecipePlanSchema = Joi.object({
+const insertMealPlanSchema = Joi.object({
   recipeIdList: Joi.array().items(Joi.number()).required(),
 });
 
-const updateRecipePlanSchema = Joi.object({
+const updateMealPlanSchema = Joi.object({
   name: Joi.string().max(200),
   recipeIdList: Joi.array().items(Joi.number()).min(1),
 }).or('name', 'recipeIdList');
 
-const getRecipePlanQuerySchema = Joi.object({
+const getMealPlanQuerySchema = Joi.object({
   includeAggregatedIngredients: Joi.boolean().required(),
   includeIngredientsWithRecipes: Joi.boolean().required(),
 });
 
-export default class RecipePlanController {
+export default class MealPlanController {
   constructor(
-    private readonly recipePlanService: RecipePlanService,
+    private readonly mealPlanService: MealPlanService,
     private readonly eventsService: EventsService,
   ) {}
 
-  async getRecipePlan(req: Request, res: Response) {
+  async getMealPlan(req: Request, res: Response) {
     try {
-      const { error, value } = getRecipePlanQuerySchema.validate(req.query);
+      const { error, value } = getMealPlanQuerySchema.validate(req.query);
       const { includeAggregatedIngredients, includeIngredientsWithRecipes } =
         value;
 
@@ -35,14 +35,14 @@ export default class RecipePlanController {
       }
 
       // validate params
-      const recipePlanUuid = req.params.id + '';
+      const mealPlanUuid = req.params.id + '';
 
-      if (!validator.isUUID(recipePlanUuid)) {
-        throw new Error('Invalid recipe plan UUID argument');
+      if (!validator.isUUID(mealPlanUuid)) {
+        throw new Error('Invalid meal plan UUID argument');
       }
 
-      const plan = await this.recipePlanService.getPlan(
-        recipePlanUuid,
+      const plan = await this.mealPlanService.getPlan(
+        mealPlanUuid,
         includeAggregatedIngredients,
         includeIngredientsWithRecipes,
       );
@@ -52,60 +52,60 @@ export default class RecipePlanController {
         errors: [],
       });
     } catch (e: any) {
-      await this.eventsService.insert('RECIPE_PLAN', 'ERROR', e.message ?? '');
+      await this.eventsService.insert('MEAL_PLAN', 'ERROR', e.message ?? '');
       return res.status(400).json({
         errors: [e?.message],
       });
     }
   }
 
-  async saveRecipePlan(req: Request, res: Response) {
+  async saveMealPlan(req: Request, res: Response) {
     try {
       // validate body
-      const { error, value } = insertRecipePlanSchema.validate(req.body);
+      const { error, value } = insertMealPlanSchema.validate(req.body);
 
       if (error) {
         throw new Error(error.message);
       }
 
-      // insert recipe plan
+      // insert meal plan
       const { recipeIdList } = value;
 
-      const uuid = await this.recipePlanService.createPlan(recipeIdList);
+      const uuid = await this.mealPlanService.createPlan(recipeIdList);
 
       await this.eventsService.insert(
-        'RECIPE_PLAN',
+        'MEAL_PLAN',
         'SUCCESS',
         `Recipe ${uuid} created`,
       );
 
-      // return recipe plan uuid
+      // return meal plan uuid
       return res.status(200).json({
         result: { uuid },
         errors: [],
       });
 
-      // return recipe plan uuid
+      // return meal plan uuid
     } catch (e: any) {
-      await this.eventsService.insert('RECIPE_PLAN', 'ERROR', e.message ?? '');
+      await this.eventsService.insert('MEAL_PLAN', 'ERROR', e.message ?? '');
       return res.status(400).json({
         errors: [e?.message],
       });
     }
   }
 
-  async updateRecipePlan(req: Request, res: Response) {
+  async updateMealPlan(req: Request, res: Response) {
     try {
       // validate params
-      const recipePlanUuid = req.params.id + '';
+      const mealPlanUuid = req.params.id + '';
 
-      if (!validator.isUUID(recipePlanUuid)) {
-        throw new Error('Invalid recipe plan UUID argument');
+      if (!validator.isUUID(mealPlanUuid)) {
+        throw new Error('Invalid meal plan UUID argument');
       }
 
       // validate body
       // need valid name or recipeIdList or both
-      const { error, value } = updateRecipePlanSchema.validate(req.body);
+      const { error, value } = updateMealPlanSchema.validate(req.body);
 
       if (error) {
         throw new Error(error.message);
@@ -114,19 +114,19 @@ export default class RecipePlanController {
       const { name, recipeIdList } = value;
 
       // get all recipes and optional ingredients
-      const { name: recipePlanName, uuid } =
-        await this.recipePlanService.updatePlan({
-          uuid: recipePlanUuid,
+      const { name: mealPlanName, uuid } =
+        await this.mealPlanService.updatePlan({
+          uuid: mealPlanUuid,
           ...(recipeIdList && { recipeIdList }),
           ...(typeof name === 'string' && { name }),
         });
 
       return res.status(200).json({
-        result: { name: recipePlanName, uuid },
+        result: { name: mealPlanName, uuid },
         errors: [],
       });
     } catch (e: any) {
-      await this.eventsService.insert('RECIPE_PLAN', 'ERROR', e.message ?? '');
+      await this.eventsService.insert('MEAL_PLAN', 'ERROR', e.message ?? '');
       return res.status(400).json({
         errors: [e?.message],
       });

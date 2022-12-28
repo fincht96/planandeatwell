@@ -66,18 +66,18 @@ router.delete(
     req.container.resolve('recipeController').removeRecipe(req, res),
 );
 
-/** recipe plan */
+/** meal plan */
 
-router.get('/recipe-plan/:id', (req: Request, res: Response) => {
-  req.container.resolve('recipePlanController').getRecipePlan(req, res);
+router.get('/meal-plan/:id', (req: Request, res: Response) => {
+  req.container.resolve('mealPlanController').getMealPlan(req, res);
 });
 
-router.post('/recipe-plan', (req: Request, res: Response) => {
-  req.container.resolve('recipePlanController').saveRecipePlan(req, res);
+router.post('/meal-plan', (req: Request, res: Response) => {
+  req.container.resolve('mealPlanController').saveMealPlan(req, res);
 });
 
-router.put('/recipe-plan/:id', (req: Request, res: Response) => {
-  req.container.resolve('recipePlanController').updateRecipePlan(req, res);
+router.put('/meal-plan/:id', (req: Request, res: Response) => {
+  req.container.resolve('mealPlanController').updateMealPlan(req, res);
 });
 
 /** storage */
@@ -94,6 +94,10 @@ router.get(
 
 router.post('/user/sync-claims', (req: Request, res: Response) => {
   req.container.resolve('userController').syncClaims(req, res);
+});
+
+router.post('/user/create', (req: Request, res: Response) => {
+  req.container.resolve('userController').createAccount(req, res);
 });
 
 export default router;

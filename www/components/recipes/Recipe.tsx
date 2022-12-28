@@ -23,10 +23,7 @@ const Recipe = ({
   return (
     <BorderBox maxW={'sm'} maxH={'xl'} overflow={'hidden'}>
       <Box>
-        <Link
-          href={`${process.env.NEXT_PUBLIC_WWW_BASE_URL}recipes/${id}`}
-          isExternal
-        >
+        <Link href={`/recipes/${id}`} isExternal>
           <Image
             src={`${process.env.NEXT_PUBLIC_CDN}${imagePath}`}
             alt={name}
@@ -90,10 +87,7 @@ const Recipe = ({
 
         <Box display="flex" alignItems="center" flexDirection={'row'} mt={4}>
           <Box mr={'0.3rem'}>
-            <Link
-              href={`${process.env.NEXT_PUBLIC_WWW_BASE_URL}recipes/${id}`}
-              isExternal
-            >
+            <Link href={`/recipes/${id}`} isExternal>
               <Text fontSize={'md'} letterSpacing={'wide'}>
                 view recipe
               </Text>

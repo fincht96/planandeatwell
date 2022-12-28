@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import RecipeService from './recipe_service';
 
-export default class RecipePlanService {
+export default class MealPlanService {
   constructor(
     private readonly db: Knex,
     private readonly recipeService: RecipeService,
@@ -12,43 +12,41 @@ export default class RecipePlanService {
     includeAggregatedIngredients = false,
     includeIngredientsWithRecipes = false,
   ) {
-    const result = await this.db('recipe_plans')
-      .select('id')
-      .where('uuid', uuid);
+    const result = await this.db('meal_plans').select('id').where('uuid', uuid);
 
     const { id: planId } = result[0];
 
     const rawQuery = this.db.raw(`
     (
       select
-        recipes.recipe_plan_name,
-        recipes.recipe_plan_id,
+        recipes.meal_plan_name,
+        recipes.meal_plan_id,
         recipes.recipes,
         ingredients.ingredients
       from
         (
           select
-            rps.recipe_plan_name,
-            rps.recipe_plan_id,
-            rps.recipes
+            mps.meal_plan_name,
+            mps.meal_plan_id,
+            mps.recipes
           from
             (
               select
-                recipe_plans.name as recipe_plan_name,
-                recipe_plan_recipes.recipe_plan_id,
+                meal_plans.name as meal_plan_name,
+                meal_plan_recipes.meal_plan_id,
                 json_agg(recipes.*) as recipes
               from
-                recipe_plans
-                left join recipe_plan_recipes on recipe_plans.id = recipe_plan_recipes.recipe_plan_id
-                left join recipes on recipe_plan_recipes.recipe_id = recipes.id
+                meal_plans
+                left join meal_plan_recipes on meal_plans.id = meal_plan_recipes.meal_plan_id
+                left join recipes on meal_plan_recipes.recipe_id = recipes.id
               group by
-                recipe_plan_recipes.recipe_plan_id,
-                recipe_plans.name
-            ) as rps
+                meal_plan_recipes.meal_plan_id,
+                meal_plans.name
+            ) as mps
         ) as recipes
         left join (
           select
-            ings.recipe_plan_id,
+            ings.meal_plan_id,
             json_agg(
               jsonb_build_object(
                 'name',
@@ -66,49 +64,49 @@ export default class RecipePlanService {
           from
             (
               select
-                recipe_plans.id as recipe_plan_id,
+                meal_plans.id as meal_plan_id,
                 ingredients.id as ingredient_id,
                 ingredients.name as ingredient_name,
                 sum(recipe_ingredients.unit_quantity) as ingredient_quantity,
                 ingredients.price_per_unit as price_per_unit,
                 categories.name as category_name
               from
-                recipe_plans
-                left join recipe_plan_recipes on recipe_plans.id = recipe_plan_recipes.recipe_plan_id
-                left join recipes on recipe_plan_recipes.recipe_id = recipes.id
+                meal_plans
+                left join meal_plan_recipes on meal_plans.id = meal_plan_recipes.meal_plan_id
+                left join recipes on meal_plan_recipes.recipe_id = recipes.id
                 left join recipe_ingredients on recipes.id = recipe_ingredients.recipe_id
                 left join ingredients on recipe_ingredients.ingredient_id = ingredients.id
                 left join categories on ingredients.category_id = categories.id
               group by
-                recipe_plans.id,
+                meal_plans.id,
                 ingredients.id,
                 ingredients.name,
                 categories.name
             ) as ings
           group by
-            recipe_plan_id
-        ) as ingredients on recipes.recipe_plan_id = ingredients.recipe_plan_id
-    ) as recipe_plans
+            meal_plan_id
+        ) as ingredients on recipes.meal_plan_id = ingredients.meal_plan_id
+    ) as meal_plans
     `);
 
-    const recipePlanSelectColumns: Array<string> = [
-      'recipe_plans.recipe_plan_name',
-      'recipe_plans.recipes',
+    const mealPlanSelectColumns: Array<string> = [
+      'meal_plans.meal_plan_name',
+      'meal_plans.recipes',
     ];
 
     if (includeAggregatedIngredients) {
-      recipePlanSelectColumns.push('recipe_plans.ingredients');
+      mealPlanSelectColumns.push('meal_plans.ingredients');
     }
 
-    const recipePlanDecorated = await this.db
-      .select(recipePlanSelectColumns)
+    const mealPlanDecorated = await this.db
+      .select(mealPlanSelectColumns)
       .from(rawQuery)
-      .where('recipe_plans.recipe_plan_id', planId);
+      .where('meal_plans.meal_plan_id', planId);
 
     if (includeIngredientsWithRecipes) {
-      const response = await this.db('recipe_plan_recipes')
+      const response = await this.db('meal_plan_recipes')
         .select('recipe_id')
-        .where('recipe_plan_id', planId);
+        .where('meal_plan_id', planId);
 
       const recipeIdsForMealPlan = response.map((r) => parseInt(r.recipe_id));
 
@@ -122,31 +120,31 @@ export default class RecipePlanService {
       });
 
       const recipesWithIngredients = recipes;
-      recipePlanDecorated[0].recipes = recipesWithIngredients;
+      mealPlanDecorated[0].recipes = recipesWithIngredients;
     }
 
-    return recipePlanDecorated;
+    return mealPlanDecorated;
   }
 
   async createPlan(recipe_id_list: Array<number>) {
     return await this.db.transaction(async (trx) => {
-      // create a recipe plan
-      const result = await this.db('recipe_plans')
+      // create a meal plan
+      const result = await this.db('meal_plans')
         .insert({}, ['id', 'uuid'])
         .transacting(trx);
 
-      // insert recipe_plan_recipes with associated recipe_plan.id
-      const { id: recipe_plan_id, uuid: recipe_plan_uuid } = result[0];
-      const recipe_plan_recipes = recipe_id_list.map((recipe_id) => ({
-        recipe_plan_id,
+      // insert meal_plan_recipes with associated meal_plan.id
+      const { id: meal_plan_id, uuid: meal_plan_uuid } = result[0];
+      const meal_plan_recipes = recipe_id_list.map((recipe_id) => ({
+        meal_plan_id,
         recipe_id,
       }));
 
-      await this.db('recipe_plan_recipes')
-        .insert(recipe_plan_recipes)
+      await this.db('meal_plan_recipes')
+        .insert(meal_plan_recipes)
         .transacting(trx);
 
-      return recipe_plan_uuid;
+      return meal_plan_uuid;
     });
   }
 
@@ -160,43 +158,43 @@ export default class RecipePlanService {
     name?: string;
   }) {
     return await this.db.transaction(async (trx) => {
-      const result = await this.db('recipe_plans')
+      const result = await this.db('meal_plans')
         .select('id')
         .where('uuid', uuid)
         .transacting(trx);
 
       const { id: planId } = result[0];
 
-      // update recipes associated with recipe_plan (if provided recipeIdList)
+      // update recipes associated with meal_plan (if provided recipeIdList)
       if (recipeIdList?.length) {
-        // delete recipe_recipe_plan rows associated with recipe plan id
-        await this.db('recipe_plan_recipes')
-          .where('recipe_plan_id', planId)
+        // delete recipe_meal_plan rows associated with meal plan id
+        await this.db('meal_plan_recipes')
+          .where('meal_plan_id', planId)
           .del()
           .transacting(trx);
 
-        // insert recipe_plan_recipes with associated recipe_plan.id
-        const recipe_plan_recipes = recipeIdList.map((recipe_id) => ({
-          recipe_plan_id: planId,
+        // insert meal_plan_recipes with associated meal_plan.id
+        const meal_plan_recipes = recipeIdList.map((recipe_id) => ({
+          meal_plan_id: planId,
           recipe_id,
         }));
 
-        await this.db('recipe_plan_recipes')
-          .insert(recipe_plan_recipes)
+        await this.db('meal_plan_recipes')
+          .insert(meal_plan_recipes)
           .transacting(trx);
       }
 
-      // update recipe_plan name (if provided recipe_plan name)
+      // update meal_plan name (if provided meal_plan name)
       if (name) {
-        await this.db('recipe_plans').where('id', planId).update({ name });
+        await this.db('meal_plans').where('id', planId).update({ name });
       }
 
-      const recipePlan = await this.db('recipe_plans')
+      const mealPlan = await this.db('meal_plans')
         .select('id', 'name')
         .where('uuid', uuid)
         .transacting(trx);
 
-      return { uuid, name: recipePlan[0].name };
+      return { uuid, name: mealPlan[0].name };
     });
   }
 }

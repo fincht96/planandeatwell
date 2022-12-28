@@ -7,12 +7,11 @@ import {
   Grid,
   Icon,
   Link,
+  Select,
   Text,
   useToast,
-  Select
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -21,19 +20,17 @@ import { FiLink2 } from 'react-icons/fi';
 import { MdModeEdit } from 'react-icons/md';
 import Editable from '../../components/Editable';
 import Layout from '../../components/layout';
-import {
-  getRecipePlan,
-  updateRecipePlan,
-} from '../../utils/requests/recipe-plans';
+import { CustomNextPage } from '../../types/CustomNextPage';
+import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
 import { groupObjects } from '../../utils/groupObjects';
-import { IngredientDecorated } from '../../types/ingredientDecorated.types';
+import { getMealPlan, updateMealPlan } from '../../utils/requests/meal-plans';
 
 const ContentBox = ({
   title,
   rows,
   summary,
-  ingredientsViewSelectComponent
+  ingredientsViewSelectComponent,
 }: {
   title: any;
   rows: Array<any>;
@@ -59,20 +56,14 @@ const ContentBox = ({
             {title}
           </Text>
         </Box>
-        <Box>
-          {ingredientsViewSelectComponent}
-        </Box>
+        <Box>{ingredientsViewSelectComponent}</Box>
       </Flex>
       <Box>
         {rows.map((row) => {
           return (
             <Box mb={'1rem'} key={row.id}>
-              <Box>
-                {row.content}
-              </Box>
-              <Box>
-                {row.subContent}
-              </Box>
+              <Box>{row.content}</Box>
+              <Box>{row.subContent}</Box>
             </Box>
           );
         })}
@@ -80,38 +71,38 @@ const ContentBox = ({
       <Box my={'1rem'}>
         <Divider />
       </Box>
-      <Box>
-        {summary}
-      </Box>
+      <Box>{summary}</Box>
     </Box>
   );
 };
 
 type PermittedIngredientsViewStates = 'ALL' | 'RECIPE' | 'CATEGORY';
 
-const RecipePlan: NextPage = () => {
+const MealPlan: CustomNextPage = () => {
   const toast = useToast();
   const router = useRouter();
-  const recipePlanUuid =
+  const mealPlanUuid =
     typeof router.query.id === 'string' ? router.query.id : '';
 
-  const [recipePlanName, setRecipePlanName] = useState<string>('');
-  const [ingredientView, setIngredientView] = useState<PermittedIngredientsViewStates>('ALL');
+  const [ingredientView, setIngredientView] =
+    useState<PermittedIngredientsViewStates>('ALL');
+
+  const [mealPlanName, setMealPlanName] = useState<string>('');
 
   const recipeQuery: any = useQuery({
-    queryKey: [`recipesQuery-${recipePlanUuid}`],
-    queryFn: () => getRecipePlan(recipePlanUuid, true, true),
+    queryKey: [`recipesQuery-${mealPlanUuid}`],
+    queryFn: () => getMealPlan(mealPlanUuid, true, true),
     refetchOnMount: 'always',
     staleTime: Infinity,
-    enabled: !!recipePlanUuid.length,
+    enabled: !!mealPlanUuid.length,
   });
 
-  const recipePlanMutation = useMutation({
-    mutationFn: ({ recipePlanName }: { recipePlanName: string }) => {
-      return updateRecipePlan(recipePlanUuid, { name: recipePlanName });
+  const mealPlanMutation = useMutation({
+    mutationFn: ({ mealPlanName }: { mealPlanName: string }) => {
+      return updateMealPlan(mealPlanUuid, { name: mealPlanName });
     },
     onSuccess: (data) => {
-      setRecipePlanName(data.name);
+      setMealPlanName(data.name);
     },
   });
 
@@ -128,11 +119,13 @@ const RecipePlan: NextPage = () => {
 
   const ingredients: Array<IngredientDecorated> = useMemo(() => {
     return !recipeQuery.isLoading && !recipeQuery.error
-      ? recipeQuery.data[0].ingredients.map((ingredient: IngredientDecorated) => {
-          const unitQuantity = Math.ceil(ingredient.unitQuantity);
-          const price = ingredient.pricePerUnit * unitQuantity;
-          return { ...ingredient, unitQuantity, price };
-        })
+      ? recipeQuery.data[0].ingredients.map(
+          (ingredient: IngredientDecorated) => {
+            const unitQuantity = Math.ceil(ingredient.unitQuantity);
+            const price = ingredient.pricePerUnit * unitQuantity;
+            return { ...ingredient, unitQuantity, price };
+          },
+        )
       : [];
   }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
 
@@ -173,9 +166,9 @@ const RecipePlan: NextPage = () => {
   } = useForm<any>({});
 
   const onSubmit: SubmitHandler<any> = (data, closeEditing) => {
-    if (data.recipePlanName !== recipePlanName) {
-      recipePlanMutation.mutate({
-        recipePlanName: data.recipePlanName,
+    if (data.mealPlanName !== mealPlanName) {
+      mealPlanMutation.mutate({
+        mealPlanName: data.mealPlanName,
       });
     }
     closeEditing();
@@ -187,16 +180,10 @@ const RecipePlan: NextPage = () => {
         id: ingredient.id,
         content: (
           <Flex justifyContent={'space-between'} gap={'1rem'}>
-            <Text
-              color={'gray.dark'}
-              fontSize={{ base: '0.9rem', md: '1rem' }}
-            >
+            <Text color={'gray.dark'} fontSize={{ base: '0.9rem', md: '1rem' }}>
               {ingredient.unitQuantity}x {ingredient.name}
             </Text>
-            <Text
-              color={'gray.dark'}
-              fontSize={{ base: '0.9rem', md: '1rem' }}
-            >
+            <Text color={'gray.dark'} fontSize={{ base: '0.9rem', md: '1rem' }}>
               £{ingredient.price.toFixed(2)}
             </Text>
           </Flex>
@@ -206,7 +193,6 @@ const RecipePlan: NextPage = () => {
 
     if (ingredientView === 'RECIPE') {
       return recipes?.map((recipe: any) => {
-
         const ingredients = recipe.ingredientsList;
 
         return {
@@ -216,75 +202,81 @@ const RecipePlan: NextPage = () => {
               <Text
                 color={'gray.dark'}
                 fontSize={{ base: '0.9rem', md: '1rem' }}
-                as='b'
+                as="b"
               >
                 {recipe.name}
               </Text>
             </Flex>
           ),
           subContent: (
-            <Flex flexDirection={'column'} gap={'1rem'} >
+            <Flex flexDirection={'column'} gap={'1rem'}>
               {ingredients.map((ingredient: any) => {
                 return (
                   <Flex key={ingredient.id}>
                     <Text
-                    color={'gray.dark'}
-                    fontSize={{ base: '0.9rem', md: '1rem' }}
-                  >
-                     {convertDecimalToFraction(ingredient.unitQuantity, true)} - {ingredient.name}
-                  </Text>
-                </Flex>
-                )
+                      color={'gray.dark'}
+                      fontSize={{ base: '0.9rem', md: '1rem' }}
+                    >
+                      {convertDecimalToFraction(ingredient.unitQuantity, true)}{' '}
+                      - {ingredient.name}
+                    </Text>
+                  </Flex>
+                );
               })}
             </Flex>
-          )
-        }
+          ),
+        };
       });
     }
 
     if (ingredientView === 'CATEGORY') {
-      const ingredientsGroupedByCategoryArray = groupObjects(ingredients, 'categoryName');
+      const ingredientsGroupedByCategoryArray = groupObjects(
+        ingredients,
+        'categoryName',
+      );
 
-      return ingredientsGroupedByCategoryArray.map(([categoryName, groupedIngredients]) => {
-        return {
-          id: categoryName,
-          content: (
-            <Flex justifyContent={'space-between'} gap={'1rem'}>
-              <Text
-                color={'gray.dark'}
-                fontSize={{ base: '0.9rem', md: '1rem' }}
-                as='b'
-              >
-                {categoryName} 
-              </Text>
-            </Flex>
-          ),
-          subContent: (
-            <Flex flexDirection={'column'} gap={'1rem'} >
-              {groupedIngredients.map((ingredient: IngredientDecorated) => {
-                return (
-                  <Flex key={ingredient.id} justifyContent={'space-between'}>
-                    <Text
-                      color={'gray.dark'}
-                      fontSize={{ base: '0.9rem', md: '1rem' }}
+      return ingredientsGroupedByCategoryArray.map(
+        ([categoryName, groupedIngredients]) => {
+          return {
+            id: categoryName,
+            content: (
+              <Flex justifyContent={'space-between'} gap={'1rem'}>
+                <Text
+                  color={'gray.dark'}
+                  fontSize={{ base: '0.9rem', md: '1rem' }}
+                  as="b"
+                >
+                  {categoryName}
+                </Text>
+              </Flex>
+            ),
+            subContent: (
+              <Flex flexDirection={'column'} gap={'1rem'}>
+                {groupedIngredients.map((ingredient: IngredientDecorated) => {
+                  return (
+                    <Flex key={ingredient.id} justifyContent={'space-between'}>
+                      <Text
+                        color={'gray.dark'}
+                        fontSize={{ base: '0.9rem', md: '1rem' }}
                       >
-                      {ingredient.unitQuantity}x {ingredient.name}
-                    </Text>
-                    <Text
-                      color={'gray.dark'}
-                      fontSize={{ base: '0.9rem', md: '1rem' }}
-                    >
-                      £{ingredient.price.toFixed(2)}
-                  </Text>
-                </Flex>
-                )
-              })}
-            </Flex>
-          )
-        }
-      });
+                        {ingredient.unitQuantity}x {ingredient.name}
+                      </Text>
+                      <Text
+                        color={'gray.dark'}
+                        fontSize={{ base: '0.9rem', md: '1rem' }}
+                      >
+                        £{ingredient.price.toFixed(2)}
+                      </Text>
+                    </Flex>
+                  );
+                })}
+              </Flex>
+            ),
+          };
+        },
+      );
     }
-  }
+  };
 
   const handleSelectChange = (event: any) => {
     if (!event.target.value) {
@@ -296,20 +288,20 @@ const RecipePlan: NextPage = () => {
 
   useEffect(() => {
     if (!recipeQuery.isLoading && !recipeQuery.error) {
-      setRecipePlanName(recipeQuery.data[0].recipePlanName);
-      setValue('recipePlanName', `${recipeQuery.data[0].recipePlanName}`);
+      setMealPlanName(recipeQuery.data[0].mealPlanName);
+      setValue('mealPlanName', `${recipeQuery.data[0].mealPlanName}`);
     }
   }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error, setValue]);
 
-  const rowData = generateRowData(); 
+  const rowData = generateRowData();
 
   return (
     <Layout>
       <Head>
-        <title>Recipe Plan | Plan and Eat Well</title>
+        <title>Meal Plan | Plan and Eat Well</title>
       </Head>
 
-      <Container my={'2rem'} w={'95vw'} maxW={'1100px'} pt={'4rem'}>
+      <Container my={'2rem'} maxW={'1100px'}>
         <Flex
           justifyContent={'space-between'}
           alignItems={'center'}
@@ -318,11 +310,11 @@ const RecipePlan: NextPage = () => {
         >
           <Box flex={1}>
             <Editable
-              previewValue={recipePlanName}
+              previewValue={mealPlanName}
               handleSubmit={(e, closeEditing) => {
                 handleSubmit((d) => onSubmit(d, closeEditing))(e);
               }}
-              {...register('recipePlanName', {
+              {...register('mealPlanName', {
                 required: 'A name is required',
                 maxLength: {
                   value: 199,
@@ -330,13 +322,13 @@ const RecipePlan: NextPage = () => {
                 },
               })}
               resetForm={() => {
-                reset({ recipePlanName });
+                reset({ mealPlanName });
               }}
               error={{
-                isError: !!errors.recipePlanName,
-                message: errors.recipePlanName?.message,
+                isError: !!errors.mealPlanName,
+                message: errors.mealPlanName?.message,
               }}
-              name={'recipePlanName'}
+              name={'mealPlanName'}
             />
           </Box>
         </Flex>
@@ -374,10 +366,10 @@ const RecipePlan: NextPage = () => {
             fontWeight={400}
             minW={'min-content'}
             onClick={() => {
-              onNavigate('/menu', {
+              onNavigate('/create-plan/menu', {
                 supermarket: 'aldi',
                 servings: 4,
-                recipe_plan_uuid: recipePlanUuid,
+                meal_plan_uuid: mealPlanUuid,
               });
             }}
           >
@@ -400,18 +392,18 @@ const RecipePlan: NextPage = () => {
         <Grid
           templateColumns={{
             base: '1fr',
-            md: '1fr 0.5fr',
+            lg: '1fr 0.5fr',
           }}
           gap={6}
         >
           <ContentBox
-            ingredientsViewSelectComponent={(
-              <Select size='sm' onChange={handleSelectChange}>
-                <option value='ALL'>All</option>
-                <option value='RECIPE'>Recipes</option>
-                <option value='CATEGORY'>Categories</option>
+            ingredientsViewSelectComponent={
+              <Select size="sm" onChange={handleSelectChange}>
+                <option value="ALL">All</option>
+                <option value="RECIPE">Recipes</option>
+                <option value="CATEGORY">Categories</option>
               </Select>
-            )}
+            }
             title={
               <Text as={'span'}>
                 Ingredients{' '}
@@ -424,26 +416,26 @@ const RecipePlan: NextPage = () => {
             summary={
               ingredientView !== 'RECIPE' && (
                 <Flex justifyContent={'space-between'} alignItems={'center'}>
-                <Text
-                  fontWeight={'600'}
-                  color={'#4d4d4d'}
-                  fontSize={{ base: '0.9rem', md: '1rem' }}
-                >
-                  Total price
-                </Text>
-                <Text
-                  fontWeight={'600'}
-                  color={'#4d4d4d'}
-                  fontSize={{ base: '0.9rem', md: '1rem' }}
-                >
-                  £{totalPrice.toFixed(2)}
-                </Text>
-              </Flex>
+                  <Text
+                    fontWeight={'600'}
+                    color={'#4d4d4d'}
+                    fontSize={{ base: '0.9rem', md: '1rem' }}
+                  >
+                    Total price
+                  </Text>
+                  <Text
+                    fontWeight={'600'}
+                    color={'#4d4d4d'}
+                    fontSize={{ base: '0.9rem', md: '1rem' }}
+                  >
+                    £{totalPrice.toFixed(2)}
+                  </Text>
+                </Flex>
               )
             }
           />
 
-          <Box>
+          <Box gridRow={{ base: 1, lg: 'auto' }}>
             <ContentBox
               title={
                 <Text as={'span'}>
@@ -504,4 +496,6 @@ const RecipePlan: NextPage = () => {
   );
 };
 
-export default RecipePlan;
+MealPlan.requireAuth = true;
+
+export default MealPlan;

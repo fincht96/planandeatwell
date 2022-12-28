@@ -267,7 +267,7 @@ export default class RecipeService {
         )
         .transacting(trx);
 
-      // insert recipe_plan_recipes with associated recipe_plan.id
+      // insert meal_plan_recipes with associated meal_plan.id
       const { id: recipe_id } = result[0];
       const recipe_ingredients = ingredients.map(
         ({

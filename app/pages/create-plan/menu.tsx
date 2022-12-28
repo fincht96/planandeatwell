@@ -1,36 +1,36 @@
 import { Button, Container, Flex, Grid, Text } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Layout from '../components/layout';
-import SearchMenu from '../components/menu/SearchMenu';
-import MenuSummaryBar from '../components/MenuSummaryBar';
-import Recipe from '../components/Recipe';
-import { useEventBus } from '../hooks/useEventBus';
-import { Event } from '../types/eventBus.types';
-import { Order, OrderBy, SortBy } from '../types/order.types';
+import Layout from '../../components/layout';
+import SearchMenu from '../../components/menu/SearchMenu';
+import Recipe from '../../components/Recipe';
+import { useEventBus } from '../../hooks/useEventBus';
+import { Event } from '../../types/eventBus.types';
+import { Order, OrderBy, SortBy } from '../../types/order.types';
 import {
   queryParamToString,
   queryParamToStringArray,
-} from '../utils/queryParamConversions';
+} from '../../utils/queryParamConversions';
 import {
-  getRecipePlan,
-  insertRecipePlan,
-  updateRecipePlan,
-} from '../utils/requests/recipe-plans';
-import { getRecipes } from '../utils/requests/recipes';
-import { roundTo2dp } from '../utils/roundTo2dp';
-import { orderToSortBy, sortByToOrder } from '../utils/sortByConversions';
+  getMealPlan,
+  insertMealPlan,
+  updateMealPlan,
+} from '../../utils/requests/meal-plans';
+import { getRecipes } from '../../utils/requests/recipes';
+import { roundTo2dp } from '../../utils/roundTo2dp';
+import { orderToSortBy, sortByToOrder } from '../../utils/sortByConversions';
 
-import { IngredientDecorated } from '../types/ingredientDecorated.types';
+import MenuSummaryBar from '../../components/MenuSummaryBar';
+import { CustomNextPage } from '../../types/CustomNextPage';
+import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 
-const Menu: NextPage = () => {
+const Menu: CustomNextPage = () => {
   const { subscribe, unsubscribe, post } = useEventBus();
   const router = useRouter();
   const [recipes, setRecipes] = useState<Array<any>>([]);
-  const [recipePlanQueryParams, setRecipePlanQueryParams] = useState<{
+  const [mealPlanQueryParams, setMealPlanQueryParams] = useState<{
     uuid: string;
   }>({ uuid: '' });
   const [recipeQueryParams, setRecipeQueryParams] = useState<{
@@ -187,7 +187,7 @@ const Menu: NextPage = () => {
     );
   }, [ingredientsBasket]);
 
-  const recipePlanMutation = useMutation({
+  const mealPlanMutation = useMutation({
     mutationFn: ({
       updateExisting,
       recipeIdList,
@@ -196,11 +196,11 @@ const Menu: NextPage = () => {
       recipeIdList: Array<number>;
     }) => {
       return updateExisting
-        ? updateRecipePlan(recipePlanQueryParams.uuid, { recipeIdList })
-        : insertRecipePlan(recipeIdList);
+        ? updateMealPlan(mealPlanQueryParams.uuid, { recipeIdList })
+        : insertMealPlan(recipeIdList);
     },
     onSuccess: (data: any) => {
-      return onNavigate(`/recipe-plan/${data.uuid}`);
+      return onNavigate(`/meal-plans/${data.uuid}`);
     },
   });
 
@@ -247,15 +247,15 @@ const Menu: NextPage = () => {
   );
 
   useQuery({
-    queryKey: ['recipePlanQuery', recipePlanQueryParams.uuid],
+    queryKey: ['mealPlanQuery', mealPlanQueryParams.uuid],
     queryFn: () => {
-      const uuid = recipePlanQueryParams.uuid;
-      return getRecipePlan(uuid, true);
+      const uuid = mealPlanQueryParams.uuid;
+      return getMealPlan(uuid, true);
     },
     staleTime: 0,
     refetchOnMount: 'always',
     refetchOnWindowFocus: false,
-    enabled: router.isReady && !!recipePlanQueryParams.uuid.length,
+    enabled: router.isReady && !!mealPlanQueryParams.uuid.length,
     onSuccess: (data) => {
       const recipes = data[0].recipes ?? [];
       const ingredients = data[0].ingredients ?? [];
@@ -307,7 +307,7 @@ const Menu: NextPage = () => {
     return () => unsubscribe(recipeInsertSubscriber);
   }, [subscribe, unsubscribe, addRecipeIngredientsToBasket]);
 
-  // initializes recipeQueryParams and recipePlanQueryParams
+  // initializes recipeQueryParams and mealPlanQueryParams
   useEffect(() => {
     if (router.isReady && !queryParamsInitialised) {
       const meals = queryParamToStringArray(router.query['meals']);
@@ -316,7 +316,7 @@ const Menu: NextPage = () => {
       const order = queryParamToString<Order>(router.query['order']);
       const orderBy = queryParamToString<OrderBy>(router.query['orderBy']);
       const searchTerm = queryParamToString(router.query['searchTerm']);
-      const uuid = queryParamToString(router.query['recipe_plan_uuid']);
+      const uuid = queryParamToString(router.query['meal_plan_uuid']);
 
       setRecipeQueryParams((current) => {
         return {
@@ -330,7 +330,7 @@ const Menu: NextPage = () => {
         };
       });
 
-      setRecipePlanQueryParams((current) => ({
+      setMealPlanQueryParams((current) => ({
         ...current,
         uuid,
       }));
@@ -353,7 +353,7 @@ const Menu: NextPage = () => {
         <title>Menu | Plan and Eat Well</title>
       </Head>
 
-      <Container mt={'5rem'} w={'95vw'} maxW={'1600px'} pt={'1rem'} pb={'5rem'}>
+      <Container maxW={'1600px'} pt={'1rem'} pb={'5rem'}>
         <SearchMenu
           mb={'2rem'}
           mealsFilters={recipeQueryParams.meals}
@@ -480,15 +480,14 @@ const Menu: NextPage = () => {
           </Flex>
         )}
       </Container>
-
       <MenuSummaryBar
         currentPrice={totalBasketPrice}
         ingredientList={ingredientsBasket}
         recipeList={recipeBasket}
         servings={recipeBasket.length * 4}
         onComplete={() => {
-          recipePlanMutation.mutate({
-            updateExisting: !!recipePlanQueryParams.uuid.length,
+          mealPlanMutation.mutate({
+            updateExisting: !!mealPlanQueryParams.uuid.length,
             recipeIdList: recipeBasket.map((recipe) => recipe.id),
           });
         }}
@@ -496,5 +495,7 @@ const Menu: NextPage = () => {
     </Layout>
   );
 };
+
+Menu.requireAuth = true;
 
 export default Menu;

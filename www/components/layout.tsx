@@ -20,7 +20,7 @@ export default function Layout({ children, excludeFooter }: layoutArg) {
         <link rel="icon" href="/favicon.ico" />
         <meta
           name="description"
-          content="A free tool for creating budgeted recipe plans from your local supermarket with meals starting from less than £0.99/pp"
+          content="A free tool for creating budgeted meal plans from your local supermarket with meals starting from less than £0.99/pp"
         />
         <meta
           property="og:image"

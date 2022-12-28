@@ -25,7 +25,15 @@ export default function MenuSummaryBar({
   const [isLessThan500] = useMediaQuery('(max-width: 500px)');
 
   return (
-    <Box sx={{ position: 'fixed', bottom: '0px', width: '100%', zIndex: '3' }}>
+    <Box
+      sx={{
+        position: 'fixed',
+        left: '0px',
+        bottom: '0px',
+        width: '100%',
+        zIndex: '3',
+      }}
+    >
       <Flex
         bg={useColorModeValue('#D9D9D9', 'gray.800')}
         color={useColorModeValue('gray.600', 'white')}

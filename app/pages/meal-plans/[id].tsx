@@ -24,10 +24,7 @@ import { CustomNextPage } from '../../types/CustomNextPage';
 import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
 import { groupObjects } from '../../utils/groupObjects';
-import {
-  getRecipePlan,
-  updateRecipePlan,
-} from '../../utils/requests/recipe-plans';
+import { getMealPlan, updateMealPlan } from '../../utils/requests/meal-plans';
 
 const ContentBox = ({
   title,
@@ -81,30 +78,31 @@ const ContentBox = ({
 
 type PermittedIngredientsViewStates = 'ALL' | 'RECIPE' | 'CATEGORY';
 
-const RecipePlan: CustomNextPage = () => {
+const MealPlan: CustomNextPage = () => {
   const toast = useToast();
   const router = useRouter();
-  const recipePlanUuid =
+  const mealPlanUuid =
     typeof router.query.id === 'string' ? router.query.id : '';
 
-  const [recipePlanName, setRecipePlanName] = useState<string>('');
   const [ingredientView, setIngredientView] =
     useState<PermittedIngredientsViewStates>('ALL');
 
+  const [mealPlanName, setMealPlanName] = useState<string>('');
+
   const recipeQuery: any = useQuery({
-    queryKey: [`recipesQuery-${recipePlanUuid}`],
-    queryFn: () => getRecipePlan(recipePlanUuid, true, true),
+    queryKey: [`recipesQuery-${mealPlanUuid}`],
+    queryFn: () => getMealPlan(mealPlanUuid, true, true),
     refetchOnMount: 'always',
     staleTime: Infinity,
-    enabled: !!recipePlanUuid.length,
+    enabled: !!mealPlanUuid.length,
   });
 
-  const recipePlanMutation = useMutation({
-    mutationFn: ({ recipePlanName }: { recipePlanName: string }) => {
-      return updateRecipePlan(recipePlanUuid, { name: recipePlanName });
+  const mealPlanMutation = useMutation({
+    mutationFn: ({ mealPlanName }: { mealPlanName: string }) => {
+      return updateMealPlan(mealPlanUuid, { name: mealPlanName });
     },
     onSuccess: (data) => {
-      setRecipePlanName(data.name);
+      setMealPlanName(data.name);
     },
   });
 
@@ -168,9 +166,9 @@ const RecipePlan: CustomNextPage = () => {
   } = useForm<any>({});
 
   const onSubmit: SubmitHandler<any> = (data, closeEditing) => {
-    if (data.recipePlanName !== recipePlanName) {
-      recipePlanMutation.mutate({
-        recipePlanName: data.recipePlanName,
+    if (data.mealPlanName !== mealPlanName) {
+      mealPlanMutation.mutate({
+        mealPlanName: data.mealPlanName,
       });
     }
     closeEditing();
@@ -290,8 +288,8 @@ const RecipePlan: CustomNextPage = () => {
 
   useEffect(() => {
     if (!recipeQuery.isLoading && !recipeQuery.error) {
-      setRecipePlanName(recipeQuery.data[0].recipePlanName);
-      setValue('recipePlanName', `${recipeQuery.data[0].recipePlanName}`);
+      setMealPlanName(recipeQuery.data[0].mealPlanName);
+      setValue('mealPlanName', `${recipeQuery.data[0].mealPlanName}`);
     }
   }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error, setValue]);
 
@@ -300,7 +298,7 @@ const RecipePlan: CustomNextPage = () => {
   return (
     <Layout>
       <Head>
-        <title>Recipe Plan | Plan and Eat Well</title>
+        <title>Meal Plan | Plan and Eat Well</title>
       </Head>
 
       <Container my={'2rem'} maxW={'1100px'}>
@@ -312,11 +310,11 @@ const RecipePlan: CustomNextPage = () => {
         >
           <Box flex={1}>
             <Editable
-              previewValue={recipePlanName}
+              previewValue={mealPlanName}
               handleSubmit={(e, closeEditing) => {
                 handleSubmit((d) => onSubmit(d, closeEditing))(e);
               }}
-              {...register('recipePlanName', {
+              {...register('mealPlanName', {
                 required: 'A name is required',
                 maxLength: {
                   value: 199,
@@ -324,13 +322,13 @@ const RecipePlan: CustomNextPage = () => {
                 },
               })}
               resetForm={() => {
-                reset({ recipePlanName });
+                reset({ mealPlanName });
               }}
               error={{
-                isError: !!errors.recipePlanName,
-                message: errors.recipePlanName?.message,
+                isError: !!errors.mealPlanName,
+                message: errors.mealPlanName?.message,
               }}
-              name={'recipePlanName'}
+              name={'mealPlanName'}
             />
           </Box>
         </Flex>
@@ -371,7 +369,7 @@ const RecipePlan: CustomNextPage = () => {
               onNavigate('/create-plan/menu', {
                 supermarket: 'aldi',
                 servings: 4,
-                recipe_plan_uuid: recipePlanUuid,
+                meal_plan_uuid: mealPlanUuid,
               });
             }}
           >
@@ -498,6 +496,6 @@ const RecipePlan: CustomNextPage = () => {
   );
 };
 
-RecipePlan.requireAuth = true;
+MealPlan.requireAuth = true;
 
-export default RecipePlan;
+export default MealPlan;

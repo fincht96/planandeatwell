@@ -1,10 +1,10 @@
-import styles from "../../styles/Hero.module.css";
-import Image from "next/image";
-import { Text, SimpleGrid, Box, Stack, Container } from "@chakra-ui/react";
+import styles from '../../styles/Hero.module.css';
+import Image from 'next/image';
+import { Text, SimpleGrid, Box, Stack, Container } from '@chakra-ui/react';
 
-import { useEffect, useState, useMemo } from "react";
-import SignupForm from "../SignupForm";
-import NavDown from "../NavDown";
+import { useEffect, useState, useMemo } from 'react';
+import SignupForm from '../SignupForm';
+import NavDown from '../NavDown';
 
 const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
   return (
@@ -12,17 +12,17 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
       <SimpleGrid columns={2} spacing={10}>
         <Box
           w="100%"
-          display={"flex"}
+          display={'flex'}
           flexDirection="column"
-          justifyContent={"space-between"}
+          justifyContent={'space-between'}
         >
-          <Stack spacing={5} py={"130px"}>
-            <Stack direction={"column"} spacing={2}>
+          <Stack spacing={5} py={'130px'}>
+            <Stack direction={'column'} spacing={2}>
               <Text fontSize="50px" color="gray.dark" fontWeight={500}>
                 Not sure what to cook?
               </Text>
 
-              <Stack direction={"row"}>
+              <Stack direction={'row'}>
                 <Text fontSize="50px" color="gray.dark" fontWeight={500}>
                   We save you&nbsp;
                 </Text>
@@ -32,8 +32,8 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
                     fontSize="50px"
                     color="gray.dark"
                     fontWeight={300}
-                    className={show ? styles.typedOut : ""}
-                    visibility={show ? "visible" : "hidden"}
+                    className={show ? styles.typedOut : ''}
+                    visibility={show ? 'visible' : 'hidden'}
                   >
                     {keyword}
                   </Text>
@@ -42,7 +42,7 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
             </Stack>
 
             <Text fontSize="20px" color="gray.normal" fontWeight={400}>
-              A free tool for creating budgeted recipe plans from your local
+              A free tool for creating budgeted meal plans from your local
               supermarket with meals starting from less than £0.99/pp
             </Text>
           </Stack>
@@ -55,13 +55,13 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
             src="/images/cooking-pan.png"
             height={663}
             width={663}
-            alt={"cooking pan"}
+            alt={'cooking pan'}
           />
         </Box>
       </SimpleGrid>
 
-      <Box display="flex" justifyContent={"center"}>
-        <NavDown link={"#what-is-it"} color={"gray.light"} />
+      <Box display="flex" justifyContent={'center'}>
+        <NavDown link={'#what-is-it'} color={'gray.light'} />
       </Box>
     </Stack>
   );
@@ -73,17 +73,17 @@ const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
       <SimpleGrid columns={1} spacing={10}>
         <Box
           w="100%"
-          display={"flex"}
+          display={'flex'}
           flexDirection="column"
-          justifyContent={"space-between"}
+          justifyContent={'space-between'}
         >
           <Stack spacing={50}>
-            <Stack direction={"column"} spacing={2} alignItems={"center"}>
+            <Stack direction={'column'} spacing={2} alignItems={'center'}>
               <Text fontSize="6vw" color="gray.dark" fontWeight={500}>
                 Not sure what to cook?
               </Text>
 
-              <Stack direction={"row"}>
+              <Stack direction={'row'}>
                 <Text fontSize="6vw" color="gray.dark" fontWeight={500} sx={{}}>
                   We save you&nbsp;
                 </Text>
@@ -93,8 +93,8 @@ const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
                     fontSize="6vw"
                     color="gray.dark"
                     fontWeight={300}
-                    className={show ? styles.typedOut : ""}
-                    visibility={show ? "visible" : "hidden"}
+                    className={show ? styles.typedOut : ''}
+                    visibility={show ? 'visible' : 'hidden'}
                   >
                     {keyword}
                   </Text>
@@ -102,8 +102,8 @@ const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
               </Stack>
             </Stack>
 
-            <Text fontSize={{ md: "3vw" }} color="gray.normal" fontWeight={400}>
-              A free tool for creating budgeted recipe plans from your local
+            <Text fontSize={{ md: '3vw' }} color="gray.normal" fontWeight={400}>
+              A free tool for creating budgeted meal plans from your local
               supermarket with meals starting from less than £0.99/pp
             </Text>
 
@@ -112,8 +112,8 @@ const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
         </Box>
       </SimpleGrid>
 
-      <Box display="flex" justifyContent={"center"}>
-        <NavDown link={"#what-is-it"} color={"gray.light"} />
+      <Box display="flex" justifyContent={'center'}>
+        <NavDown link={'#what-is-it'} color={'gray.light'} />
       </Box>
     </Stack>
   );
@@ -121,7 +121,7 @@ const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
 
 const Hero = () => {
   const [show, setShow] = useState(true);
-  const words = useMemo(() => ["time", "money", "effort"], []);
+  const words = useMemo(() => ['time', 'money', 'effort'], []);
   const [keyword, setKeyword] = useState(words[0]);
 
   useEffect(() => {
@@ -146,18 +146,18 @@ const Hero = () => {
 
   return (
     <Box
-      backgroundColor={"#FCFCFC"}
-      pt={"100px"}
+      backgroundColor={'#FCFCFC'}
+      pt={'100px'}
       borderBottom={1}
-      borderStyle={"solid"}
-      borderColor={"gray.200"}
+      borderStyle={'solid'}
+      borderColor={'gray.200'}
     >
       <Container maxW="1200px" mb={10}>
-        <Box display={{ base: "none", lg: "block" }}>
+        <Box display={{ base: 'none', lg: 'block' }}>
           <DesktopHero keyword={keyword} show={show} />
         </Box>
 
-        <Box display={{ base: "block", lg: "none" }}>
+        <Box display={{ base: 'block', lg: 'none' }}>
           <MobileHero keyword={keyword} show={show} />
         </Box>
       </Container>

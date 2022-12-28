@@ -13,12 +13,12 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
-import { stripHtml } from 'string-strip-html';
 import Layout from '../components/layout';
 import IngredientsSearchModal from '../components/modal/IngredientsSearchModal';
 import InstructionsAddModal from '../components/modal/InstructionsAddModal';
@@ -39,6 +39,14 @@ import {
 } from '../utils/requests/recipes';
 import { getSignedUploadUrl } from '../utils/requests/storage';
 import { toTitleCase } from '../utils/toTitleCase';
+
+// run import only on client
+const Interweave = dynamic<any>(
+  () => import('interweave').then((mod) => mod.Interweave),
+  {
+    ssr: false,
+  },
+);
 
 const RecipeInstructionCard = ({
   indexPosition,
@@ -63,7 +71,7 @@ const RecipeInstructionCard = ({
           <Text fontSize={'1rem'} fontWeight={100}>
             Step: {step}
           </Text>
-          <Text fontSize={'1rem'}>{instruction}</Text>
+          <Interweave content={instruction} />
         </Box>
       </Flex>
       <Button
@@ -470,8 +478,6 @@ export default function Recipes() {
       ...current,
       {
         instruction: stepCreationEvent.richTextContent,
-        instructionStripped: stripHtml(stepCreationEvent.richTextContent)
-          .result,
       },
     ]);
   };
@@ -794,7 +800,7 @@ export default function Recipes() {
                               <Box key={index}>
                                 <RecipeInstructionCard
                                   indexPosition={index}
-                                  instruction={instruction.instructionStripped}
+                                  instruction={instruction.instruction}
                                   onDelete={onRemoveInstructionsStep}
                                 />
                               </Box>

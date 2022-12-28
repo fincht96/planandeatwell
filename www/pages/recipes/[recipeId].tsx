@@ -17,14 +17,15 @@ import {
 import { getRecipes } from '../../utils/api-requests/recipes';
 import Image from 'next/image';
 import BorderBox from '../../components/BorderBox';
+import dynamic from 'next/dynamic';
 
-// will remove this once we have instructions given to us by database
-const instructionsDummy = [
-  { step: 1, instruction: 'do this thing gdf <b>hello world</b> this is' },
-  { step: 2, instruction: 'do this thing blahwell go to shop' },
-  { step: 3, instruction: 'do this thing teasdt sad' },
-  { step: 4, instruction: 'do this thing asdasdasd' },
-];
+// run import only on client
+const Interweave = dynamic<any>(
+  () => import('interweave').then((mod) => mod.Interweave),
+  {
+    ssr: false,
+  },
+);
 
 const Recipe: NextPage = ({ recipe }: any) => {
   const updatedSiteTitle = `Recipe | ${siteTitle}`;
@@ -39,7 +40,7 @@ const Recipe: NextPage = ({ recipe }: any) => {
               <Box display={'flex'} flexDirection={'column'}>
                 <BorderBox mb={4} p={3}>
                   <Text fontSize={'2.5rem'} fontWeight={600} color="gray.dark">
-                    {recipe?.name}
+                    {recipe.name}
                   </Text>
                 </BorderBox>
                 <Tabs
@@ -78,38 +79,46 @@ const Recipe: NextPage = ({ recipe }: any) => {
                               fontWeight={450}
                               color="gray.light"
                             >
-                              for {recipe?.servings} servings - change as needed
+                              for {recipe.servings} servings - change as needed
                             </Text>
                           </Box>
                         </Box>
 
                         <Box>
-                          {instructionsDummy.map((instruction) => {
-                            return (
-                              <Box
-                                key={instruction.step}
-                                display="flex"
-                                flexDirection={'row'}
-                                mb={2.5}
-                                alignItems={'center'}
-                              >
+                          {recipe.instructionsList.map(
+                            (instruction: {
+                              id: number;
+                              instruction: string;
+                              step: number;
+                            }) => {
+                              return (
                                 <Box
-                                  mr={'0.5rem'}
-                                  borderRadius={'9999px'}
-                                  borderWidth={'1px'}
-                                  width={'1.75rem'}
-                                  height={'1.75rem'}
+                                  key={instruction.step}
                                   display="flex"
+                                  flexDirection={'row'}
+                                  mb={2.5}
                                   alignItems={'center'}
-                                  justifyContent={'center'}
-                                  borderColor={'gray.dark'}
                                 >
-                                  <Box>{instruction.step}</Box>
+                                  <Box
+                                    mr={'0.5rem'}
+                                    borderRadius={'9999px'}
+                                    borderWidth={'1px'}
+                                    width={'1.75rem'}
+                                    height={'1.75rem'}
+                                    display="flex"
+                                    alignItems={'center'}
+                                    justifyContent={'center'}
+                                    borderColor={'gray.dark'}
+                                  >
+                                    <Box>{instruction.step}</Box>
+                                  </Box>
+                                  <Interweave
+                                    content={`${instruction.instruction}`}
+                                  />
                                 </Box>
-                                <Box>{instruction.instruction}</Box>
-                              </Box>
-                            );
-                          })}
+                              );
+                            },
+                          )}
                         </Box>
                       </Box>
                     </TabPanel>
@@ -125,7 +134,7 @@ const Recipe: NextPage = ({ recipe }: any) => {
                           </Text>
                         </Box>
                         <Box>
-                          {recipe?.ingredientsList.map((ingredient: any) => {
+                          {recipe.ingredientsList.map((ingredient: any) => {
                             return (
                               <Box key={ingredient.id} mb={2.5}>
                                 <Text>
@@ -162,7 +171,7 @@ const Recipe: NextPage = ({ recipe }: any) => {
               <Box display={'flex'} flexDirection={'column'}>
                 <BorderBox mb={4} p={3}>
                   <Text fontSize={'3.5rem'} fontWeight={600} color="gray.dark">
-                    {recipe?.name}
+                    {recipe.name}
                   </Text>
                 </BorderBox>
 
@@ -189,38 +198,44 @@ const Recipe: NextPage = ({ recipe }: any) => {
                         fontWeight={450}
                         color="gray.light"
                       >
-                        for {recipe?.servings} servings - change as needed
+                        for {recipe.servings} servings - change as needed
                       </Text>
                     </Box>
                   </Box>
 
                   <Box>
-                    {instructionsDummy.map((instruction) => {
-                      return (
-                        <Box
-                          key={instruction.step}
-                          display="flex"
-                          flexDirection={'row'}
-                          mb={2.5}
-                          alignItems={'center'}
-                        >
+                    {recipe.instructionsList.map(
+                      (instruction: {
+                        id: number;
+                        instruction: string;
+                        step: number;
+                      }) => {
+                        return (
                           <Box
-                            mr={'0.5rem'}
-                            borderRadius={'9999px'}
-                            borderWidth={'1px'}
-                            width={'1.75rem'}
-                            height={'1.75rem'}
+                            key={instruction.step}
                             display="flex"
+                            flexDirection={'row'}
+                            mb={2.5}
                             alignItems={'center'}
-                            justifyContent={'center'}
-                            borderColor={'gray.dark'}
                           >
-                            <Box>{instruction.step}</Box>
+                            <Box
+                              mr={'0.5rem'}
+                              borderRadius={'9999px'}
+                              borderWidth={'1px'}
+                              width={'1.75rem'}
+                              height={'1.75rem'}
+                              display="flex"
+                              alignItems={'center'}
+                              justifyContent={'center'}
+                              borderColor={'gray.dark'}
+                            >
+                              <Box>{instruction.step}</Box>
+                            </Box>
+                            <Interweave content={instruction.instruction} />
                           </Box>
-                          <Box>{instruction.instruction}</Box>
-                        </Box>
-                      );
-                    })}
+                        );
+                      },
+                    )}
                   </Box>
                 </BorderBox>
                 <BorderBox mb={4} p={3}>
@@ -234,7 +249,10 @@ const Recipe: NextPage = ({ recipe }: any) => {
                     </Text>
                   </Box>
                   <Box>
-                    <Text>Cooking time (20mins)</Text>
+                    <Text>Cooking time ({recipe.cookTime} mins)</Text>
+                  </Box>
+                  <Box>
+                    <Text>Prep time ({recipe.prepTime} mins)</Text>
                   </Box>
                 </BorderBox>
               </Box>
@@ -249,12 +267,12 @@ const Recipe: NextPage = ({ recipe }: any) => {
               >
                 <Box>
                   <Text fontSize={'1.2rem'} fontWeight={450} color="gray.dark">
-                    {recipe?.servings} servings
+                    {recipe.servings} servings
                   </Text>
                 </Box>
                 <Box>
                   <Text fontSize={'0.8rem'} fontWeight={450} color="gray.light">
-                    £{recipe?.pricePerServing} per serving
+                    £{recipe.pricePerServing} per serving
                   </Text>
                 </Box>
               </Box>
@@ -265,7 +283,7 @@ const Recipe: NextPage = ({ recipe }: any) => {
                   </Text>
                 </Box>
                 <Box>
-                  {recipe?.ingredientsList.map((ingredient: any) => {
+                  {recipe.ingredientsList.map((ingredient: any) => {
                     return (
                       <Box key={ingredient.id} mb={2.5}>
                         <Text>
@@ -294,8 +312,8 @@ const Recipe: NextPage = ({ recipe }: any) => {
           <Container maxW="1200px" mb={4}>
             <BorderBox my={2} width={'100%'} height={300} position={'relative'}>
               <Image
-                src={`${process.env.NEXT_PUBLIC_CDN}${recipe?.imagePath}`}
-                alt={recipe?.name}
+                src={`${process.env.NEXT_PUBLIC_CDN}${recipe.imagePath}`}
+                alt={recipe.name}
                 layout={'fill'}
                 objectFit="cover"
                 priority
@@ -314,7 +332,7 @@ export async function getStaticPaths() {
     const paths: Array<any> = [];
     return { paths, fallback: 'blocking' };
   } else {
-    const { recipes } = await getRecipes({
+    const res: any = await getRecipes({
       includeIngredientsWithRecipes: false,
       offset: 0,
       limit: 100,
@@ -322,7 +340,7 @@ export async function getStaticPaths() {
       orderBy: 'relevance',
     });
 
-    const paths: Array<any> = recipes.map((recipe: any) => {
+    const paths: Array<any> = res.recipes.map((recipe: any) => {
       return {
         params: { recipeId: recipe.id.toString() },
       };
@@ -339,7 +357,7 @@ export async function getStaticProps(context: any) {
   const recipeId = context.params.recipeId;
 
   // getting one specific recipe
-  const { recipes } = await getRecipes({
+  const res: any = await getRecipes({
     includeIngredientsWithRecipes: true,
     offset: 0,
     limit: 1,
@@ -348,7 +366,7 @@ export async function getStaticProps(context: any) {
     recipeIds: [parseInt(recipeId)],
   });
 
-  const recipe = recipes[0];
+  const recipe = res.recipes[0];
 
   return {
     props: {

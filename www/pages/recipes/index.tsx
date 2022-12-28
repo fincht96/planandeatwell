@@ -219,6 +219,8 @@ const Recipes: NextPage = (props: any) => {
                     imagePath={recipe.imagePath}
                     key={recipe.id}
                     servings={recipe.servings}
+                    cookTime={recipe.cookTime}
+                    prepTime={recipe.prepTime}
                   />
                 );
               })}

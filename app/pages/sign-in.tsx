@@ -109,7 +109,7 @@ const SignIn: CustomNextPage = () => {
             <Heading fontSize={'4xl'}>Sign in to your account</Heading>
             <Text fontSize={'lg'} color={'gray.600'}>
               to enjoy all of our cool{' '}
-              <Link color={'brand.400'} href="https://planandeatwell.uk">
+              <Link color={'brand.400'} href={process.env.NEXT_PUBLIC_WWW_URL}>
                 features
               </Link>{' '}
               ✌️

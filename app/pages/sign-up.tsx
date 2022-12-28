@@ -41,7 +41,7 @@ const SignUp: CustomNextPage = () => {
     defaultIsOpen: false,
   });
 
-  const recipePlanMutation = useMutation({
+  const signUpMutation = useMutation({
     mutationFn: ({
       email,
       firstName,
@@ -88,7 +88,7 @@ const SignUp: CustomNextPage = () => {
     email: string;
     password: string;
   }) => {
-    recipePlanMutation.mutate(data);
+    signUpMutation.mutate(data);
   };
 
   return (

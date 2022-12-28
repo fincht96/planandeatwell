@@ -37,6 +37,11 @@ const insertRecipeSchema = Joi.object({
   pricePerServing: Joi.number().min(0).max(20).required(),
   imagePath: Joi.string().max(400).required(),
   link: Joi.string().max(400).required(),
+  instructions: Joi.array().items(Joi.string()).required().min(1).messages({
+    'array.min': 'Instructions cannot be empty',
+  }),
+  cookTime: Joi.number().min(1).max(120).required(),
+  prepTime: Joi.number().min(1).max(120).required(),
   ingredients: Joi.array()
     .items(
       Joi.object({

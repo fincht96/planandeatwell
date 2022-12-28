@@ -16,6 +16,8 @@ export async function seed(knex: Knex): Promise<void> {
       meal_type: ['dinner', 'lunch'],
       lifestyle_type: ['vegetarian'],
       free_from_type: ['dairy_free'],
+      prep_time: 10,
+      cook_time: 20,
     },
     {
       name: 'Vegan Pesto Pasta',
@@ -25,6 +27,8 @@ export async function seed(knex: Knex): Promise<void> {
       link: 'https://www.aldi.co.uk/vegan-pesto-pasta/p/000000481143300',
       meal_type: ['dinner', 'lunch'],
       lifestyle_type: ['vegan'],
+      prep_time: 5,
+      cook_time: 10,
     },
     {
       name: 'Fish Pie',
@@ -35,6 +39,8 @@ export async function seed(knex: Knex): Promise<void> {
       meal_type: ['dinner', 'lunch'],
       lifestyle_type: ['pescatarian'],
       free_from_type: ['gluten_free'],
+      prep_time: 10,
+      cook_time: 30,
     },
   ]);
 }

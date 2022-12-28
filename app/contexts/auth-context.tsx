@@ -7,11 +7,8 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Event, Subscriber } from '../types/eventBus.types';
-
 import Auth from '../auth';
-
-const auth = new Auth();
+import { Event, Subscriber } from '../types/eventBus.types';
 
 export const AuthContext = createContext<{
   user: User | null;
@@ -40,6 +37,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: JSX.Element }) => {
+  const [auth] = useState(new Auth());
   const [user, setUser] = useState<User | null>(null);
   const [initialized, setInitialized] = useState(false);
   const [redirectPath, setRedirectPath] = useState('');

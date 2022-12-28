@@ -1,14 +1,14 @@
 import { Box, Grid, Text } from '@chakra-ui/react';
-import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import Layout, { siteTitle } from '../components/layout';
-import StepLayout from '../components/StepLayout';
-import aldiImg from '../public/images/aldi.png';
-import asdaImg from '../public/images/asda.png';
-import sainsburysImg from '../public/images/sainsburys.png';
-import tescoImg from '../public/images/tesco.png';
+import Layout, { siteTitle } from '../../components/layout';
+import StepLayout from '../../components/StepLayout';
+import aldiImg from '../../public/images/aldi.png';
+import asdaImg from '../../public/images/asda.png';
+import sainsburysImg from '../../public/images/sainsburys.png';
+import tescoImg from '../../public/images/tesco.png';
+import { CustomNextPage } from '../../types/CustomNextPage';
 
 const SupermarketButton = ({
   disabled = false,
@@ -43,7 +43,7 @@ const SupermarketButton = ({
   );
 };
 
-const Steps: NextPage = () => {
+const Supermarket: CustomNextPage = () => {
   const router = useRouter();
   const supermarkets = [
     { img: aldiImg, name: 'aldi' },
@@ -92,7 +92,7 @@ const Steps: NextPage = () => {
                   <SupermarketButton
                     disabled={sm.name !== 'aldi'}
                     onClick={() =>
-                      onNavigate(`/servings?supermarket=${sm.name}`)
+                      onNavigate(`/create-plan/servings?supermarket=${sm.name}`)
                     }
                     supermarket={`${sm.name}`}
                     imageProp={sm.img}
@@ -107,4 +107,6 @@ const Steps: NextPage = () => {
   );
 };
 
-export default Steps;
+Supermarket.requireAuth = true;
+
+export default Supermarket;

@@ -1,13 +1,13 @@
 import { Box, Button, Flex, Text } from '@chakra-ui/react';
-import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import Layout, { siteTitle } from '../components/layout';
-import StepLayout from '../components/StepLayout';
-import stepsImg from '../public/images/steps.png';
+import Layout, { siteTitle } from '../../components/layout';
+import StepLayout from '../../components/StepLayout';
+import stepsImg from '../../public/images/steps.png';
+import { CustomNextPage } from '../../types/CustomNextPage';
 
-const Steps: NextPage = () => {
+const Steps: CustomNextPage = () => {
   const router = useRouter();
 
   const onNavigate = (href: string) => {
@@ -57,7 +57,7 @@ const Steps: NextPage = () => {
               fontSize={{ base: '1.2rem', md: '1.5rem' }}
               fontWeight={600}
               padding={'1.5rem 1rem'}
-              onClick={() => onNavigate('/supermarket')}
+              onClick={() => onNavigate('/create-plan/supermarket')}
             >
               Get started
             </Button>
@@ -67,5 +67,7 @@ const Steps: NextPage = () => {
     </Layout>
   );
 };
+
+Steps.requireAuth = true;
 
 export default Steps;

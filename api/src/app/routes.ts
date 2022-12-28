@@ -96,4 +96,8 @@ router.post('/user/sync-claims', (req: Request, res: Response) => {
   req.container.resolve('userController').syncClaims(req, res);
 });
 
+router.post('/user/create', (req: Request, res: Response) => {
+  req.container.resolve('userController').createAccount(req, res);
+});
+
 export default router;

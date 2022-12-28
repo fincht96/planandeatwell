@@ -1,32 +1,32 @@
 import { Button, Container, Flex, Grid, Text } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Layout from '../components/layout';
-import SearchMenu from '../components/menu/SearchMenu';
-import MenuSummaryBar from '../components/MenuSummaryBar';
-import Recipe from '../components/Recipe';
-import { useEventBus } from '../hooks/useEventBus';
-import { Event } from '../types/eventBus.types';
-import { Order, OrderBy, SortBy } from '../types/order.types';
+import Layout from '../../components/layout';
+import SearchMenu from '../../components/menu/SearchMenu';
+import Recipe from '../../components/Recipe';
+import { useEventBus } from '../../hooks/useEventBus';
+import { Event } from '../../types/eventBus.types';
+import { Order, OrderBy, SortBy } from '../../types/order.types';
 import {
   queryParamToString,
   queryParamToStringArray,
-} from '../utils/queryParamConversions';
+} from '../../utils/queryParamConversions';
 import {
   getRecipePlan,
   insertRecipePlan,
   updateRecipePlan,
-} from '../utils/requests/recipe-plans';
-import { getRecipes } from '../utils/requests/recipes';
-import { roundTo2dp } from '../utils/roundTo2dp';
-import { orderToSortBy, sortByToOrder } from '../utils/sortByConversions';
+} from '../../utils/requests/recipe-plans';
+import { getRecipes } from '../../utils/requests/recipes';
+import { roundTo2dp } from '../../utils/roundTo2dp';
+import { orderToSortBy, sortByToOrder } from '../../utils/sortByConversions';
 
-import { IngredientDecorated } from '../types/ingredientDecorated.types';
+import MenuSummaryBar from '../../components/MenuSummaryBar';
+import { CustomNextPage } from '../../types/CustomNextPage';
+import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 
-const Menu: NextPage = () => {
+const Menu: CustomNextPage = () => {
   const { subscribe, unsubscribe, post } = useEventBus();
   const router = useRouter();
   const [recipes, setRecipes] = useState<Array<any>>([]);
@@ -200,7 +200,7 @@ const Menu: NextPage = () => {
         : insertRecipePlan(recipeIdList);
     },
     onSuccess: (data: any) => {
-      return onNavigate(`/recipe-plan/${data.uuid}`);
+      return onNavigate(`/meal-plans/${data.uuid}`);
     },
   });
 
@@ -353,7 +353,7 @@ const Menu: NextPage = () => {
         <title>Menu | Plan and Eat Well</title>
       </Head>
 
-      <Container mt={'5rem'} w={'95vw'} maxW={'1600px'} pt={'1rem'} pb={'5rem'}>
+      <Container maxW={'1600px'} pt={'1rem'} pb={'5rem'}>
         <SearchMenu
           mb={'2rem'}
           mealsFilters={recipeQueryParams.meals}
@@ -480,7 +480,6 @@ const Menu: NextPage = () => {
           </Flex>
         )}
       </Container>
-
       <MenuSummaryBar
         currentPrice={totalBasketPrice}
         ingredientList={ingredientsBasket}
@@ -496,5 +495,7 @@ const Menu: NextPage = () => {
     </Layout>
   );
 };
+
+Menu.requireAuth = true;
 
 export default Menu;

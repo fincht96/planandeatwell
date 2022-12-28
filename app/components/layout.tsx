@@ -3,16 +3,29 @@ import Navbar from './navbar';
 
 export const siteTitle = 'Meal Planner | Plan and Eat Well';
 
-export default function Layout({ children }: { children: any }) {
+export default function Layout({
+  children,
+  includeNavBar = true,
+}: {
+  children: any;
+  includeNavBar?: boolean;
+}) {
   return (
     <>
       <Meta />
-      <header>
-        <Navbar />
-      </header>
-      <div>
-        <main>{children}</main>
-      </div>
+      {includeNavBar ? (
+        <header>
+          <Navbar>
+            <div>
+              <main>{children}</main>
+            </div>
+          </Navbar>
+        </header>
+      ) : (
+        <div>
+          <main>{children}</main>
+        </div>
+      )}
     </>
   );
 }

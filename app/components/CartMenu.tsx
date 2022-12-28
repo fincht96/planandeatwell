@@ -67,7 +67,7 @@ const CartMenu = ({
               fontWeight={600}
               textAlign={'center'}
             >
-              Recipe plan
+              Meal plan
             </Text>
             <Text
               fontSize={'1rem'}

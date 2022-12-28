@@ -14,10 +14,10 @@ import {
   queryParamToStringArray,
 } from '../../utils/queryParamConversions';
 import {
-  getRecipePlan,
-  insertRecipePlan,
-  updateRecipePlan,
-} from '../../utils/requests/recipe-plans';
+  getMealPlan,
+  insertMealPlan,
+  updateMealPlan,
+} from '../../utils/requests/meal-plans';
 import { getRecipes } from '../../utils/requests/recipes';
 import { roundTo2dp } from '../../utils/roundTo2dp';
 import { orderToSortBy, sortByToOrder } from '../../utils/sortByConversions';
@@ -30,7 +30,7 @@ const Menu: CustomNextPage = () => {
   const { subscribe, unsubscribe, post } = useEventBus();
   const router = useRouter();
   const [recipes, setRecipes] = useState<Array<any>>([]);
-  const [recipePlanQueryParams, setRecipePlanQueryParams] = useState<{
+  const [mealPlanQueryParams, setMealPlanQueryParams] = useState<{
     uuid: string;
   }>({ uuid: '' });
   const [recipeQueryParams, setRecipeQueryParams] = useState<{
@@ -187,7 +187,7 @@ const Menu: CustomNextPage = () => {
     );
   }, [ingredientsBasket]);
 
-  const recipePlanMutation = useMutation({
+  const mealPlanMutation = useMutation({
     mutationFn: ({
       updateExisting,
       recipeIdList,
@@ -196,8 +196,8 @@ const Menu: CustomNextPage = () => {
       recipeIdList: Array<number>;
     }) => {
       return updateExisting
-        ? updateRecipePlan(recipePlanQueryParams.uuid, { recipeIdList })
-        : insertRecipePlan(recipeIdList);
+        ? updateMealPlan(mealPlanQueryParams.uuid, { recipeIdList })
+        : insertMealPlan(recipeIdList);
     },
     onSuccess: (data: any) => {
       return onNavigate(`/meal-plans/${data.uuid}`);
@@ -247,15 +247,15 @@ const Menu: CustomNextPage = () => {
   );
 
   useQuery({
-    queryKey: ['recipePlanQuery', recipePlanQueryParams.uuid],
+    queryKey: ['mealPlanQuery', mealPlanQueryParams.uuid],
     queryFn: () => {
-      const uuid = recipePlanQueryParams.uuid;
-      return getRecipePlan(uuid, true);
+      const uuid = mealPlanQueryParams.uuid;
+      return getMealPlan(uuid, true);
     },
     staleTime: 0,
     refetchOnMount: 'always',
     refetchOnWindowFocus: false,
-    enabled: router.isReady && !!recipePlanQueryParams.uuid.length,
+    enabled: router.isReady && !!mealPlanQueryParams.uuid.length,
     onSuccess: (data) => {
       const recipes = data[0].recipes ?? [];
       const ingredients = data[0].ingredients ?? [];
@@ -307,7 +307,7 @@ const Menu: CustomNextPage = () => {
     return () => unsubscribe(recipeInsertSubscriber);
   }, [subscribe, unsubscribe, addRecipeIngredientsToBasket]);
 
-  // initializes recipeQueryParams and recipePlanQueryParams
+  // initializes recipeQueryParams and mealPlanQueryParams
   useEffect(() => {
     if (router.isReady && !queryParamsInitialised) {
       const meals = queryParamToStringArray(router.query['meals']);
@@ -316,7 +316,7 @@ const Menu: CustomNextPage = () => {
       const order = queryParamToString<Order>(router.query['order']);
       const orderBy = queryParamToString<OrderBy>(router.query['orderBy']);
       const searchTerm = queryParamToString(router.query['searchTerm']);
-      const uuid = queryParamToString(router.query['recipe_plan_uuid']);
+      const uuid = queryParamToString(router.query['meal_plan_uuid']);
 
       setRecipeQueryParams((current) => {
         return {
@@ -330,7 +330,7 @@ const Menu: CustomNextPage = () => {
         };
       });
 
-      setRecipePlanQueryParams((current) => ({
+      setMealPlanQueryParams((current) => ({
         ...current,
         uuid,
       }));
@@ -486,8 +486,8 @@ const Menu: CustomNextPage = () => {
         recipeList={recipeBasket}
         servings={recipeBasket.length * 4}
         onComplete={() => {
-          recipePlanMutation.mutate({
-            updateExisting: !!recipePlanQueryParams.uuid.length,
+          mealPlanMutation.mutate({
+            updateExisting: !!mealPlanQueryParams.uuid.length,
             recipeIdList: recipeBasket.map((recipe) => recipe.id),
           });
         }}

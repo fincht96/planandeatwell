@@ -9,15 +9,15 @@ DATABASE_URL=postgres://postgres:mysecretpassword@localhost:5432/api_local knex 
 
 `docker-compose run api yarn knex migrate:latest --knexfile ./src/knexfile.ts`
 # Migrate down a single migration
-DATABASE_URL=postgres://postgres:mysecretpassword@localhost:5432/api_local knex migrate:latest --knexfile ./api/src/knexfile.ts 
+DATABASE_URL=postgres://postgres:mysecretpassword@localhost:5432/api_local knex migrate:down --knexfile ./api/src/knexfile.ts 
 
 `docker-compose run api yarn knex migrate:down --knexfile ./src/knexfile.ts`
 # Migrate up a single migration
-DATABASE_URL=postgres://postgres:mysecretpassword@localhost:5432/api_local knex migrate:latest --knexfile ./api/src/knexfile.ts 
+DATABASE_URL=postgres://postgres:mysecretpassword@localhost:5432/api_local knex migrate:up --knexfile ./api/src/knexfile.ts 
 
 `docker-compose run api yarn knex migrate:up --knexfile ./src/knexfile.ts`
 # Roll back (revert) last migration
-DATABASE_URL=postgres://postgres:mysecretpassword@localhost:5432/api_local knex migrate:latest --knexfile ./api/src/knexfile.ts 
+DATABASE_URL=postgres://postgres:mysecretpassword@localhost:5432/api_local knex migrate:rollback --knexfile ./api/src/knexfile.ts 
 
 `docker-compose run api yarn knex migrate:rollback --knexfile ./src/knexfile.ts`
 # Create seeds

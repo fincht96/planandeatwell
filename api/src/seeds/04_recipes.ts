@@ -18,6 +18,7 @@ export async function seed(knex: Knex): Promise<void> {
       free_from_type: ['dairy_free'],
       prep_time: 10,
       cook_time: 20,
+      supermarket_id: 1,
     },
     {
       name: 'Vegan Pesto Pasta',
@@ -29,6 +30,7 @@ export async function seed(knex: Knex): Promise<void> {
       lifestyle_type: ['vegan'],
       prep_time: 5,
       cook_time: 10,
+      supermarket_id: 1,
     },
     {
       name: 'Fish Pie',
@@ -41,6 +43,7 @@ export async function seed(knex: Knex): Promise<void> {
       free_from_type: ['gluten_free'],
       prep_time: 10,
       cook_time: 30,
+      supermarket_id: 2,
     },
   ]);
 }

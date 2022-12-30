@@ -7,6 +7,7 @@ import {
   FormErrorMessage,
   Image,
   Input,
+  Select,
   Stack,
   Text,
   useDisclosure,
@@ -25,6 +26,7 @@ import InstructionsAddModal from '../components/modal/InstructionsAddModal';
 import FilterCheckBox from '../components/recipes/FilterCheckBox';
 import { useAuth } from '../contexts/auth-context';
 import { RecipeWithIngredients } from '../types/recipe.types';
+import { Supermarket } from '../types/supermarket.types';
 import { calcPricePerServing } from '../utils/calcPricePerServing';
 import { convertBoolObjToStringArray } from '../utils/convertBoolObjToStringArray';
 import {
@@ -38,6 +40,7 @@ import {
   insertRecipe,
 } from '../utils/requests/recipes';
 import { getSignedUploadUrl } from '../utils/requests/storage';
+import { getSupermarkets } from '../utils/requests/supermarkets';
 import { toTitleCase } from '../utils/toTitleCase';
 
 // run import only on client
@@ -193,6 +196,8 @@ export default function Recipes() {
     onOpen: onOpenInstructionsModal,
     onClose: onCloseInstructionsModal,
   } = useDisclosure();
+  const [disableIngredientsButton, setDisableIngredientsButton] =
+    useState<boolean>(true);
   const [previewImage, setPreviewImage] = useState<any>(null);
   const [ingredients, setIngredients] = useState<any>([]); // represents viewable ingredients list
   const [recipeInstructions, setRecipeInstructions] = useState<any>([]);
@@ -204,6 +209,9 @@ export default function Recipes() {
   const [totalCountRecipes, setTotalCountRecipes] = useState(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isReady, setIsReady] = useState(false);
+  const [selectedSupermarket, setSelectedSupermarket] =
+    useState<Supermarket | null>(null);
+  const [supermarkets, setSupermarkets] = useState<Array<Supermarket>>([]);
   const toast = useToast();
   const { currentUser, idToken, authLoading } = useAuth();
   const router = useRouter();
@@ -309,6 +317,7 @@ export default function Recipes() {
       setPreviewImage(null);
       setIngredients([]);
       setRecipeInstructions([]);
+      setSupermarkets([]);
       recipesQuery.refetch();
     },
     onError: (error: string) => {
@@ -343,6 +352,21 @@ export default function Recipes() {
           return [...current, ...data.recipes];
         });
         setTotalCountRecipes(data.totalCount);
+      },
+    },
+  );
+
+  useQuery(
+    [`supermarkets`],
+    () => {
+      return getSupermarkets();
+    },
+    {
+      enabled: isReady,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      onSuccess: (data: Array<Supermarket>) => {
+        setSupermarkets(data);
       },
     },
   );
@@ -487,6 +511,52 @@ export default function Recipes() {
     deleteRecipeMutation.mutate({ recipeId });
   };
 
+  const handleSupermarketSelectChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    // when user selects first supermarket
+    if (event.target.value && !selectedSupermarket) {
+      const supermarket = supermarkets.find(
+        (sm) => sm.id === parseInt(event.target.value),
+      );
+
+      if (supermarket) {
+        setSelectedSupermarket(supermarket);
+        setDisableIngredientsButton(false);
+      }
+
+      return;
+    }
+
+    // when user selects a different supermarket after having selected one already
+    if (
+      selectedSupermarket &&
+      event.target.value &&
+      parseInt(event.target.value) !== selectedSupermarket.id
+    ) {
+      const supermarket = supermarkets.find(
+        (sm) => sm.id === parseInt(event.target.value),
+      );
+
+      if (supermarket) {
+        setSelectedSupermarket(supermarket);
+        setIngredients([]);
+        setDisableIngredientsButton(false);
+        remove();
+      }
+
+      return;
+    }
+
+    // when user selects placeholder
+    if (!event.target.value) {
+      setSelectedSupermarket(null);
+      setIngredients([]);
+      setDisableIngredientsButton(true);
+      remove();
+    }
+  };
+
   useEffect(() => {
     const newLoadingState =
       isSubmitting ||
@@ -513,11 +583,14 @@ export default function Recipes() {
       <main>
         {isReady && (
           <>
-            <IngredientsSearchModal
-              onClose={onClose}
-              isOpen={isOpen}
-              onSubmit={onAddIngredient}
-            />
+            {selectedSupermarket && (
+              <IngredientsSearchModal
+                onClose={onClose}
+                isOpen={isOpen}
+                onSubmit={onAddIngredient}
+                selectedSupermarket={selectedSupermarket}
+              />
+            )}
             <InstructionsAddModal
               onClose={onCloseInstructionsModal}
               isOpen={isOpenInstructionsModal}
@@ -741,6 +814,39 @@ export default function Recipes() {
                       </Flex>
                     </Box>
 
+                    <Box>
+                      <FormControl isInvalid={!!errors.supermarketId}>
+                        <Text>Supermarket name</Text>
+                        <Select
+                          autoComplete="off"
+                          id={'supermarketId'}
+                          placeholder="Select supermarket"
+                          variant="outline"
+                          bg={'#ffffff'}
+                          {...register('supermarketId', {
+                            required: 'Supermarket is required',
+                            valueAsNumber: true,
+                          })}
+                          onChange={handleSupermarketSelectChange}
+                        >
+                          {supermarkets.map((supermarket) => {
+                            return (
+                              <option
+                                key={supermarket.id}
+                                value={supermarket.id}
+                              >
+                                {supermarket.name}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                        <FormErrorMessage>
+                          {errors.supermarketId &&
+                            `${errors?.supermarketId.message}`}
+                        </FormErrorMessage>
+                      </FormControl>
+                    </Box>
+
                     <Stack>
                       <Text fontSize={'2xl'} color={'#4D4D4D'} mb={'0rem'}>
                         Ingredients ({ingredients.length})
@@ -784,7 +890,11 @@ export default function Recipes() {
                         })}
                       </Stack>
 
-                      <Button colorScheme="brandSecondary" onClick={onOpen}>
+                      <Button
+                        colorScheme="brandSecondary"
+                        onClick={onOpen}
+                        disabled={disableIngredientsButton}
+                      >
                         <FiPlus /> Add ingredients
                       </Button>
                     </Stack>

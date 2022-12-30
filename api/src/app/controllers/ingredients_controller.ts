@@ -5,7 +5,8 @@ import IngredientsService from '../services/ingredients_service';
 import Joi from 'joi';
 
 const searchIngredientsSchema = Joi.object({
-  search: Joi.string().max(100),
+  search: Joi.string().max(100).required(),
+  supermarketId: Joi.number().min(1),
 });
 
 const insertIngredientSchema = Joi.object({
@@ -13,7 +14,8 @@ const insertIngredientSchema = Joi.object({
   pricePerUnit: Joi.number().min(0).max(100).required(),
   productId: Joi.number().min(0).required(),
   categoryId: Joi.number().min(1).required(),
-}).and('name', 'pricePerUnit', 'productId', 'categoryId');
+  supermarketId: Joi.number().min(1).required(),
+}).and('name', 'pricePerUnit', 'productId', 'categoryId', 'supermarketId');
 
 const getIngredientsSchema = Joi.object({
   orderBy: Joi.string().valid('createdAt'),
@@ -52,10 +54,16 @@ export default class IngredientsController {
 
       // get ingredients that could match search
       else if (req.query.search) {
-        // validate search
         const search: string = req.query.search + '';
+        let supermarketId: number | null = null;
+
+        if (req.query?.supermarketId) {
+          supermarketId = parseInt(`${req.query.supermarketId}`);
+        }
+
         const { error, value } = searchIngredientsSchema.validate({
           search,
+          supermarketId,
         });
         if (error) {
           throw new Error(error.message);
@@ -63,6 +71,7 @@ export default class IngredientsController {
 
         const result = await this.ingredientsService.searchIngredients(
           value.search.toLowerCase(),
+          value.supermarketId,
         );
 
         return res.status(200).json({

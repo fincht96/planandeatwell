@@ -1,7 +1,8 @@
-import { Box, Text, Link } from '@chakra-ui/react';
+import { Box, Text, Link, Badge } from '@chakra-ui/react';
 import { TimeIcon, ArrowForwardIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import Image from 'next/image';
 import BorderBox from '../BorderBox';
+import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
 
 const Recipe = ({
   id,
@@ -11,6 +12,7 @@ const Recipe = ({
   servings,
   cookTime,
   prepTime,
+  supermarketName,
 }: {
   id: number;
   name: string;
@@ -19,6 +21,7 @@ const Recipe = ({
   servings: number;
   cookTime: number;
   prepTime: number;
+  supermarketName: string;
 }) => {
   return (
     <BorderBox maxW={'sm'} maxH={'xl'} overflow={'hidden'}>
@@ -39,6 +42,15 @@ const Recipe = ({
           <Text fontSize={'1.8rem'} fontWeight={800} color="gray.dark">
             {name}
           </Text>
+        </Box>
+
+        <Box my={0.5}>
+          <Badge
+            variant={'solid'}
+            colorScheme={getSupermarketBrandColor(supermarketName)}
+          >
+            {supermarketName}
+          </Badge>
         </Box>
 
         <Box

@@ -13,6 +13,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -20,6 +21,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
 import Layout from '../components/layout';
 import IngredientsSearchModal from '../components/modal/IngredientsSearchModal';
+import InstructionsAddModal from '../components/modal/InstructionsAddModal';
 import FilterCheckBox from '../components/recipes/FilterCheckBox';
 import { useAuth } from '../contexts/auth-context';
 import { RecipeWithIngredients } from '../types/recipe.types';
@@ -37,6 +39,52 @@ import {
 } from '../utils/requests/recipes';
 import { getSignedUploadUrl } from '../utils/requests/storage';
 import { toTitleCase } from '../utils/toTitleCase';
+
+// run import only on client
+const Interweave = dynamic<any>(
+  () => import('interweave').then((mod) => mod.Interweave),
+  {
+    ssr: false,
+  },
+);
+
+const RecipeInstructionCard = ({
+  indexPosition,
+  instruction,
+  onDelete,
+}: {
+  indexPosition: number;
+  instruction: string;
+  onDelete: (indexPosition: number) => void;
+}) => {
+  const step = indexPosition + 1;
+  return (
+    <Flex
+      bg={'#ffffff'}
+      border={'#cccccc'}
+      justifyContent={'space-between'}
+      alignItems={'center'}
+      p={'1rem'}
+    >
+      <Flex gap={'1rem'}>
+        <Box>
+          <Text fontSize={'1rem'} fontWeight={100}>
+            Step: {step}
+          </Text>
+          <Interweave content={instruction} />
+        </Box>
+      </Flex>
+      <Button
+        colorScheme="brandSecondary"
+        onClick={() => onDelete(indexPosition)}
+      >
+        <FiTrash2 />
+      </Button>
+    </Flex>
+  );
+};
+
+RecipeInstructionCard.displayName = 'RecipeInstructionCard';
 
 const IngredientCard = React.forwardRef<any>(
   ({ ingredient, id, onChange, name, onDelete }, ref) => {
@@ -140,9 +188,15 @@ const aldiRecipeImagePath = 'recipe_images/aldi';
 
 export default function Recipes() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenInstructionsModal,
+    onOpen: onOpenInstructionsModal,
+    onClose: onCloseInstructionsModal,
+  } = useDisclosure();
   const [previewImage, setPreviewImage] = useState<any>(null);
   const [ingredients, setIngredients] = useState<any>([]); // represents viewable ingredients list
-  const [recipes, setRecipes] = useState<any>([]); // represents viewable recipes list
+  const [recipeInstructions, setRecipeInstructions] = useState<any>([]);
+  const [recipes, setRecipes] = useState<any>([]);
   const [filename, setFilename] = useState<string>('');
   const [contentType, setContentType] = useState<string>('');
   const [recipe, setRecipe] = useState<any>();
@@ -254,6 +308,7 @@ export default function Recipes() {
       reset();
       setPreviewImage(null);
       setIngredients([]);
+      setRecipeInstructions([]);
       recipesQuery.refetch();
     },
     onError: (error: string) => {
@@ -329,24 +384,19 @@ export default function Recipes() {
     handleSubmit,
     watch,
     control,
-    unregister,
     clearErrors,
     getValues,
     reset,
-    setValue,
-    setError,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors, isSubmitting },
   } = useForm();
 
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      control, // control props comes from useForm (optional: if you are using FormContext)
-      name: 'ingredients', // unique name for your Field Array
-    },
-  );
+  const { remove } = useFieldArray({
+    control, // control props comes from useForm (optional: if you are using FormContext)
+    name: 'ingredients', // unique name for your Field Array
+  });
 
   // submit recipe
-  const onSubmit = (data) => {
+  const onSubmit = (data: any) => {
     const meals = convertBoolObjToStringArray(data.meals);
     const lifestyles = convertBoolObjToStringArray(data.lifestyles);
     const freeFroms = convertBoolObjToStringArray(data.freeFroms);
@@ -372,6 +422,9 @@ export default function Recipes() {
           unitQuantity,
         };
       }),
+      instructions: recipeInstructions.map(
+        (instruction: any) => instruction.instruction, // store unstripped html string
+      ),
     };
 
     setRecipe(newRecipe);
@@ -399,13 +452,32 @@ export default function Recipes() {
     });
   };
 
-  // addd ingredient to viewable list
+  // add ingredient to viewable list
   const onAddIngredient = (ingredient) => {
     setIngredients((current) => [
       ...current,
       {
         ...ingredient,
         uid: ingredient.id + current.length + Math.floor(Math.random() * 1000),
+      },
+    ]);
+  };
+
+  // remove instructions from viewable list
+  const onRemoveInstructionsStep = (indexPosition: number) => {
+    setRecipeInstructions((current: any) => {
+      return current
+        .slice(0, indexPosition)
+        .concat(current.slice(indexPosition + 1));
+    });
+  };
+
+  const onAddInstructionsStep = (stepCreationEvent: any) => {
+    // steps in array are added sequentially
+    setRecipeInstructions((current) => [
+      ...current,
+      {
+        instruction: stepCreationEvent.richTextContent,
       },
     ]);
   };
@@ -445,6 +517,12 @@ export default function Recipes() {
               onClose={onClose}
               isOpen={isOpen}
               onSubmit={onAddIngredient}
+            />
+            <InstructionsAddModal
+              onClose={onCloseInstructionsModal}
+              isOpen={isOpenInstructionsModal}
+              onSubmit={onAddInstructionsStep}
+              stepBeingAdded={recipeInstructions.length + 1}
             />
 
             <Container maxW={'auto'}>
@@ -519,6 +597,60 @@ export default function Recipes() {
                         />
                         <FormErrorMessage>
                           {errors.link && `${errors?.link.message}`}
+                        </FormErrorMessage>
+                      </FormControl>
+
+                      <FormControl isInvalid={!!errors.prepTime}>
+                        <Text>Recipe prep time (minutes)</Text>
+                        <Input
+                          variant="outline"
+                          autoComplete="off"
+                          bg={'#ffffff'}
+                          id={'prepTime'}
+                          {...register('prepTime', {
+                            required:
+                              'A prep time number for the recipe is required',
+                            max: {
+                              value: 120,
+                              message: 'Max prep time is 120 minutes',
+                            },
+                            min: {
+                              value: 1,
+                              message: 'Min prep time is 1 minute',
+                            },
+                            valueAsNumber: true,
+                          })}
+                          type={'number'}
+                        />
+                        <FormErrorMessage>
+                          {errors.prepTime && `${errors?.prepTime.message}`}
+                        </FormErrorMessage>
+                      </FormControl>
+
+                      <FormControl isInvalid={!!errors.cookTime}>
+                        <Text>Recipe cook time (minutes)</Text>
+                        <Input
+                          variant="outline"
+                          autoComplete="off"
+                          bg={'#ffffff'}
+                          id={'cookTime'}
+                          {...register('cookTime', {
+                            required:
+                              'A cook time number for the recipe is required',
+                            max: {
+                              value: 120,
+                              message: 'Max cook time is 120 minutes',
+                            },
+                            min: {
+                              value: 1,
+                              message: 'Min cook time is 1 minute',
+                            },
+                            valueAsNumber: true,
+                          })}
+                          type={'number'}
+                        />
+                        <FormErrorMessage>
+                          {errors.cookTime && `${errors?.cookTime.message}`}
                         </FormErrorMessage>
                       </FormControl>
 
@@ -610,11 +742,10 @@ export default function Recipes() {
                     </Box>
 
                     <Stack>
-                      <Text fontSize={'2xl'} color={'#4D4D4D'} mb={'1rem'}>
-                        Ingredients({ingredients.length})
+                      <Text fontSize={'2xl'} color={'#4D4D4D'} mb={'0rem'}>
+                        Ingredients ({ingredients.length})
                       </Text>
-
-                      <Stack pb={'2rem'}>
+                      <Stack pb={'0rem'}>
                         {ingredients.map((ingredient, index) => {
                           const error = errors.ingredients?.length
                             ? errors.ingredients[index] ?? false
@@ -654,7 +785,36 @@ export default function Recipes() {
                       </Stack>
 
                       <Button colorScheme="brandSecondary" onClick={onOpen}>
-                        <FiPlus />
+                        <FiPlus /> Add ingredients
+                      </Button>
+                    </Stack>
+
+                    <Stack>
+                      <Text fontSize={'2xl'} color={'#4D4D4D'} mt={'2rem'}>
+                        Recipe instructions steps ({recipeInstructions.length})
+                      </Text>
+                      <Stack pb={'0rem'}>
+                        {recipeInstructions.map(
+                          (instruction: any, index: number) => {
+                            return (
+                              <Box key={index}>
+                                <RecipeInstructionCard
+                                  indexPosition={index}
+                                  instruction={instruction.instruction}
+                                  onDelete={onRemoveInstructionsStep}
+                                />
+                              </Box>
+                            );
+                          },
+                        )}
+                      </Stack>
+
+                      <Button
+                        colorScheme="brandSecondary"
+                        onClick={onOpenInstructionsModal}
+                      >
+                        <FiPlus /> Add instruction step{' '}
+                        {recipeInstructions.length + 1}
                       </Button>
                     </Stack>
                   </Box>

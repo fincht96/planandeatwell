@@ -92,11 +92,13 @@ export default class RecipeService {
 
   private getRecipesQuery = (includeIngredientsWithRecipes: boolean) => {
     const rawQuery = this.db.raw(`
-    (
-      select *
-      from (
-        select 
-          recipes.id, 
+  (
+    select
+      *
+    from
+      (
+        select
+          recipes.id,
           recipes.name,
           recipes.servings,
           recipes.created_at,
@@ -106,26 +108,42 @@ export default class RecipeService {
           recipes.meal_type,
           recipes.lifestyle_type,
           recipes.free_from_type,
+          recipes.prep_time,
+          recipes.cook_time,
           (
-            select 
-              json_agg(ingredients) 
-            from (
-            select 
-                ingredients.id,
-                CAST(recipe_ingredients.unit_quantity as FLOAT),
-                ingredients.name,
-                CAST(ingredients.price_per_unit as FLOAT)
-              from 
-                recipe_ingredients 
-              join 
-                ingredients 
-              on 
-                recipe_ingredients.ingredient_id = ingredients.id
-              where 
-                recipe_ingredients.recipe_id = recipes.id
-            ) as ingredients
-          )  as ingredients_list
-          from recipes
+            select
+              json_agg(ingredients)
+            from
+              (
+                select
+                  ingredients.id,
+                  CAST(recipe_ingredients.unit_quantity as FLOAT),
+                  ingredients.name,
+                  CAST(ingredients.price_per_unit as FLOAT)
+                from
+                  recipe_ingredients
+                  inner join ingredients on recipe_ingredients.ingredient_id = ingredients.id
+                where
+                  recipe_ingredients.recipe_id = recipes.id
+              ) as ingredients
+          ) as ingredients_list,
+          (
+            select
+              json_agg(instructions)
+            from
+              (
+                select
+                  recipe_instructions.id,
+                  recipe_instructions.instruction,
+                  recipe_instructions.step
+                from
+                  recipe_instructions
+                where
+                  recipe_instructions.recipe_id = recipes.id
+              ) as instructions
+          ) as instructions_list
+        from
+          recipes
       ) as recipes) as recipes
   `);
     return this.db
@@ -206,15 +224,7 @@ export default class RecipeService {
     return { recipes: recipesResult, count };
   }
 
-  async insertRecipe(
-    recipeWithIngredients: RecipeWithIngredients & {
-      meals: Array<
-        'breakfast' | 'brunch' | 'lunch' | 'dinner' | 'sides' | 'dessert'
-      >;
-      lifestyles: Array<'vegetarian' | 'vegan' | 'meat' | 'pescatarian'>;
-      freeFroms: Array<'dairyFree' | 'glutenFree'>;
-    },
-  ) {
+  async insertRecipe(recipeWithIngredients: RecipeWithIngredients) {
     // convert recipe to snake case
     const recipeWithIngredientsSnake = snakeize(recipeWithIngredients);
 
@@ -229,6 +239,9 @@ export default class RecipeService {
         meals,
         lifestyles,
         free_froms,
+        cook_time,
+        prep_time,
+        instructions,
       } = recipeWithIngredientsSnake;
 
       const freeFromsSnakeCase = <Array<'dairy_free' | 'gluten_free'>>(
@@ -247,6 +260,8 @@ export default class RecipeService {
             meal_type: [...meals],
             lifestyle_type: [...lifestyles],
             free_from_type: [...freeFromsSnakeCase],
+            cook_time,
+            prep_time,
           },
           ['id'],
         )
@@ -270,6 +285,22 @@ export default class RecipeService {
 
       await this.db('recipe_ingredients')
         .insert(recipe_ingredients)
+        .transacting(trx);
+
+      // insert recipe_instructions with associated recipe_id
+      const recipe_instructions = instructions.map(
+        (instruction: string, index: number) => {
+          const step = index + 1;
+          return {
+            step,
+            instruction,
+            recipe_id,
+          };
+        },
+      );
+
+      await this.db('recipe_instructions')
+        .insert(recipe_instructions)
         .transacting(trx);
 
       return recipe_id;

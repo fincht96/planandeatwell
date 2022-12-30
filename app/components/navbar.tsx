@@ -19,7 +19,6 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ReactNode, ReactText } from 'react';
 import { IconType } from 'react-icons';
@@ -27,6 +26,7 @@ import { BiBookContent } from 'react-icons/bi';
 import { FiBell, FiChevronDown, FiMenu, FiSettings } from 'react-icons/fi';
 import { IoAddOutline } from 'react-icons/io5';
 import { useAuth } from '../contexts/auth-context';
+import ChakraNextLink from './NextChakraLink';
 
 interface LinkItemProps {
   name: string;
@@ -128,7 +128,7 @@ const NavItem = ({
   ...rest
 }: NavItemProps) => {
   return (
-    <Link href={href} style={{ textDecoration: 'none' }}>
+    <ChakraNextLink href={href} style={{ textDecoration: 'none' }}>
       <Flex
         align="center"
         p="4"
@@ -143,7 +143,7 @@ const NavItem = ({
         {icon && <Icon mr="4" fontSize="16" as={icon} />}
         {children}
       </Flex>
-    </Link>
+    </ChakraNextLink>
   );
 };
 
@@ -221,9 +221,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem
                 onClick={() => {
                   if (signOut) {
-                    signOut().catch((error: Error) => {
-                      console.error(error);
-                    });
+                    signOut();
                   }
                 }}
               >

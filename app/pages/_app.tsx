@@ -21,7 +21,10 @@ function MyApp({
     <QueryClientProvider client={queryClient}>
       <ChakraProvider theme={theme}>
         <AuthProvider>
-          <RouteGuard isProtectedComponent={Component.requireAuth}>
+          <RouteGuard
+            isProtectedComponent={Component.requireAuth}
+            routeName={Component.displayName ?? ''}
+          >
             <Component {...pageProps} />
           </RouteGuard>
         </AuthProvider>

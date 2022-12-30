@@ -1,4 +1,10 @@
 import { Knex } from 'knex';
+import {
+  getMealPlansBaseQuery,
+  matchingCreatedByQuery,
+  mealPlanQueryOrdering,
+  mealPlanQuerySearch,
+} from '../utils/mealPlanQueryBuilder';
 import RecipeService from './recipe_service';
 
 export default class MealPlanService {
@@ -6,6 +12,56 @@ export default class MealPlanService {
     private readonly db: Knex,
     private readonly recipeService: RecipeService,
   ) {}
+
+  async getPlansCount({
+    userId,
+    searchTerm = '',
+  }: {
+    userId: number;
+    searchTerm?: string;
+  }) {
+    const result = await this.db('meal_plans')
+      .modify(matchingCreatedByQuery({ userIds: [userId] }))
+      .modify(
+        mealPlanQuerySearch({
+          searchTerm,
+        }),
+      )
+      .count();
+    return result[0].count;
+  }
+
+  async getManyPlans({
+    userId,
+    offset = 0,
+    limit = 10,
+    order = 'any',
+    orderBy = 'relevance',
+    searchTerm = '',
+  }: {
+    userId: number;
+    offset?: number;
+    limit?: number;
+    order?: 'asc' | 'desc' | 'any';
+    orderBy?: 'relevance' | 'createdAt';
+    searchTerm?: string;
+  }) {
+    return getMealPlansBaseQuery(this.db)
+      .modify(matchingCreatedByQuery({ userIds: [userId] }))
+      .modify(
+        mealPlanQuerySearch({
+          searchTerm,
+        }),
+      )
+      .modify(
+        mealPlanQueryOrdering({
+          order,
+          orderBy,
+        }),
+      )
+      .offset(offset)
+      .limit(limit);
+  }
 
   async getPlan(
     uuid: string,

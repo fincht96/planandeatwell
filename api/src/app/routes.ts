@@ -68,6 +68,14 @@ router.delete(
 
 /** meal plan */
 
+router.get(
+  '/meal-plans',
+  isAuthenticated('user'),
+  (req: Request, res: Response) => {
+    req.container.resolve('mealPlanController').getMealPlans(req, res);
+  },
+);
+
 router.get('/meal-plan/:id', (req: Request, res: Response) => {
   req.container.resolve('mealPlanController').getMealPlan(req, res);
 });
@@ -76,7 +84,7 @@ router.post(
   '/meal-plan',
   isAuthenticated('user'),
   (req: Request, res: Response) => {
-  req.container.resolve('mealPlanController').saveMealPlan(req, res);
+    req.container.resolve('mealPlanController').saveMealPlan(req, res);
   },
 );
 
@@ -84,7 +92,7 @@ router.put(
   '/meal-plan/:id',
   isAuthenticated('user'),
   (req: Request, res: Response) => {
-  req.container.resolve('mealPlanController').updateMealPlan(req, res);
+    req.container.resolve('mealPlanController').updateMealPlan(req, res);
   },
 );
 

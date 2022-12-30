@@ -18,11 +18,57 @@ const getMealPlanQuerySchema = Joi.object({
   includeIngredientsWithRecipes: Joi.boolean().required(),
 });
 
+const getMealPlansQuerySchema = Joi.object({
+  userId: Joi.number().min(1).required(),
+  offset: Joi.number().min(0),
+  limit: Joi.number().min(1).max(100).required(),
+  order: Joi.string().valid('asc', 'desc', 'any'),
+  orderBy: Joi.string().valid('relevance', 'createdAt'),
+  searchTerm: Joi.string().min(2).max(200),
+  includeCount: Joi.boolean().default(false),
+});
+
 export default class MealPlanController {
   constructor(
     private readonly mealPlanService: MealPlanService,
     private readonly eventsService: EventsService,
   ) {}
+
+  async getMealPlans(req: Request, res: Response) {
+    try {
+      // validate and sanitize params
+      const { error, value } = getMealPlansQuerySchema.validate(req.query);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // resource access authorization
+      if (req.user.planandeatwell_id !== value.userId) {
+        throw new Error('User does not have permission to access resource');
+      }
+
+      const mealPlans = await this.mealPlanService.getManyPlans(value);
+      let count = null;
+
+      if (value.includeCount) {
+        count = await this.mealPlanService.getPlansCount(value);
+      }
+
+      return res.status(200).json({
+        result: {
+          mealPlans,
+          ...(count && { count }),
+        },
+        errors: [],
+      });
+    } catch (e: any) {
+      await this.eventsService.insert('MEAL_PLAN', 'ERROR', e.message ?? '');
+      return res.status(400).json({
+        errors: [e?.message],
+      });
+    }
+  }
 
   async getMealPlan(req: Request, res: Response) {
     try {

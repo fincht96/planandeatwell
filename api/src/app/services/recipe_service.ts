@@ -110,6 +110,7 @@ export default class RecipeService {
           recipes.free_from_type,
           recipes.prep_time,
           recipes.cook_time,
+          supermarkets.name as supermarket_name,
           (
             select
               json_agg(ingredients)
@@ -144,6 +145,7 @@ export default class RecipeService {
           ) as instructions_list
         from
           recipes
+        inner join supermarkets on supermarkets.id = recipes.supermarket_id
       ) as recipes) as recipes
   `);
     return this.db
@@ -242,6 +244,7 @@ export default class RecipeService {
         cook_time,
         prep_time,
         instructions,
+        supermarket_id,
       } = recipeWithIngredientsSnake;
 
       const freeFromsSnakeCase = <Array<'dairy_free' | 'gluten_free'>>(
@@ -262,6 +265,7 @@ export default class RecipeService {
             free_from_type: [...freeFromsSnakeCase],
             cook_time,
             prep_time,
+            supermarket_id,
           },
           ['id'],
         )

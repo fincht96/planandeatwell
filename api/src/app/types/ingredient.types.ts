@@ -3,4 +3,6 @@ export interface Ingredient {
   name: string;
   pricePerUnit: number;
   productId: number;
+  categoryId: number;
+  supermarketId: number;
 }

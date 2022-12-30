@@ -19,6 +19,12 @@ router.post('/email', (req: Request, res: Response) => {
   req.container.resolve('emailController').registerCustomerEmail(req, res);
 });
 
+/** supermarkets */
+
+router.get('/supermarkets', (req: Request, res: Response) =>
+  req.container.resolve('supermarketsController').getSupermarkets(req, res),
+);
+
 /** categories */
 
 router.get('/categories', (req: Request, res: Response) =>

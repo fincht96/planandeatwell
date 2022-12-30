@@ -12,6 +12,15 @@ export default class IngredientsService {
     this.db = db;
   }
 
+  private matchingSupermarketId =
+    ({ supermarketId }: { supermarketId: number | null }) =>
+    (queryBuilder: Knex.QueryBuilder) => {
+      if (supermarketId) {
+        queryBuilder.andWhere('ingredients.supermarket_id', supermarketId);
+      }
+      return queryBuilder;
+    };
+
   async getIngredients(orderOptions: {
     orderBy?: 'createdAt';
     order?: 'asc' | 'desc';
@@ -50,34 +59,43 @@ export default class IngredientsService {
     return this.db.select('*').from(rawQuery);
   }
 
-  async searchIngredients(searchString: string) {
+  async searchIngredients(searchString: string, supermarketId: number | null) {
     const rawQuery = this.db.raw(
       `
-    (
-      SELECT 
-        ingredients.id,
-        ingredients.name,
-        CAST(ingredients.price_per_unit as FLOAT) 
-      FROM 
-        ingredients
-      WHERE 
-        position(? in lower(ingredients.name))>0
+     (
+        SELECT 
+          ingredients.id,
+          ingredients.name,
+          CAST(ingredients.price_per_unit as FLOAT),
+          ingredients.supermarket_id
+        FROM 
+          ingredients
+        WHERE 
+          position(? in lower(ingredients.name))>0
       ) as ingredients
       `,
       [searchString],
     );
 
-    return this.db.select('*').from(rawQuery).limit(30);
+    return this.db
+      .select('*')
+      .from(rawQuery)
+      .modify(this.matchingSupermarketId({ supermarketId }))
+      .limit(30);
   }
 
   async insertIngredient(ingredient: Ingredient) {
     // convert recipe to snake case
     const ingredientSnake = snakeize(ingredient);
     return await this.db.transaction(async (trx) => {
-      const { name, price_per_unit, product_id, category_id } = ingredientSnake;
+      const { name, price_per_unit, product_id, category_id, supermarket_id } =
+        ingredientSnake;
       // insert ingredient
       const result = await this.db('ingredients')
-        .insert({ name, price_per_unit, product_id, category_id }, ['*'])
+        .insert(
+          { name, price_per_unit, product_id, category_id, supermarket_id },
+          ['*'],
+        )
         .transacting(trx);
       return camelize(result[0]);
     });

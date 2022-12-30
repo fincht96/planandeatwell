@@ -42,6 +42,7 @@ const insertRecipeSchema = Joi.object({
   }),
   cookTime: Joi.number().min(1).max(120).required(),
   prepTime: Joi.number().min(1).max(120).required(),
+  supermarketId: Joi.number().min(1).required(),
   ingredients: Joi.array()
     .items(
       Joi.object({
@@ -74,6 +75,10 @@ const insertRecipeSchema = Joi.object({
   'link',
   'ingredients',
   'meals',
+  'instructions',
+  'cookTime',
+  'prepTime',
+  'supermarketId',
 );
 
 const removeRecipeSchema = Joi.object({

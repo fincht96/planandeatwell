@@ -221,6 +221,7 @@ const Recipes: NextPage = (props: any) => {
                     servings={recipe.servings}
                     cookTime={recipe.cookTime}
                     prepTime={recipe.prepTime}
+                    supermarketName={recipe.supermarketName}
                   />
                 );
               })}

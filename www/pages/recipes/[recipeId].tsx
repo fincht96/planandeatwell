@@ -13,11 +13,13 @@ import {
   TabPanel,
   TabPanels,
   Tab,
+  Badge,
 } from '@chakra-ui/react';
 import { getRecipes } from '../../utils/api-requests/recipes';
 import Image from 'next/image';
 import BorderBox from '../../components/BorderBox';
 import dynamic from 'next/dynamic';
+import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
 
 // run import only on client
 const Interweave = dynamic<any>(
@@ -42,6 +44,17 @@ const Recipe: NextPage = ({ recipe }: any) => {
                   <Text fontSize={'2.5rem'} fontWeight={600} color="gray.dark">
                     {recipe.name}
                   </Text>
+                  <Box>
+                    <Badge
+                      variant={'solid'}
+                      colorScheme={getSupermarketBrandColor(
+                        recipe.supermarketName,
+                      )}
+                      fontSize="1em"
+                    >
+                      {recipe.supermarketName}
+                    </Badge>
+                  </Box>
                 </BorderBox>
                 <Tabs
                   borderWidth={'1px'}
@@ -68,16 +81,17 @@ const Recipe: NextPage = ({ recipe }: any) => {
                               fontSize={'1.5rem'}
                               fontWeight={450}
                               color="gray.dark"
-                              my={2}
+                              mt={2}
                             >
                               Method
                             </Text>
                           </Box>
                           <Box>
                             <Text
-                              fontSize={'0.8rem'}
-                              fontWeight={450}
-                              color="gray.light"
+                              fontSize={'sm'}
+                              letterSpacing={'wide'}
+                              fontWeight={'semibold'}
+                              color={'gray.500'}
                             >
                               for {recipe.servings} servings - change as needed
                             </Text>
@@ -123,6 +137,32 @@ const Recipe: NextPage = ({ recipe }: any) => {
                       </Box>
                     </TabPanel>
                     <TabPanel>
+                      <Box
+                        borderWidth={'1px'}
+                        borderRadius={'lg'}
+                        p={3}
+                        textAlign={'center'}
+                      >
+                        <Box>
+                          <Text
+                            fontSize={'1.2rem'}
+                            fontWeight={450}
+                            color="gray.dark"
+                          >
+                            {recipe.servings} servings
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Text
+                            fontSize={'sm'}
+                            fontWeight={'semibold'}
+                            color={'gray.500'}
+                            letterSpacing={'wide'}
+                          >
+                            £{recipe.pricePerServing} per serving
+                          </Text>
+                        </Box>
+                      </Box>
                       <Box p={3}>
                         <Box mb={2.5}>
                           <Text
@@ -173,6 +213,17 @@ const Recipe: NextPage = ({ recipe }: any) => {
                   <Text fontSize={'3.5rem'} fontWeight={600} color="gray.dark">
                     {recipe.name}
                   </Text>
+                  <Box>
+                    <Badge
+                      variant={'solid'}
+                      colorScheme={getSupermarketBrandColor(
+                        recipe.supermarketName,
+                      )}
+                      fontSize="1em"
+                    >
+                      {recipe.supermarketName}
+                    </Badge>
+                  </Box>
                 </BorderBox>
 
                 <BorderBox
@@ -187,16 +238,17 @@ const Recipe: NextPage = ({ recipe }: any) => {
                         fontSize={'1.5rem'}
                         fontWeight={450}
                         color="gray.dark"
-                        my={2}
+                        mt={2}
                       >
                         Method
                       </Text>
                     </Box>
                     <Box>
                       <Text
-                        fontSize={'0.8rem'}
-                        fontWeight={450}
-                        color="gray.light"
+                        fontSize={'sm'}
+                        fontWeight={'semibold'}
+                        color={'gray.500'}
+                        letterSpacing={'wide'}
                       >
                         for {recipe.servings} servings - change as needed
                       </Text>
@@ -271,7 +323,12 @@ const Recipe: NextPage = ({ recipe }: any) => {
                   </Text>
                 </Box>
                 <Box>
-                  <Text fontSize={'0.8rem'} fontWeight={450} color="gray.light">
+                  <Text
+                    fontSize={'sm'}
+                    fontWeight={'semibold'}
+                    color={'gray.500'}
+                    letterSpacing={'wide'}
+                  >
                     £{recipe.pricePerServing} per serving
                   </Text>
                 </Box>

@@ -72,13 +72,21 @@ router.get('/meal-plan/:id', (req: Request, res: Response) => {
   req.container.resolve('mealPlanController').getMealPlan(req, res);
 });
 
-router.post('/meal-plan', (req: Request, res: Response) => {
+router.post(
+  '/meal-plan',
+  isAuthenticated('user'),
+  (req: Request, res: Response) => {
   req.container.resolve('mealPlanController').saveMealPlan(req, res);
-});
+  },
+);
 
-router.put('/meal-plan/:id', (req: Request, res: Response) => {
+router.put(
+  '/meal-plan/:id',
+  isAuthenticated('user'),
+  (req: Request, res: Response) => {
   req.container.resolve('mealPlanController').updateMealPlan(req, res);
-});
+  },
+);
 
 /** storage */
 

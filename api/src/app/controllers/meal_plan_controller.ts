@@ -71,7 +71,10 @@ export default class MealPlanController {
       // insert meal plan
       const { recipeIdList } = value;
 
-      const uuid = await this.mealPlanService.createPlan(recipeIdList);
+      const uuid = await this.mealPlanService.createPlan(
+        req.user.planandeatwell_id,
+        recipeIdList,
+      );
 
       await this.eventsService.insert(
         'MEAL_PLAN',
@@ -116,6 +119,7 @@ export default class MealPlanController {
       // get all recipes and optional ingredients
       const { name: mealPlanName, uuid } =
         await this.mealPlanService.updatePlan({
+          userId: req.user.planandeatwell_id,
           uuid: mealPlanUuid,
           ...(recipeIdList && { recipeIdList }),
           ...(typeof name === 'string' && { name }),

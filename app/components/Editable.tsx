@@ -22,6 +22,7 @@ const CustomEditable = React.forwardRef<
       name,
       resetForm,
       error,
+      enableEditing,
     }: {
       previewValue: string;
       handleSubmit: any;
@@ -29,6 +30,7 @@ const CustomEditable = React.forwardRef<
       name: any;
       resetForm: any;
       error: any;
+      enableEditing: false;
     },
     ref,
   ) => {
@@ -42,47 +44,51 @@ const CustomEditable = React.forwardRef<
           </Text>
         )}
 
-        {isEditing ? (
-          <form
-            onSubmit={(e) => handleSubmit(e, () => setIsEditing(false))}
-            autoComplete="off"
-            style={{ width: '100%' }}
-          >
-            <FormControl isInvalid={error.isError}>
-              <Flex alignItems={'center'} gap={'1rem'}>
-                <Input ref={ref} onChange={onChange} name={name} />
+        {enableEditing && (
+          <>
+            {isEditing ? (
+              <form
+                onSubmit={(e) => handleSubmit(e, () => setIsEditing(false))}
+                autoComplete="off"
+                style={{ width: '100%' }}
+              >
+                <FormControl isInvalid={error.isError}>
+                  <Flex alignItems={'center'} gap={'1rem'}>
+                    <Input ref={ref} onChange={onChange} name={name} />
 
-                <ButtonGroup justifyContent="center" size="sm">
-                  <IconButton
-                    icon={<CheckIcon />}
-                    type="submit"
-                    aria-label="submit-button"
-                  />
-                  <IconButton
-                    icon={<CloseIcon />}
-                    onClick={() => {
-                      resetForm();
-                      setIsEditing(false);
-                    }}
-                    aria-label="cancel-button"
-                  />
-                </ButtonGroup>
+                    <ButtonGroup justifyContent="center" size="sm">
+                      <IconButton
+                        icon={<CheckIcon />}
+                        type="submit"
+                        aria-label="submit-button"
+                      />
+                      <IconButton
+                        icon={<CloseIcon />}
+                        onClick={() => {
+                          resetForm();
+                          setIsEditing(false);
+                        }}
+                        aria-label="cancel-button"
+                      />
+                    </ButtonGroup>
+                  </Flex>
+
+                  <FormErrorMessage>
+                    {error.isError && `${error?.message}`}
+                  </FormErrorMessage>
+                </FormControl>
+              </form>
+            ) : (
+              <Flex justifyContent="center">
+                <IconButton
+                  size="sm"
+                  icon={<EditIcon />}
+                  onClick={() => setIsEditing(true)}
+                  aria-label="edit-button"
+                />
               </Flex>
-
-              <FormErrorMessage>
-                {error.isError && `${error?.message}`}
-              </FormErrorMessage>
-            </FormControl>
-          </form>
-        ) : (
-          <Flex justifyContent="center">
-            <IconButton
-              size="sm"
-              icon={<EditIcon />}
-              onClick={() => setIsEditing(true)}
-              aria-label="edit-button"
-            />
-          </Flex>
+            )}
+          </>
         )}
       </Flex>
     );

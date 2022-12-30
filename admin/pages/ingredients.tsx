@@ -4,13 +4,13 @@ import {
   Container,
   Flex,
   FormControl,
-  FormLabel,
   FormErrorMessage,
+  FormLabel,
   Input,
+  Select,
   Stack,
   Text,
   useToast,
-  Select
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
@@ -18,17 +18,19 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiTrash2 } from 'react-icons/fi';
 import Layout from '../components/layout';
+import { getCategories } from '../utils/requests/categories';
 import {
   deleteIngredient,
   getIngredients,
   insertIngredient,
 } from '../utils/requests/ingredients';
-import { getCategories } from '../utils/requests/categories';
+import { getSupermarkets } from '../utils/requests/supermarkets';
 
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/auth-context';
-import { Ingredient } from '../types/ingredient.types';
 import { Category } from '../types/category.types';
+import { Ingredient } from '../types/ingredient.types';
+import { Supermarket } from '../types/supermarket.types';
 
 const IngredientCard = ({
   ingredient,
@@ -92,6 +94,7 @@ export default function Ingredients() {
   const { currentUser, idToken, authLoading } = useAuth();
   const [ingredients, setIngredients] = useState<Array<Ingredient>>([]);
   const [categories, setCategories] = useState<Array<Category>>([]);
+  const [supermarkets, setSupermarkets] = useState<Array<Supermarket>>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
   const router = useRouter();
@@ -134,7 +137,7 @@ export default function Ingredients() {
     },
   );
 
-  const categoriesQuery = useQuery(
+  useQuery(
     [`categories`],
     () => {
       return getCategories();
@@ -145,6 +148,21 @@ export default function Ingredients() {
       refetchOnWindowFocus: false,
       onSuccess: (data: Array<Category>) => {
         setCategories(data);
+      },
+    },
+  );
+
+  useQuery(
+    [`supermarkets`],
+    () => {
+      return getSupermarkets();
+    },
+    {
+      enabled: isReady,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      onSuccess: (data: Array<Supermarket>) => {
+        setSupermarkets(data);
       },
     },
   );
@@ -216,14 +234,8 @@ export default function Ingredients() {
   const {
     register,
     handleSubmit,
-    watch,
-    control,
-    unregister,
-    clearErrors,
-    getValues,
     reset,
-    setValue,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors },
   } = useForm();
 
   // submit ingredient
@@ -321,25 +333,54 @@ export default function Ingredients() {
 
                     <FormControl isInvalid={!!errors.categoryId}>
                       <FormLabel>Category name</FormLabel>
-                        <Select 
-                          autoComplete="off"
-                          id={'categoryId'}
-                          placeholder='Select category name' 
-                          variant='outline' bg={'#ffffff'} 
-                          {...register("categoryId", {
-                            required: 'Category name is required',
-                            valueAsNumber: true,
-                          })}>
-                          {
-                            categories.map((category) => {
-                              return (
-                                <option key={category.id} value={category.id}>{category.name}</option>
-                              )
-                            })
-                          }
-                        </Select>
+                      <Select
+                        autoComplete="off"
+                        id={'categoryId'}
+                        placeholder="Select category name"
+                        variant="outline"
+                        bg={'#ffffff'}
+                        {...register('categoryId', {
+                          required: 'Category name is required',
+                          valueAsNumber: true,
+                        })}
+                      >
+                        {categories.map((category) => {
+                          return (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          );
+                        })}
+                      </Select>
                       <FormErrorMessage>
                         {errors.categoryId && `${errors?.categoryId.message}`}
+                      </FormErrorMessage>
+                    </FormControl>
+
+                    <FormControl isInvalid={!!errors.supermarketId}>
+                      <FormLabel>Supermarket name</FormLabel>
+                      <Select
+                        autoComplete="off"
+                        id={'supermarketId'}
+                        placeholder="Select supermarket name"
+                        variant="outline"
+                        bg={'#ffffff'}
+                        {...register('supermarketId', {
+                          required: 'Supermarket name is required',
+                          valueAsNumber: true,
+                        })}
+                      >
+                        {supermarkets.map((supermarket) => {
+                          return (
+                            <option key={supermarket.id} value={supermarket.id}>
+                              {supermarket.name}
+                            </option>
+                          );
+                        })}
+                      </Select>
+                      <FormErrorMessage>
+                        {errors.supermarketId &&
+                          `${errors?.supermarketId.message}`}
                       </FormErrorMessage>
                     </FormControl>
                   </Stack>

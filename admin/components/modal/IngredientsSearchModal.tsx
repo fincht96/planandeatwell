@@ -14,25 +14,10 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Supermarket } from '../../types/supermarket.types';
 import { getIngredientsSearch } from '../../utils/requests/ingredients';
-
-const ingredients = [
-  {
-    id: 1,
-    name: 'Natures pick red onions',
-    pricePerUnit: 1.2,
-    link: 'https://onions.com',
-  },
-  {
-    id: 2,
-    name: 'Natures cabbage',
-    pricePerUnit: 1.2,
-    link: 'https://cabbage.com',
-  },
-];
-
 interface Ingredient {
   id: number;
   name: string;
@@ -64,19 +49,17 @@ export default function IngredientsSearchModal({
   isOpen,
   onClose,
   onSubmit,
+  selectedSupermarket,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (ingredient: Ingredient) => void;
+  selectedSupermarket: Supermarket;
 }) {
   const {
+    reset,
     register,
     handleSubmit,
-    watch,
-    control,
-    unregister,
-    clearErrors,
-    getValues,
     formState: { errors },
   } = useForm();
 
@@ -85,7 +68,7 @@ export default function IngredientsSearchModal({
 
   useQuery({
     queryKey: [`ingredientsQuery`, searchString],
-    queryFn: () => getIngredientsSearch(searchString),
+    queryFn: () => getIngredientsSearch({ searchString, selectedSupermarket }),
     refetchOnMount: false,
     enabled: !!searchString.length,
     staleTime: 0,
@@ -93,6 +76,14 @@ export default function IngredientsSearchModal({
       setResults(data);
     },
   });
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchString('');
+      setResults([]);
+      reset();
+    }
+  }, [isOpen, reset]);
 
   const onSearchSubmit = (data) => {
     setSearchString(data.searchString);
@@ -104,7 +95,7 @@ export default function IngredientsSearchModal({
         <ModalOverlay />
         <ModalContent p={'2rem 0'}>
           <ModalHeader as={Text} fontSize={'2xl'} fontWeight={'400'}>
-            Ingredients Search
+            Ingredients Search for {selectedSupermarket.name}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>

@@ -32,7 +32,7 @@ export default class IngredientsController {
 
   async getIngredients(req: Request, res: Response) {
     try {
-      // get ingredents for recipe
+      // get ingredients for recipe
       if (req.query.recipeId) {
         // validate recipe id
         const recipeId: string = req.query.recipeId + '';

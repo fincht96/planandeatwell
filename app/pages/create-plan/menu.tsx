@@ -8,7 +8,11 @@ import SearchMenu from '../../components/menu/SearchMenu';
 import Recipe from '../../components/Recipe';
 import { useEventBus } from '../../hooks/useEventBus';
 import { Event } from '../../types/eventBus.types';
-import { Order, OrderBy, SortBy } from '../../types/order.types';
+import { Order, OrderBy, SortBy } from '../../types/menuOrder.types';
+import {
+  orderToSortBy,
+  sortByToOrder,
+} from '../../utils/menuSortByConversions';
 import {
   queryParamToString,
   queryParamToStringArray,
@@ -20,13 +24,14 @@ import {
 } from '../../utils/requests/meal-plans';
 import { getRecipes } from '../../utils/requests/recipes';
 import { roundTo2dp } from '../../utils/roundTo2dp';
-import { orderToSortBy, sortByToOrder } from '../../utils/sortByConversions';
 
 import MenuSummaryBar from '../../components/MenuSummaryBar';
+import { useAuth } from '../../contexts/auth-context';
 import { CustomNextPage } from '../../types/CustomNextPage';
 import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 
 const Menu: CustomNextPage = () => {
+  const { authToken } = useAuth();
   const { subscribe, unsubscribe, post } = useEventBus();
   const router = useRouter();
   const [recipes, setRecipes] = useState<Array<any>>([]);
@@ -196,8 +201,8 @@ const Menu: CustomNextPage = () => {
       recipeIdList: Array<number>;
     }) => {
       return updateExisting
-        ? updateMealPlan(mealPlanQueryParams.uuid, { recipeIdList })
-        : insertMealPlan(recipeIdList);
+        ? updateMealPlan(authToken, mealPlanQueryParams.uuid, { recipeIdList })
+        : insertMealPlan(authToken, recipeIdList);
     },
     onSuccess: (data: any) => {
       return onNavigate(`/meal-plans/${data.uuid}`);

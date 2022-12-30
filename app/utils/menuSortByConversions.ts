@@ -1,4 +1,4 @@
-import { Order, OrderBy, SortBy } from '../types/order.types';
+import { Order, OrderBy, SortBy } from '../types/menuOrder.types';
 
 export function sortByToOrder(sortBy: SortBy): {
   order: Order;

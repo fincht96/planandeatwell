@@ -1,17 +1,10 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  Grid,
-  Spinner,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Button, Container, Flex, Grid, Text } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
+import CenteredLoadingSpinner from '../../components/CenteredLoadingSpinner';
 import Layout from '../../components/layout';
 import MealPlan from '../../components/meal-plans/MealPlan';
 import SearchMenu from '../../components/meal-plans/SearchMenu';
@@ -121,7 +114,7 @@ const MealPlans: CustomNextPage = () => {
         <Container maxW="1200px" mb={10}>
           <Box textAlign={'left'}>
             <Text fontSize={'2rem'} color="gray.dark" fontWeight={500}>
-              Sorry, it looks you have currently have no meal plans.
+              Sorry, it looks like you have currently have no meal plans.
             </Text>
           </Box>
           <Box height={'7rem'}>
@@ -257,41 +250,23 @@ const MealPlans: CustomNextPage = () => {
     );
   };
 
-  if (isLoading) {
-    return (
-      <Layout>
-        <Container maxW={'1200px'}>
-          <Box display="flex" justifyContent="center">
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="brand.500"
-              size="xl"
-              position="fixed"
-              top="0"
-              left="0"
-              bottom="0"
-              right="0"
-              margin="auto"
-            />
-          </Box>
-        </Container>
-      </Layout>
-    );
-  } else {
-    return (
-      <Layout>
-        <Head>
-          <title>Meal Plans | Plan and Eat Well</title>
-        </Head>
+  return (
+    <Layout>
+      <Head>
+        <title>Meal Plans | Plan and Eat Well</title>
+      </Head>
 
-        <Container my={'2rem'} maxW={'1200px'}>
-          {!!mealPlans.length ? showMealPlans() : showNoMealPlans()}
-        </Container>
-      </Layout>
-    );
-  }
+      <Container my={'2rem'} maxW={'1200px'}>
+        {isLoading ? (
+          <CenteredLoadingSpinner />
+        ) : !!mealPlans.length ? (
+          showMealPlans()
+        ) : (
+          showNoMealPlans()
+        )}
+      </Container>
+    </Layout>
+  );
 };
 
 MealPlans.requireAuth = true;

@@ -20,6 +20,7 @@ export default class MealPlanService {
     userId: number;
     searchTerm?: string;
   }) {
+    // only single userId is used, though multiple userIds is supported
     const result = await this.db('meal_plans')
       .modify(matchingCreatedByQuery({ userIds: [userId] }))
       .modify(
@@ -46,21 +47,24 @@ export default class MealPlanService {
     orderBy?: 'relevance' | 'createdAt';
     searchTerm?: string;
   }) {
-    return getMealPlansBaseQuery(this.db)
-      .modify(matchingCreatedByQuery({ userIds: [userId] }))
-      .modify(
-        mealPlanQuerySearch({
-          searchTerm,
-        }),
-      )
-      .modify(
-        mealPlanQueryOrdering({
-          order,
-          orderBy,
-        }),
-      )
-      .offset(offset)
-      .limit(limit);
+    return (
+      getMealPlansBaseQuery(this.db)
+        // only single userId is used, though multiple userIds is supported
+        .modify(matchingCreatedByQuery({ userIds: [userId] }))
+        .modify(
+          mealPlanQuerySearch({
+            searchTerm,
+          }),
+        )
+        .modify(
+          mealPlanQueryOrdering({
+            order,
+            orderBy,
+          }),
+        )
+        .offset(offset)
+        .limit(limit)
+    );
   }
 
   async getPlan(

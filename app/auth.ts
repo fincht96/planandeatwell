@@ -41,7 +41,6 @@ class Auth {
             // update fb access token claims
             return auth.currentUser?.getIdToken(true);
           })
-
           .then(() => {
             return Promise.all([
               auth.currentUser?.getIdToken(),

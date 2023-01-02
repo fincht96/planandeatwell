@@ -5,7 +5,7 @@ import ChakraNextLink from '../NextChakraLink';
 
 const MealPlan = ({ uuid, name }: { uuid: string; name: string }) => {
   return (
-    <BorderBox maxH={'xl'} overflow={'hidden'}>
+    <BorderBox height={'7rem'} overflow={'hidden'}>
       <Box p={'6'}>
         <Box mt={'1'} noOfLines={1}>
           <Text fontSize={'1.5rem'} fontWeight={450} color="gray.dark">

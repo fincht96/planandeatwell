@@ -114,7 +114,7 @@ const MealPlans: CustomNextPage = () => {
         <Container maxW="1200px" mb={10}>
           <Box textAlign={'left'}>
             <Text fontSize={'2rem'} color="gray.dark" fontWeight={500}>
-              Sorry, it looks like you have currently have no meal plans.
+              Sorry, it looks like you do not currently have any meal plans.
             </Text>
           </Box>
           <Box height={'7rem'}>

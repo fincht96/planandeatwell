@@ -19,15 +19,16 @@ import {
 import Head from 'next/head';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Layout from '../components/layout';
 import { useAuth } from '../contexts/auth-context';
 import { CustomNextPage } from '../types/CustomNextPage';
+import { Event } from '../types/eventBus.types';
 
 const SignIn: CustomNextPage = () => {
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signIn, unsubscribe, subscribe } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const { isOpen: isNewAccountAlertVisible, onClose: onCloseNewAccountAlert } =
@@ -41,6 +42,30 @@ const SignIn: CustomNextPage = () => {
     defaultIsOpen: false,
   });
 
+  useEffect(() => {
+    const authSubscriber = {
+      notify(event: Event) {
+        if (event.name === 'onSignIn') {
+          setLoading(false);
+        }
+        if (event.name === 'onError') {
+          setLoading(false);
+          onOpenSignInErrorAlert();
+        }
+      },
+    };
+
+    if (subscribe) {
+      subscribe(authSubscriber);
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe(authSubscriber);
+      }
+    };
+  }, [onOpenSignInErrorAlert, subscribe, unsubscribe]);
+
   const {
     register,
     handleSubmit,
@@ -51,14 +76,7 @@ const SignIn: CustomNextPage = () => {
     const { email, password } = data;
     if (signIn) {
       setLoading(true);
-      signIn(email, password)
-        .catch((e: Error) => {
-          console.error(e);
-          onOpenSignInErrorAlert();
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      signIn(email, password);
     }
   };
 
@@ -188,5 +206,6 @@ const SignIn: CustomNextPage = () => {
 };
 
 SignIn.requireAuth = false;
+SignIn.displayName = 'SignIn';
 
 export default SignIn;

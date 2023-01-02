@@ -12,6 +12,7 @@ export default class UserService {
   async updateFirebaseIdTokenClaims(idToken: string) {
     let user: {
       roles: Array<string>;
+      id: string;
     } | null = null;
 
     // decode token
@@ -22,23 +23,18 @@ export default class UserService {
       .select('*')
       .where('uid', decodedId.uid);
 
-    // no user found, insert a new user
-    if (!results.length) {
-      const { uid, email } = decodedId;
-      const result = await this.db('users').insert(
-        { uid, roles: ['user'], email },
-        ['*'],
-      );
-      user = result[0];
-    }
-    // found existing user
-    else {
+    if (results.length) {
+      // found existing user
       user = results[0];
+    } else {
+      // no user found
+      throw new Error('No user account found');
     }
     // update the id token claims
-    await this.firebaseAdmin
-      .auth()
-      .setCustomUserClaims(decodedId.uid, { roles: user?.roles });
+    await this.firebaseAdmin.auth().setCustomUserClaims(decodedId.uid, {
+      roles: user?.roles,
+      planandeatwell_id: user?.id,
+    });
 
     return camelize(user);
   }
@@ -51,20 +47,9 @@ export default class UserService {
   }) {
     const { firstName, lastName, email, password } = account;
 
-    // create firebase account
-    const userRecord = await this.firebaseAdmin.auth().createUser({
-      email,
-      emailVerified: false,
-      password,
-      displayName: `${firstName} ${lastName}`,
-      disabled: false,
-    });
-
     // create a new user in app db
-    const { uid } = userRecord;
     const result = await this.db('users').insert(
       {
-        uid,
         roles: ['user'],
         email,
         first_name: firstName,
@@ -73,8 +58,24 @@ export default class UserService {
       ['*'],
     );
 
+    const firebase_uid = result[0].uid;
+    const planandeatwell_id = result[0].id;
+
+    // create firebase account
+    await this.firebaseAdmin.auth().createUser({
+      uid: firebase_uid,
+      email,
+      emailVerified: false,
+      password,
+      displayName: `${firstName} ${lastName}`,
+      disabled: false,
+    });
+
     // update the id token claims
-    await this.firebaseAdmin.auth().setCustomUserClaims(uid, { roles: 'user' });
+    await this.firebaseAdmin.auth().setCustomUserClaims(firebase_uid, {
+      roles: 'user',
+      planandeatwell_id,
+    });
 
     return result[0];
   }

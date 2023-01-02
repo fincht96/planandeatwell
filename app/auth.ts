@@ -1,26 +1,23 @@
-import { Unsubscribe, User } from 'firebase/auth';
+import {
+  IdTokenResult,
+  signInWithEmailAndPassword,
+  signOut,
+  Unsubscribe,
+  User,
+} from 'firebase/auth';
 import auth from './firebase';
-
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { Event, Subscriber } from './types/eventBus.types';
-
 import { syncClaims } from './utils/requests/user';
 
-export default class Auth {
-  private firebaseUnsubscribe: Unsubscribe;
+class Auth {
+  private firebaseUnsubscribe: Unsubscribe | null = null;
   private initialised: boolean = false;
   private user: User | null = null;
+  private idTokenResult: IdTokenResult | undefined = undefined;
+  private idToken: string | undefined = undefined;
   private subscribers: Array<Subscriber> = [];
-
   private currentState: 'signedIn' | 'signedOut' = 'signedOut';
-
-  constructor() {
-    this.firebaseUnsubscribe = auth.onIdTokenChanged(this._onIdTokenChanged);
-  }
-
-  destructor() {
-    this.firebaseUnsubscribe();
-  }
+  private busy: boolean = false;
 
   private _notify = (event: Event) => {
     this.subscribers.forEach((subscriber) => {
@@ -29,72 +26,99 @@ export default class Auth {
   };
 
   private _onIdTokenChanged = (user: User | null) => {
-    this.user = user;
+    if (!this.busy) {
+      // sign in user
+      if (this.currentState !== 'signedIn' && user) {
+        this.busy = true;
 
-    // initialise auth
-    if (!this.initialised) {
-      this.initialised = true;
-      this._notify({ name: 'onInit', data: '' });
-    }
+        user
+          .getIdToken()
+          .then((accessToken) => {
+            // sync claims with planandeatwell db
+            return syncClaims({ accessToken });
+          })
+          .then(() => {
+            // update fb access token claims
+            return auth.currentUser?.getIdToken(true);
+          })
+          .then(() => {
+            return Promise.all([
+              auth.currentUser?.getIdToken(),
+              auth.currentUser?.getIdTokenResult(),
+            ]);
+          })
+          .then((values) => {
+            this.user = auth.currentUser;
+            this.idToken = values[0];
+            this.idTokenResult = values[1];
+            this.currentState = 'signedIn';
+            this._notify({ name: 'onSignIn', data: '' });
+          })
+          .catch(() => {
+            this._notify({ name: 'onError', data: 'Sign in error occurred' });
+          })
+          .finally(() => {
+            // if not initialised, initialise now
+            if (!this.initialised) {
+              this.initialised = true;
+              this._notify({ name: 'onInit', data: '' });
+            }
+            this.busy = false;
+          });
+      }
 
-    // user signed in
-    if (this.currentState !== 'signedIn' && this.user) {
-      this.currentState = 'signedIn';
-      this._notify({ name: 'onSignIn', data: '' });
-    }
+      // sign out user
+      if (this.currentState !== 'signedOut' && !user) {
+        this.currentState = 'signedOut';
+        this.idTokenResult = undefined;
+        this.idToken = undefined;
+        this.user = null;
+        this._notify({ name: 'onSignOut', data: '' });
+      }
 
-    // user signed out
-    if (this.currentState !== 'signedOut' && !this.user) {
-      this.currentState = 'signedOut';
-      this._notify({ name: 'onSignOut', data: '' });
+      // initialise auth, no fb user currently signed in
+      if (!this.initialised && !user) {
+        this.initialised = true;
+        this._notify({ name: 'onInit', data: '' });
+      }
     }
   };
 
   async signIn(email: string, password: string) {
-    // unsubscribe firebase listener
-    this.firebaseUnsubscribe();
-    return signInWithEmailAndPassword(auth, email, password)
-      .then((userCredentials) => {
-        // grab firebase id token
-        return userCredentials.user.getIdToken();
-      })
-      .then((idToken) => {
-        // sync firebase id token claims with db
-        return syncClaims({ accessToken: idToken });
-      })
-      .then(() => {
-        // refresh firebase id token with new claims
-        return auth.currentUser?.getIdTokenResult(true);
-      })
-      .then(() => {
-        // auth sign in
-        this.currentState = 'signedIn';
-        this.user = auth.currentUser;
-        this._notify({ name: 'onSignIn', data: '' });
-        return this.user;
-      })
-      .catch((error: Error) => {
-        this.user = null;
-        this._notify({ name: 'onError', data: error.message });
-        throw error;
-      })
-      .finally(() => {
-        // resubscribe firebase listener
-        this.firebaseUnsubscribe = auth.onIdTokenChanged(
-          this._onIdTokenChanged,
-        );
-      });
+    signInWithEmailAndPassword(auth, email, password).catch(() => {
+      this._notify({ name: 'onError', data: 'Firebase sign in error' });
+    });
   }
 
   async signOut() {
-    return signOut(auth).catch((error: Error) => {
-      this._notify({ name: 'onError', data: error.message });
-      throw error;
+    signOut(auth).catch(() => {
+      this._notify({ name: 'onError', data: 'Firebase sign out error' });
     });
+  }
+
+  init() {
+    if (!this.firebaseUnsubscribe) {
+      this.firebaseUnsubscribe = auth.onIdTokenChanged(this._onIdTokenChanged);
+    }
+  }
+
+  terminate() {
+    if (this.firebaseUnsubscribe) {
+      this.firebaseUnsubscribe();
+      this.firebaseUnsubscribe = null;
+    }
   }
 
   getUser() {
     return this.user;
+  }
+
+  getIdToken() {
+    return this.idToken ?? '';
+  }
+
+  getIdTokenResult() {
+    return this.idTokenResult ?? null;
   }
 
   subscribe = (subscriber: Subscriber) => {
@@ -107,3 +131,5 @@ export default class Auth {
     );
   };
 }
+
+export default Auth;

@@ -1,4 +1,4 @@
-import { Order, OrderBy, SortBy } from '../types/order.types';
+import { Order, OrderBy, SortBy } from '../types/mealPlanOrder.types';
 
 export function sortByToOrder(sortBy: SortBy): {
   order: Order;
@@ -12,21 +12,6 @@ export function sortByToOrder(sortBy: SortBy): {
         orderBy: 'relevance',
       };
     }
-
-    case 'priceAscending': {
-      return {
-        order: 'asc',
-        orderBy: 'price',
-      };
-    }
-
-    case 'priceDescending': {
-      return {
-        order: 'desc',
-        orderBy: 'price',
-      };
-    }
-
     case 'newest': {
       return {
         order: 'desc',
@@ -42,14 +27,6 @@ export function orderToSortBy(order: Order, orderBy: OrderBy) {
   orderMap.set(
     JSON.stringify({ order: 'any', orderBy: 'relevance' }),
     'relevance',
-  );
-  orderMap.set(
-    JSON.stringify({ order: 'asc', orderBy: 'price' }),
-    'priceAscending',
-  );
-  orderMap.set(
-    JSON.stringify({ order: 'desc', orderBy: 'price' }),
-    'priceDescending',
   );
   orderMap.set(
     JSON.stringify({ order: 'desc', orderBy: 'createdAt' }),

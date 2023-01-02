@@ -27,8 +27,8 @@ import {
   mealDefaults,
 } from '../../utils/filterDefaults';
 import { toTitleCase } from '../../utils/toTitleCase';
+import SearchField from '../shared/SearchField';
 import FilterCheckBox from './FilterCheckBox';
-import SearchField from './SearchField';
 
 const SearchMenu = (props) => {
   const {

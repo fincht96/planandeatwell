@@ -1,4 +1,10 @@
 import { Knex } from 'knex';
+import {
+  getMealPlansBaseQuery,
+  matchingCreatedByQuery,
+  mealPlanQueryOrdering,
+  mealPlanQuerySearch,
+} from '../utils/mealPlanQueryBuilder';
 import RecipeService from './recipe_service';
 
 export default class MealPlanService {
@@ -6,6 +12,60 @@ export default class MealPlanService {
     private readonly db: Knex,
     private readonly recipeService: RecipeService,
   ) {}
+
+  async getPlansCount({
+    userId,
+    searchTerm = '',
+  }: {
+    userId: number;
+    searchTerm?: string;
+  }) {
+    // only single userId is used, though multiple userIds is supported
+    const result = await this.db('meal_plans')
+      .modify(matchingCreatedByQuery({ userIds: [userId] }))
+      .modify(
+        mealPlanQuerySearch({
+          searchTerm,
+        }),
+      )
+      .count();
+    return result[0].count;
+  }
+
+  async getManyPlans({
+    userId,
+    offset = 0,
+    limit = 10,
+    order = 'any',
+    orderBy = 'relevance',
+    searchTerm = '',
+  }: {
+    userId: number;
+    offset?: number;
+    limit?: number;
+    order?: 'asc' | 'desc' | 'any';
+    orderBy?: 'relevance' | 'createdAt';
+    searchTerm?: string;
+  }) {
+    return (
+      getMealPlansBaseQuery(this.db)
+        // only single userId is used, though multiple userIds is supported
+        .modify(matchingCreatedByQuery({ userIds: [userId] }))
+        .modify(
+          mealPlanQuerySearch({
+            searchTerm,
+          }),
+        )
+        .modify(
+          mealPlanQueryOrdering({
+            order,
+            orderBy,
+          }),
+        )
+        .offset(offset)
+        .limit(limit)
+    );
+  }
 
   async getPlan(
     uuid: string,
@@ -21,18 +81,21 @@ export default class MealPlanService {
       select
         recipes.meal_plan_name,
         recipes.meal_plan_id,
+        recipes.meal_plan_created_by::INTEGER,
         recipes.recipes,
         ingredients.ingredients
       from
         (
           select
             mps.meal_plan_name,
+            mps.meal_plan_created_by,
             mps.meal_plan_id,
             mps.recipes
           from
             (
               select
                 meal_plans.name as meal_plan_name,
+                meal_plans.created_by as meal_plan_created_by,
                 meal_plan_recipes.meal_plan_id,
                 json_agg(recipes.*) as recipes
               from
@@ -41,7 +104,8 @@ export default class MealPlanService {
                 left join recipes on meal_plan_recipes.recipe_id = recipes.id
               group by
                 meal_plan_recipes.meal_plan_id,
-                meal_plans.name
+                meal_plans.name,
+                meal_plans.created_by
             ) as mps
         ) as recipes
         left join (
@@ -92,6 +156,7 @@ export default class MealPlanService {
     const mealPlanSelectColumns: Array<string> = [
       'meal_plans.meal_plan_name',
       'meal_plans.recipes',
+      'meal_plans.meal_plan_created_by',
     ];
 
     if (includeAggregatedIngredients) {
@@ -126,11 +191,11 @@ export default class MealPlanService {
     return mealPlanDecorated;
   }
 
-  async createPlan(recipe_id_list: Array<number>) {
+  async createPlan(userId: number, recipe_id_list: Array<number>) {
     return await this.db.transaction(async (trx) => {
       // create a meal plan
       const result = await this.db('meal_plans')
-        .insert({}, ['id', 'uuid'])
+        .insert({ created_by: userId }, ['id', 'uuid'])
         .transacting(trx);
 
       // insert meal_plan_recipes with associated meal_plan.id
@@ -149,18 +214,22 @@ export default class MealPlanService {
   }
 
   async updatePlan({
+    userId,
     uuid,
     recipeIdList,
     name,
   }: {
+    userId: number;
     uuid: string;
     recipeIdList?: Array<number>;
     name?: string;
   }) {
     return await this.db.transaction(async (trx) => {
+      // find meal plan with uuid and created by user
       const result = await this.db('meal_plans')
         .select('id')
         .where('uuid', uuid)
+        .andWhere('created_by', userId)
         .transacting(trx);
 
       const { id: planId } = result[0];
@@ -186,7 +255,10 @@ export default class MealPlanService {
 
       // update meal_plan name (if provided meal_plan name)
       if (name) {
-        await this.db('meal_plans').where('id', planId).update({ name });
+        await this.db('meal_plans')
+          .where('uuid', uuid)
+          .andWhere('created_by', userId)
+          .update({ name });
       }
 
       const mealPlan = await this.db('meal_plans')

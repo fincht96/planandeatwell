@@ -20,6 +20,7 @@ import { FiLink2 } from 'react-icons/fi';
 import { MdModeEdit } from 'react-icons/md';
 import Editable from '../../components/Editable';
 import Layout from '../../components/layout';
+import { useAuth } from '../../contexts/auth-context';
 import { CustomNextPage } from '../../types/CustomNextPage';
 import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
@@ -79,6 +80,7 @@ const ContentBox = ({
 type PermittedIngredientsViewStates = 'ALL' | 'RECIPE' | 'CATEGORY';
 
 const MealPlan: CustomNextPage = () => {
+  const { authToken, user, authClaims } = useAuth();
   const toast = useToast();
   const router = useRouter();
   const mealPlanUuid =
@@ -89,7 +91,7 @@ const MealPlan: CustomNextPage = () => {
 
   const [mealPlanName, setMealPlanName] = useState<string>('');
 
-  const recipeQuery: any = useQuery({
+  const mealPlanQuery: any = useQuery({
     queryKey: [`recipesQuery-${mealPlanUuid}`],
     queryFn: () => getMealPlan(mealPlanUuid, true, true),
     refetchOnMount: 'always',
@@ -99,7 +101,7 @@ const MealPlan: CustomNextPage = () => {
 
   const mealPlanMutation = useMutation({
     mutationFn: ({ mealPlanName }: { mealPlanName: string }) => {
-      return updateMealPlan(mealPlanUuid, { name: mealPlanName });
+      return updateMealPlan(authToken, mealPlanUuid, { name: mealPlanName });
     },
     onSuccess: (data) => {
       setMealPlanName(data.name);
@@ -112,14 +114,14 @@ const MealPlan: CustomNextPage = () => {
     servings: number;
     link: string;
   }> = useMemo(() => {
-    return !recipeQuery.isLoading && !recipeQuery.error
-      ? recipeQuery.data[0].recipes
+    return !mealPlanQuery.isLoading && !mealPlanQuery.error
+      ? mealPlanQuery.data[0].recipes
       : [];
-  }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
+  }, [mealPlanQuery.data, mealPlanQuery.isLoading, mealPlanQuery.error]);
 
   const ingredients: Array<IngredientDecorated> = useMemo(() => {
-    return !recipeQuery.isLoading && !recipeQuery.error
-      ? recipeQuery.data[0].ingredients.map(
+    return !mealPlanQuery.isLoading && !mealPlanQuery.error
+      ? mealPlanQuery.data[0].ingredients.map(
           (ingredient: IngredientDecorated) => {
             const unitQuantity = Math.ceil(ingredient.unitQuantity);
             const price = ingredient.pricePerUnit * unitQuantity;
@@ -127,7 +129,15 @@ const MealPlan: CustomNextPage = () => {
           },
         )
       : [];
-  }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error]);
+  }, [mealPlanQuery.data, mealPlanQuery.isLoading, mealPlanQuery.error]);
+
+  const mealPlanCreatedBy: number | null = (() => {
+    return !mealPlanQuery.isLoading && !mealPlanQuery.error
+      ? mealPlanQuery?.data[0]?.mealPlanCreatedBy
+      : null;
+  })();
+
+  const editMode = user && mealPlanCreatedBy === authClaims?.userId;
 
   const onNavigate = (pathname: string, query: any) => {
     router.push({ pathname, query });
@@ -287,16 +297,21 @@ const MealPlan: CustomNextPage = () => {
   };
 
   useEffect(() => {
-    if (!recipeQuery.isLoading && !recipeQuery.error) {
-      setMealPlanName(recipeQuery.data[0].mealPlanName);
-      setValue('mealPlanName', `${recipeQuery.data[0].mealPlanName}`);
+    if (!mealPlanQuery.isLoading && !mealPlanQuery.error) {
+      setMealPlanName(mealPlanQuery.data[0].mealPlanName);
+      setValue('mealPlanName', `${mealPlanQuery.data[0].mealPlanName}`);
     }
-  }, [recipeQuery.data, recipeQuery.isLoading, recipeQuery.error, setValue]);
+  }, [
+    mealPlanQuery.data,
+    mealPlanQuery.isLoading,
+    mealPlanQuery.error,
+    setValue,
+  ]);
 
   const rowData = generateRowData();
 
   return (
-    <Layout>
+    <Layout includeNavBar={!!editMode}>
       <Head>
         <title>Meal Plan | Plan and Eat Well</title>
       </Head>
@@ -310,6 +325,7 @@ const MealPlan: CustomNextPage = () => {
         >
           <Box flex={1}>
             <Editable
+              enableEditing={editMode}
               previewValue={mealPlanName}
               handleSubmit={(e, closeEditing) => {
                 handleSubmit((d) => onSubmit(d, closeEditing))(e);
@@ -357,38 +373,39 @@ const MealPlan: CustomNextPage = () => {
               <Text>Copy Link</Text>
             </Flex>
           </Button>
-          <Button
-            bg={'#ffffff'}
-            border={'solid 1px'}
-            borderColor={'brand.500'}
-            color={'brand.500'}
-            fontSize={'1rem'}
-            fontWeight={400}
-            minW={'min-content'}
-            onClick={() => {
-              onNavigate('/create-plan/menu', {
-                supermarket: 'aldi',
-                servings: 4,
-                meal_plan_uuid: mealPlanUuid,
-              });
-            }}
-          >
-            <Flex
-              justifyContent={'space-between'}
-              alignItems={'center'}
-              gap={'0.5rem'}
+          {editMode && (
+            <Button
+              bg={'#ffffff'}
+              border={'solid 1px'}
+              borderColor={'brand.500'}
+              color={'brand.500'}
+              fontSize={'1rem'}
+              fontWeight={400}
+              minW={'min-content'}
+              onClick={() => {
+                onNavigate('/create-plan/menu', {
+                  supermarket: 'aldi',
+                  servings: 4,
+                  meal_plan_uuid: mealPlanUuid,
+                });
+              }}
             >
-              <Icon
-                as={MdModeEdit}
-                width={{ base: '1.2rem' }}
-                height={{ base: '1.2rem' }}
-                color={'brand.500'}
-              />
-              <Text>Edit meal plan</Text>
-            </Flex>
-          </Button>
+              <Flex
+                justifyContent={'space-between'}
+                alignItems={'center'}
+                gap={'0.5rem'}
+              >
+                <Icon
+                  as={MdModeEdit}
+                  width={{ base: '1.2rem' }}
+                  height={{ base: '1.2rem' }}
+                  color={'brand.500'}
+                />
+                <Text>Edit meal plan</Text>
+              </Flex>
+            </Button>
+          )}
         </Flex>
-
         <Grid
           templateColumns={{
             base: '1fr',
@@ -496,6 +513,6 @@ const MealPlan: CustomNextPage = () => {
   );
 };
 
-MealPlan.requireAuth = true;
+MealPlan.requireAuth = false;
 
 export default MealPlan;

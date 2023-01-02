@@ -256,5 +256,6 @@ const SignUp: CustomNextPage = () => {
 };
 
 SignUp.requireAuth = false;
+SignUp.displayName = 'SignUp';
 
 export default SignUp;

@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { FiPlus } from 'react-icons/fi';
+import CenteredLoadingSpinner from '../../components/CenteredLoadingSpinner';
 import Layout from '../../components/layout';
 import MealPlan from '../../components/meal-plans/MealPlan';
 import SearchMenu from '../../components/meal-plans/SearchMenu';
@@ -19,6 +21,7 @@ import { getMealPlans } from '../../utils/requests/meal-plans';
 const MealPlans: CustomNextPage = () => {
   const router = useRouter();
   const { authClaims, authToken } = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [queryParamsInitialised, setQueryParamsInitialised] = useState(false);
   const [totalCountMealPlans, setTotalCountMealPlans] = useState(0);
   const [mealPlans, setMealPlans] = useState<
@@ -27,6 +30,10 @@ const MealPlans: CustomNextPage = () => {
       uuid: string;
     }>
   >([]);
+
+  const onNavigate = (pathname: string) => {
+    router.push({ pathname });
+  };
 
   const [mealPlansQueryParams, setMealPlansQueryParams] = useState<{
     limit: number;
@@ -94,19 +101,38 @@ const MealPlans: CustomNextPage = () => {
           }
           return [...current, ...data.mealPlans];
         });
+        setIsLoading(false);
       },
     },
   );
 
   const showMore = mealPlans.length < totalCountMealPlans;
 
-  return (
-    <Layout>
-      <Head>
-        <title>Meal Plans | Plan and Eat Well</title>
-      </Head>
+  const showNoMealPlans = () => {
+    return (
+      <>
+        <Container maxW="1200px" mb={10}>
+          <Box textAlign={'left'}>
+            <Text fontSize={'2rem'} color="gray.dark" fontWeight={500}>
+              Sorry, it looks like you do not currently have any meal plans.
+            </Text>
+          </Box>
+          <Box height={'7rem'}>
+            <Button
+              height={'100%'}
+              onClick={() => onNavigate('/create-plan/steps')}
+            >
+              <FiPlus /> Add new meal plan
+            </Button>
+          </Box>
+        </Container>
+      </>
+    );
+  };
 
-      <Container my={'2rem'} maxW={'1200px'}>
+  const showMealPlans = () => {
+    return (
+      <>
         <Container maxW="1200px" mb={10}>
           <Box textAlign={'left'}>
             <Text fontSize={'2rem'} color="gray.dark" fontWeight={500}>
@@ -186,6 +212,15 @@ const MealPlans: CustomNextPage = () => {
                 />
               );
             })}
+            <Box height={'7rem'}>
+              <Button
+                height={'100%'}
+                width={'100%'}
+                onClick={() => onNavigate('/create-plan/steps')}
+              >
+                <FiPlus /> Add new meal plan
+              </Button>
+            </Box>
           </Grid>
         </Container>
         <Container maxW="1200px" mb={10}>
@@ -211,6 +246,24 @@ const MealPlans: CustomNextPage = () => {
             </Flex>
           )}
         </Container>
+      </>
+    );
+  };
+
+  return (
+    <Layout>
+      <Head>
+        <title>Meal Plans | Plan and Eat Well</title>
+      </Head>
+
+      <Container my={'2rem'} maxW={'1200px'}>
+        {isLoading ? (
+          <CenteredLoadingSpinner />
+        ) : !!mealPlans.length ? (
+          showMealPlans()
+        ) : (
+          showNoMealPlans()
+        )}
       </Container>
     </Layout>
   );

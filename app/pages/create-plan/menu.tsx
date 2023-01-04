@@ -1,13 +1,18 @@
-import { Button, Container, Flex, Grid, Text } from '@chakra-ui/react';
+import {
+  Button,
+  Container,
+  Flex,
+  Grid,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Layout from '../../components/layout';
+import Recipe from '../../components/menu/Recipe';
 import SearchMenu from '../../components/menu/SearchMenu';
-import Recipe from '../../components/Recipe';
-import { useEventBus } from '../../hooks/useEventBus';
-import { Event } from '../../types/eventBus.types';
 import { Order, OrderBy, SortBy } from '../../types/menuOrder.types';
 import {
   orderToSortBy,
@@ -25,14 +30,26 @@ import {
 import { getRecipes } from '../../utils/requests/recipes';
 import { roundTo2dp } from '../../utils/roundTo2dp';
 
+import RecipeModal from '../../components/menu/RecipeModal';
 import MenuSummaryBar from '../../components/MenuSummaryBar';
 import { useAuth } from '../../contexts/auth-context';
 import { CustomNextPage } from '../../types/CustomNextPage';
 import { IngredientDecorated } from '../../types/ingredientDecorated.types';
+import {
+  addIngredients,
+  addRecipeServings,
+  removeIngredients,
+  removeRecipeServings,
+  roundUpQuantities,
+  scaleIngredientQuantities,
+} from '../../utils/recipeBasketHelper';
 
 const Menu: CustomNextPage = () => {
   const { authToken } = useAuth();
-  const { subscribe, unsubscribe, post } = useEventBus();
+
+  const { isOpen, onClose, onOpen } = useDisclosure({ defaultIsOpen: false });
+  const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
+
   const router = useRouter();
   const [recipes, setRecipes] = useState<Array<any>>([]);
   const [mealPlanQueryParams, setMealPlanQueryParams] = useState<{
@@ -59,128 +76,15 @@ const Menu: CustomNextPage = () => {
   });
   const [queryParamsInitialised, setQueryParamsInitialised] = useState(false);
   const [totalCountRecipes, setTotalCountRecipes] = useState(0);
-  const [recipeBasket, setRecipeBasket] = useState<Array<any>>([]);
+  const [recipeBasket, setRecipeBasket] = useState<
+    Array<{ recipe: any; servings: number }>
+  >([]);
   const [exactIngredientsBasket, setExactIngredientsBasket] = useState<
     Array<IngredientDecorated>
   >([]);
   const ingredientsBasket = useMemo(() => {
-    return exactIngredientsBasket.map((ingredient) => {
-      const unitQuantity = Math.ceil(ingredient.unitQuantity);
-      const price = roundTo2dp(unitQuantity * ingredient.pricePerUnit);
-
-      return {
-        ...ingredient,
-        unitQuantity,
-        price,
-      };
-    });
+    return roundUpQuantities(exactIngredientsBasket);
   }, [exactIngredientsBasket]);
-
-  const updateRecipesInBasket = useCallback(
-    (recipeId: number) => {
-      const recipeInBasket = recipeBasket.find(
-        (recipe) => recipe.id === recipeId,
-      );
-
-      post({
-        name: recipeInBasket
-          ? 'remove-recipe-ingredients'
-          : 'add-recipe-ingredients',
-        data: `${recipeId}`,
-      });
-
-      const { ingredientsList, ...recipe } = recipes.find(
-        (recipe) => recipe.id === recipeId,
-      );
-
-      setRecipeBasket((currentRecipeBasket: Array<any>) => {
-        return recipeInBasket
-          ? currentRecipeBasket.filter((recipe) => recipe.id !== recipeId)
-          : [...currentRecipeBasket, recipe];
-      });
-    },
-    [post, recipeBasket, recipes],
-  );
-
-  const removeRecipeIngredientsFromBasket = useCallback(
-    (recipeId: number) => {
-      // get recipe ingredients to be removed
-      const ingredientsToRemove = recipes.find(
-        (recipe) => recipe.id === recipeId,
-      )?.ingredientsList;
-
-      // subtract ingredients from ingredients basket
-      const newExactIngredientsBasket = exactIngredientsBasket.reduce(
-        (newExactIngredientsBasket, basketIngredient) => {
-          const ingredientToRemove = ingredientsToRemove.find(
-            (ingredient: IngredientDecorated) =>
-              ingredient.id === basketIngredient.id,
-          );
-
-          if (ingredientToRemove) {
-            const updatedIngredient = {
-              ...basketIngredient,
-              unitQuantity: (basketIngredient.unitQuantity -=
-                ingredientToRemove.unitQuantity),
-            };
-
-            return updatedIngredient.unitQuantity <= 0.0001
-              ? newExactIngredientsBasket
-              : [...newExactIngredientsBasket, updatedIngredient];
-          }
-
-          return [...newExactIngredientsBasket, { ...basketIngredient }];
-        },
-        Array<IngredientDecorated>(),
-      );
-
-      setExactIngredientsBasket(newExactIngredientsBasket);
-    },
-    [recipes, exactIngredientsBasket],
-  );
-
-  const addRecipeIngredientsToBasket = useCallback(
-    (recipeId: number) => {
-      // get recipe ingredients to be added
-      const ingredientsToAdd: Array<IngredientDecorated> = recipes.find(
-        (recipe) => recipe.id === recipeId,
-      )?.ingredientsList;
-
-      // add ingredients to ingredients basket
-      const newExactIngredientsBasket = ingredientsToAdd.reduce(
-        (newExactIngredientsBasket, ingredientToAdd) => {
-          const existingIngredient = newExactIngredientsBasket.find(
-            (ingredient) => ingredient.id === ingredientToAdd.id,
-          );
-
-          // if no existing ingredient found simply append
-          if (!existingIngredient) {
-            return [...newExactIngredientsBasket, { ...ingredientToAdd }];
-          }
-
-          // update existing ingredient
-          else {
-            const updatedIngredient = {
-              ...existingIngredient,
-              unitQuantity: (existingIngredient.unitQuantity +=
-                ingredientToAdd.unitQuantity),
-            };
-
-            return newExactIngredientsBasket.map((ingredient) => {
-              if (updatedIngredient.id === ingredient.id) {
-                return updatedIngredient;
-              }
-              return ingredient;
-            });
-          }
-        },
-        exactIngredientsBasket,
-      );
-
-      setExactIngredientsBasket(newExactIngredientsBasket);
-    },
-    [exactIngredientsBasket, recipes],
-  );
 
   const showMore = recipes.length < totalCountRecipes;
 
@@ -198,7 +102,7 @@ const Menu: CustomNextPage = () => {
       recipeIdList,
     }: {
       updateExisting: boolean;
-      recipeIdList: Array<number>;
+      recipeIdList: Array<{ recipeId: number; servings: number }>;
     }) => {
       return updateExisting
         ? updateMealPlan(authToken, mealPlanQueryParams.uuid, { recipeIdList })
@@ -208,6 +112,10 @@ const Menu: CustomNextPage = () => {
       return onNavigate(`/meal-plans/${data.uuid}`);
     },
   });
+
+  const totalServingsInBasket = recipeBasket.reduce((total, currentRecipe) => {
+    return currentRecipe.servings + total;
+  }, 0);
 
   useQuery(
     ['recipes', recipeQueryParams],
@@ -255,62 +163,36 @@ const Menu: CustomNextPage = () => {
     queryKey: ['mealPlanQuery', mealPlanQueryParams.uuid],
     queryFn: () => {
       const uuid = mealPlanQueryParams.uuid;
-      return getMealPlan(uuid, true);
+      return getMealPlan(uuid);
     },
     staleTime: 0,
     refetchOnMount: 'always',
     refetchOnWindowFocus: false,
     enabled: router.isReady && !!mealPlanQueryParams.uuid.length,
     onSuccess: (data) => {
-      const recipes = data[0].recipes ?? [];
-      const ingredients = data[0].ingredients ?? [];
+      const recipes = data?.recipes ?? [];
+
+      let tempIngredients: Array<any> = [];
+
+      recipes.map((recipeWithServings: any) => {
+        const ingredients = recipeWithServings.recipe.ingredientsList;
+        const baseServings = recipeWithServings.recipe.baseServings;
+        const servings = recipeWithServings.servings;
+        // in each recipe scale number of servings with number of ingredients
+        const scaledIngredients = scaleIngredientQuantities(
+          ingredients,
+          baseServings,
+          servings,
+        );
+
+        // aggregate ingredients
+        tempIngredients = addIngredients(tempIngredients, scaledIngredients);
+      });
+
       setRecipeBasket(recipes);
-      setExactIngredientsBasket(ingredients);
+      setExactIngredientsBasket(tempIngredients);
     },
   });
-
-  // add/remove recipe id to recipe basket
-  useEffect(() => {
-    const recipeClickedSubscriber = {
-      notify(event: Event) {
-        if (event.name === 'recipe-clicked') {
-          const id = parseInt(event.data);
-          updateRecipesInBasket(id);
-        }
-      },
-    };
-
-    subscribe(recipeClickedSubscriber);
-    return () => unsubscribe(recipeClickedSubscriber);
-  }, [subscribe, unsubscribe, post, updateRecipesInBasket]);
-
-  // remove recipe ingredients from basket
-  useEffect(() => {
-    const recipeRemovedSubscriber = {
-      notify(event: Event) {
-        if (event.name === 'remove-recipe-ingredients') {
-          const id = parseInt(event.data);
-          removeRecipeIngredientsFromBasket(id);
-        }
-      },
-    };
-    subscribe(recipeRemovedSubscriber);
-    return () => unsubscribe(recipeRemovedSubscriber);
-  }, [subscribe, unsubscribe, removeRecipeIngredientsFromBasket]);
-
-  // add recipe ingredients to basket
-  useEffect(() => {
-    const recipeInsertSubscriber = {
-      notify(event: Event) {
-        if (event.name === 'add-recipe-ingredients') {
-          const id = parseInt(event.data);
-          addRecipeIngredientsToBasket(id);
-        }
-      },
-    };
-    subscribe(recipeInsertSubscriber);
-    return () => unsubscribe(recipeInsertSubscriber);
-  }, [subscribe, unsubscribe, addRecipeIngredientsToBasket]);
 
   // initializes recipeQueryParams and mealPlanQueryParams
   useEffect(() => {
@@ -347,16 +229,72 @@ const Menu: CustomNextPage = () => {
     router.push(pathname, undefined, { shallow: true });
   };
 
-  // on recipe clicked notifies event bus
-  const onRecipeClick = (id: number) => {
-    post({ name: 'recipe-clicked', data: `${id}` });
-  };
+  useEffect(() => {
+    if (selectedRecipe) {
+      onOpen();
+    }
+  }, [onOpen, selectedRecipe]);
 
   return (
     <Layout>
       <Head>
         <title>Menu | Plan and Eat Well</title>
       </Head>
+
+      {selectedRecipe && (
+        <RecipeModal
+          isOpen={isOpen}
+          onClose={() => {
+            setSelectedRecipe(null);
+            onClose();
+          }}
+          recipe={selectedRecipe}
+          currentServings={
+            recipeBasket.find(
+              (recipeInBasket) =>
+                recipeInBasket.recipe.id === selectedRecipe?.id,
+            )?.servings ?? 0
+          }
+          onAddRecipeServings={(recipe: any, servings: number) => {
+            const newRecipesBasket = addRecipeServings(recipeBasket, {
+              recipe,
+              servings,
+            });
+            const ingredientsToAdd = scaleIngredientQuantities(
+              recipe.ingredientsList,
+              recipe.baseServings,
+              servings,
+            );
+
+            const newIngredientsBasket = addIngredients(
+              exactIngredientsBasket,
+              ingredientsToAdd,
+            );
+
+            setRecipeBasket(newRecipesBasket);
+            setExactIngredientsBasket(newIngredientsBasket);
+          }}
+          onRemoveRecipeServings={(recipe: any, servings: number) => {
+            const newRecipesBasket = removeRecipeServings(recipeBasket, {
+              recipe,
+              servings,
+            });
+            const ingredientsToRemove = scaleIngredientQuantities(
+              recipe.ingredientsList,
+              recipe.baseServings,
+              servings,
+            );
+
+            const newIngredientsBasket = removeIngredients(
+              exactIngredientsBasket,
+              ingredientsToRemove,
+            );
+
+            setRecipeBasket(newRecipesBasket);
+            setExactIngredientsBasket(newIngredientsBasket);
+          }}
+        />
+      )}
 
       <Container maxW={'1600px'} pt={'1rem'} pb={'5rem'}>
         <SearchMenu
@@ -446,18 +384,25 @@ const Menu: CustomNextPage = () => {
         <Grid templateColumns="repeat(auto-fill, minMax(275px,1fr));" gap={6}>
           {recipes.map((recipe) => {
             const recipeInBasket = recipeBasket
-              .map((recipe) => recipe.id)
+              .map((recipe) => recipe.recipe.id)
               .includes(recipe.id);
             return (
               <Recipe
                 id={recipe.id}
-                name={recipe.name}
-                pricePerServing={recipe.pricePerServing}
-                imagePath={recipe.imagePath}
-                onClick={onRecipeClick}
-                showRemove={recipeInBasket}
-                link={recipe.link}
                 key={recipe.id}
+                name={recipe.name}
+                pricePerServing={parseInt(recipe.pricePerServing)}
+                imagePath={recipe.imagePath}
+                baseServings={recipe.baseServings}
+                cookTime={recipe.cookTime}
+                prepTime={recipe.prepTime}
+                supermarketName={recipe.supermarketName}
+                selected={recipeInBasket}
+                onClick={(recipeId) => {
+                  setSelectedRecipe(
+                    recipes.find((recipe) => recipe.id === recipeId),
+                  );
+                }}
               />
             );
           })}
@@ -489,11 +434,16 @@ const Menu: CustomNextPage = () => {
         currentPrice={totalBasketPrice}
         ingredientList={ingredientsBasket}
         recipeList={recipeBasket}
-        servings={recipeBasket.length * 4}
+        servings={totalServingsInBasket}
         onComplete={() => {
           mealPlanMutation.mutate({
             updateExisting: !!mealPlanQueryParams.uuid.length,
-            recipeIdList: recipeBasket.map((recipe) => recipe.id),
+            recipeIdList: recipeBasket.map((basketItem) => {
+              return {
+                recipeId: basketItem.recipe.id,
+                servings: basketItem.servings,
+              };
+            }),
           });
         }}
       />

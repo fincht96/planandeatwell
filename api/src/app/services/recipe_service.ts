@@ -100,7 +100,7 @@ export default class RecipeService {
         select
           recipes.id,
           recipes.name,
-          recipes.servings,
+          recipes.base_servings,
           recipes.created_at,
           CAST(recipes.price_per_serving as FLOAT),
           recipes.image_path,
@@ -120,10 +120,16 @@ export default class RecipeService {
                   ingredients.id,
                   CAST(recipe_ingredients.unit_quantity as FLOAT),
                   ingredients.name,
-                  CAST(ingredients.price_per_unit as FLOAT)
+                  CAST(ingredients.price_per_unit as FLOAT),
+                  supermarkets.name as supermarket_name,
+                  categories.name as category_name
                 from
                   recipe_ingredients
                   inner join ingredients on recipe_ingredients.ingredient_id = ingredients.id
+                left join 
+                  supermarkets on supermarkets.id = ingredients.supermarket_id
+                left join 
+                  categories on categories.id = ingredients.category_id
                 where
                   recipe_ingredients.recipe_id = recipes.id
               ) as ingredients

@@ -9,7 +9,7 @@ const Recipe = ({
   name,
   pricePerServing,
   imagePath,
-  servings,
+  baseServings,
   cookTime,
   prepTime,
   supermarketName,
@@ -18,7 +18,7 @@ const Recipe = ({
   name: string;
   pricePerServing: number;
   imagePath: string;
-  servings: number;
+  baseServings: number;
   cookTime: number;
   prepTime: number;
   supermarketName: string;
@@ -93,7 +93,7 @@ const Recipe = ({
             position={'absolute'}
             bottom={'0'}
           >
-            £{pricePerServing.toFixed(2)} per serving | serves {servings}
+            £{pricePerServing.toFixed(2)} per serving | serves {baseServings}
           </Box>
         </Box>
 

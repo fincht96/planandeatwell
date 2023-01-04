@@ -93,7 +93,8 @@ const Recipe: NextPage = ({ recipe }: any) => {
                               fontWeight={'semibold'}
                               color={'gray.500'}
                             >
-                              for {recipe.servings} servings - change as needed
+                              for {recipe.baseServings} servings - change as
+                              needed
                             </Text>
                           </Box>
                         </Box>
@@ -149,7 +150,7 @@ const Recipe: NextPage = ({ recipe }: any) => {
                             fontWeight={450}
                             color="gray.dark"
                           >
-                            {recipe.servings} servings
+                            {recipe.baseServings} servings
                           </Text>
                         </Box>
                         <Box>
@@ -250,7 +251,7 @@ const Recipe: NextPage = ({ recipe }: any) => {
                         color={'gray.500'}
                         letterSpacing={'wide'}
                       >
-                        for {recipe.servings} servings - change as needed
+                        for {recipe.baseServings} servings - change as needed
                       </Text>
                     </Box>
                   </Box>
@@ -319,7 +320,7 @@ const Recipe: NextPage = ({ recipe }: any) => {
               >
                 <Box>
                   <Text fontSize={'1.2rem'} fontWeight={450} color="gray.dark">
-                    {recipe.servings} servings
+                    {recipe.baseServings} servings
                   </Text>
                 </Box>
                 <Box>

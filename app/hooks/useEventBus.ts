@@ -1,10 +1,10 @@
 import { useCallback, useRef } from 'react';
 import { Event, Subscriber } from '../types/eventBus.types';
 
-export const useEventBus = () => {
-  const eventQueue = useRef<Array<Event>>([]);
+export const useEventBus = <EventType = Event>() => {
+  const eventQueue = useRef<Array<EventType>>([]);
   const busy = useRef(false);
-  const subscribers = useRef<Array<{ notify: (event: Event) => void }>>([]);
+  const subscribers = useRef<Array<{ notify: (event: EventType) => void }>>([]);
 
   const _processNextEvent = useCallback(() => {
     if (!busy.current && eventQueue.current.length) {
@@ -28,18 +28,18 @@ export const useEventBus = () => {
     }
   }, []);
 
-  const subscribe = useCallback((subscriber: Subscriber) => {
+  const subscribe = useCallback((subscriber: Subscriber<EventType>) => {
     subscribers.current = [...subscribers.current, subscriber];
   }, []);
 
-  const unsubscribe = useCallback((subscriber: Subscriber) => {
+  const unsubscribe = useCallback((subscriber: Subscriber<EventType>) => {
     subscribers.current = subscribers.current.filter(
       (currentSubscriber) => currentSubscriber !== subscriber,
     );
   }, []);
 
   const post = useCallback(
-    (event: Event) => {
+    (event: EventType) => {
       // push event on queue
       eventQueue.current.push(event);
       _processNextEvent();

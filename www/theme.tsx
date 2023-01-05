@@ -34,6 +34,10 @@ const theme = extendTheme({
       '900': '#0B281E',
     },
   },
+  components: {
+    Popover: { baseStyle: { _focus: { boxShadow: 'none' } } },
+    Button: { baseStyle: { _focus: { boxShadow: 'none' } } },
+  },
 });
 
 export default theme;

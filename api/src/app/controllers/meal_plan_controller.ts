@@ -5,18 +5,28 @@ import validator from 'validator';
 import Joi from 'joi';
 
 const insertMealPlanSchema = Joi.object({
-  recipeIdList: Joi.array().items(Joi.number()).required(),
+  recipeIdList: Joi.array()
+    .items(
+      Joi.object({
+        recipeId: Joi.number().min(1).required(),
+        servings: Joi.number().min(1).required(),
+      }),
+    )
+    .min(1)
+    .required(),
 });
 
 const updateMealPlanSchema = Joi.object({
   name: Joi.string().max(200),
-  recipeIdList: Joi.array().items(Joi.number()).min(1),
+  recipeIdList: Joi.array()
+    .items(
+      Joi.object({
+        recipeId: Joi.number().min(1).required(),
+        servings: Joi.number().min(1).required(),
+      }),
+    )
+    .min(1),
 }).or('name', 'recipeIdList');
-
-const getMealPlanQuerySchema = Joi.object({
-  includeAggregatedIngredients: Joi.boolean().required(),
-  includeIngredientsWithRecipes: Joi.boolean().required(),
-});
 
 const getMealPlansQuerySchema = Joi.object({
   userId: Joi.number().min(1).required(),
@@ -72,14 +82,6 @@ export default class MealPlanController {
 
   async getMealPlan(req: Request, res: Response) {
     try {
-      const { error, value } = getMealPlanQuerySchema.validate(req.query);
-      const { includeAggregatedIngredients, includeIngredientsWithRecipes } =
-        value;
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
       // validate params
       const mealPlanUuid = req.params.id + '';
 
@@ -87,11 +89,7 @@ export default class MealPlanController {
         throw new Error('Invalid meal plan UUID argument');
       }
 
-      const plan = await this.mealPlanService.getPlan(
-        mealPlanUuid,
-        includeAggregatedIngredients,
-        includeIngredientsWithRecipes,
-      );
+      const plan = await this.mealPlanService.getPlan(mealPlanUuid);
 
       return res.status(200).json({
         result: plan,

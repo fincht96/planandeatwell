@@ -18,8 +18,8 @@ const CartMenu = ({
   disabled,
 }: {
   currentPrice: number;
-  recipeList: any;
-  ingredientList: any;
+  recipeList: Array<any>;
+  ingredientList: Array<any>;
   servings: number;
   disabled: boolean;
 }) => (
@@ -69,14 +69,6 @@ const CartMenu = ({
             >
               Meal plan
             </Text>
-            <Text
-              fontSize={'1rem'}
-              color="gray.dark"
-              fontWeight={400}
-              textAlign={'center'}
-            >
-              4 servings per recipe
-            </Text>
           </Box>
 
           <Box py={'1rem'}>
@@ -96,11 +88,11 @@ const CartMenu = ({
             return (
               <Box
                 p={'0.5rem'}
-                key={recipe.id}
+                key={recipe.recipe.id}
                 fontSize={'1rem'}
                 color="gray.normal"
               >
-                {recipe.name}
+                {recipe.recipe.name} - ({recipe.servings} servings)
               </Box>
             );
           })}

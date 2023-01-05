@@ -45,13 +45,9 @@ export const getMealPlans = ({
   });
 };
 
-export const getMealPlan = (
-  mealPlanUuid: string,
-  includeAggregatedIngredients: boolean = false,
-  includeIngredientsWithRecipes: boolean = false,
-) => {
+export const getMealPlan = (mealPlanUuid: string) => {
   return fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/meal-plan/${mealPlanUuid}?includeAggregatedIngredients=${includeAggregatedIngredients}&includeIngredientsWithRecipes=${includeIngredientsWithRecipes}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/meal-plan/${mealPlanUuid}`,
   ).then(async (res) => {
     const json = await res.json();
     if (json?.errors.length) {
@@ -61,7 +57,10 @@ export const getMealPlan = (
   });
 };
 
-export const insertMealPlan = (token: string, recipeIdList: Array<number>) => {
+export const insertMealPlan = (
+  token: string,
+  recipeIdList: Array<{ recipeId: number; servings: number }>,
+) => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/meal-plan`, {
     method: 'POST',
     headers: {
@@ -81,7 +80,10 @@ export const insertMealPlan = (token: string, recipeIdList: Array<number>) => {
 export const updateMealPlan = (
   token: string,
   mealPlanUuid: string,
-  newMealPlan: { recipeIdList?: Array<number>; name?: string },
+  newMealPlan: {
+    recipeIdList?: Array<{ recipeId: number; servings: number }>;
+    name?: string;
+  },
 ) => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/meal-plan/${mealPlanUuid}`, {
     method: 'PUT',

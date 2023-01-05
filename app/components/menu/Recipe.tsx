@@ -1,8 +1,8 @@
-import { Box, Text, Link, Badge } from '@chakra-ui/react';
-import { TimeIcon, ArrowForwardIcon, InfoOutlineIcon } from '@chakra-ui/icons';
+import { CheckCircleIcon, InfoOutlineIcon, TimeIcon } from '@chakra-ui/icons';
+import { Badge, Box, Flex, Text } from '@chakra-ui/react';
 import Image from 'next/image';
-import BorderBox from '../BorderBox';
 import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
+import BorderBox from '../BorderBox';
 
 const Recipe = ({
   id,
@@ -13,6 +13,8 @@ const Recipe = ({
   cookTime,
   prepTime,
   supermarketName,
+  selected,
+  onClick,
 }: {
   id: number;
   name: string;
@@ -22,22 +24,32 @@ const Recipe = ({
   cookTime: number;
   prepTime: number;
   supermarketName: string;
+  selected: boolean;
+  onClick: (recipeId: number) => void;
 }) => {
   return (
-    <BorderBox maxW={'sm'} maxH={'xl'} overflow={'hidden'}>
-      <Box>
-        <Link href={`/recipes/${id}`} isExternal>
-          <Image
-            src={`${process.env.NEXT_PUBLIC_CDN}${imagePath}`}
-            alt={name}
-            width="100%"
-            height="100%"
-            layout="responsive"
-            priority
-          />
-        </Link>
+    <BorderBox
+      maxH={'xl'}
+      overflow={'hidden'}
+      cursor={'pointer'}
+      onClick={() => onClick(id)}
+      border={selected && 'solid black 1px'}
+    >
+      <Box minH={'20rem'} position={'relative'}>
+        <Image
+          quality={75}
+          src={`${process.env.NEXT_PUBLIC_CDN}${imagePath}`}
+          layout={'fill'}
+          alt={name}
+          objectFit={'cover'}
+          priority
+        />
       </Box>
-      <Box p={'4'}>
+      <Box
+        p={'4'}
+        _hover={{ bg: 'brand.50' }}
+        // bg={selected ? 'brand.100' : 'white'}
+      >
         <Box noOfLines={1}>
           <Text fontSize={'1.8rem'} fontWeight={800} color="gray.dark">
             {name}
@@ -97,18 +109,9 @@ const Recipe = ({
           </Box>
         </Box>
 
-        <Box display="flex" alignItems="center" flexDirection={'row'} mt={4}>
-          <Box mr={'0.3rem'}>
-            <Link href={`/recipes/${id}`} isExternal>
-              <Text fontSize={'md'} letterSpacing={'wide'}>
-                view recipe
-              </Text>
-            </Link>
-          </Box>
-          <Box>
-            <ArrowForwardIcon w={4} h={4} />
-          </Box>
-        </Box>
+        <Flex justifyContent={'flex-end'}>
+          <CheckCircleIcon visibility={selected ? 'visible' : 'hidden'} />
+        </Flex>
       </Box>
     </BorderBox>
   );

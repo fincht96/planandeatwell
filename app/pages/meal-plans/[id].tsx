@@ -25,6 +25,12 @@ import { CustomNextPage } from '../../types/CustomNextPage';
 import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
 import { groupObjects } from '../../utils/groupObjects';
+import {
+  addIngredients,
+  calcTotalIngredientsPrice,
+  roundUpQuantities,
+  scaleIngredientQuantities,
+} from '../../utils/recipeBasketHelper';
 import { getMealPlan, updateMealPlan } from '../../utils/requests/meal-plans';
 
 const ContentBox = ({
@@ -91,9 +97,9 @@ const MealPlan: CustomNextPage = () => {
 
   const [mealPlanName, setMealPlanName] = useState<string>('');
 
-  const mealPlanQuery: any = useQuery({
+  const mealPlanQuery = useQuery({
     queryKey: [`recipesQuery-${mealPlanUuid}`],
-    queryFn: () => getMealPlan(mealPlanUuid, true, true),
+    queryFn: () => getMealPlan(mealPlanUuid),
     refetchOnMount: 'always',
     staleTime: Infinity,
     enabled: !!mealPlanUuid.length,
@@ -114,30 +120,42 @@ const MealPlan: CustomNextPage = () => {
     servings: number;
     link: string;
   }> = useMemo(() => {
-    return !mealPlanQuery.isLoading && !mealPlanQuery.error
-      ? mealPlanQuery.data[0].recipes
-      : [];
-  }, [mealPlanQuery.data, mealPlanQuery.isLoading, mealPlanQuery.error]);
+    if (mealPlanQuery.isSuccess) {
+      return mealPlanQuery.data.recipes;
+    }
+    return [];
+  }, [mealPlanQuery]);
 
-  const ingredients: Array<IngredientDecorated> = useMemo(() => {
-    return !mealPlanQuery.isLoading && !mealPlanQuery.error
-      ? mealPlanQuery.data[0].ingredients.map(
-          (ingredient: IngredientDecorated) => {
-            const unitQuantity = Math.ceil(ingredient.unitQuantity);
-            const price = ingredient.pricePerUnit * unitQuantity;
-            return { ...ingredient, unitQuantity, price };
-          },
-        )
-      : [];
-  }, [mealPlanQuery.data, mealPlanQuery.isLoading, mealPlanQuery.error]);
+  const ingredients: Array<any> = useMemo(() => {
+    if (mealPlanQuery.isSuccess) {
+      let tempIngredients: Array<any> = [];
+
+      mealPlanQuery.data.recipes.map((recipe) => {
+        const ingredients = recipe.recipe.ingredientsList;
+        const baseServings = recipe.recipe.baseServings;
+        const servings = recipe.servings;
+        // in each recipe scale number of servings with number of ingredients
+        const scaledIngredients = scaleIngredientQuantities(
+          ingredients,
+          baseServings,
+          servings,
+        );
+
+        // aggregate ingredients
+        tempIngredients = addIngredients(tempIngredients, scaledIngredients);
+      });
+
+      return tempIngredients;
+    }
+
+    return [];
+  }, [mealPlanQuery]);
 
   const mealPlanCreatedBy: number | null = (() => {
-    return !mealPlanQuery.isLoading && !mealPlanQuery.error
-      ? mealPlanQuery?.data[0]?.mealPlanCreatedBy
-      : null;
+    return mealPlanQuery.isSuccess ? mealPlanQuery.data.createdBy : null;
   })();
 
-  const editMode = user && mealPlanCreatedBy === authClaims?.userId;
+  const editMode = !!(!!user && mealPlanCreatedBy === authClaims?.userId);
 
   const onNavigate = (pathname: string, query: any) => {
     router.push({ pathname, query });
@@ -150,9 +168,8 @@ const MealPlan: CustomNextPage = () => {
   }, [recipes]);
 
   const totalPrice = useMemo(() => {
-    return ingredients.reduce((prev, current) => {
-      return prev + current.price;
-    }, 0);
+    const roundedUpIngredients = roundUpQuantities(ingredients);
+    return calcTotalIngredientsPrice(roundedUpIngredients);
   }, [ingredients]);
 
   const onCopyLink = () => {
@@ -186,7 +203,9 @@ const MealPlan: CustomNextPage = () => {
 
   const generateRowData = () => {
     if (ingredientView === 'ALL') {
-      return ingredients?.map((ingredient) => ({
+      // round up unit quantities of ingredients
+      const roundedUpIngredients = roundUpQuantities(ingredients);
+      return roundedUpIngredients?.map((ingredient) => ({
         id: ingredient.id,
         content: (
           <Flex justifyContent={'space-between'} gap={'1rem'}>
@@ -202,11 +221,16 @@ const MealPlan: CustomNextPage = () => {
     }
 
     if (ingredientView === 'RECIPE') {
-      return recipes?.map((recipe: any) => {
-        const ingredients = recipe.ingredientsList;
+      return recipes?.map((recipeWithServings: any) => {
+        // scale ingredients in recipe depending on # of servings
+        const ingredients = scaleIngredientQuantities(
+          recipeWithServings.recipe.ingredientsList,
+          recipeWithServings.recipe.baseServings,
+          recipeWithServings.servings,
+        );
 
         return {
-          id: recipe.id,
+          id: recipeWithServings.recipe.id,
           content: (
             <Flex justifyContent={'space-between'} gap={'1rem'}>
               <Text
@@ -214,7 +238,7 @@ const MealPlan: CustomNextPage = () => {
                 fontSize={{ base: '0.9rem', md: '1rem' }}
                 as="b"
               >
-                {recipe.name}
+                {recipeWithServings.recipe.name}
               </Text>
             </Flex>
           ),
@@ -240,8 +264,9 @@ const MealPlan: CustomNextPage = () => {
     }
 
     if (ingredientView === 'CATEGORY') {
+      const roundedUpIngredients = roundUpQuantities(ingredients);
       const ingredientsGroupedByCategoryArray = groupObjects(
-        ingredients,
+        roundedUpIngredients,
         'categoryName',
       );
 
@@ -297,21 +322,16 @@ const MealPlan: CustomNextPage = () => {
   };
 
   useEffect(() => {
-    if (!mealPlanQuery.isLoading && !mealPlanQuery.error) {
-      setMealPlanName(mealPlanQuery.data[0].mealPlanName);
-      setValue('mealPlanName', `${mealPlanQuery.data[0].mealPlanName}`);
+    if (mealPlanQuery.isSuccess) {
+      setMealPlanName(mealPlanQuery.data.name);
+      setValue('mealPlanName', `${mealPlanQuery.data.name}`);
     }
-  }, [
-    mealPlanQuery.data,
-    mealPlanQuery.isLoading,
-    mealPlanQuery.error,
-    setValue,
-  ]);
+  }, [mealPlanQuery.data, setValue, mealPlanQuery.isSuccess]);
 
   const rowData = generateRowData();
 
   return (
-    <Layout includeNavBar={!!editMode}>
+    <Layout includeNavBar={editMode}>
       <Head>
         <title>Meal Plan | Plan and Eat Well</title>
       </Head>
@@ -462,8 +482,8 @@ const MealPlan: CustomNextPage = () => {
                   </Text>
                 </Text>
               }
-              rows={recipes.map((recipe) => ({
-                id: recipe.id,
+              rows={recipes.map((recipeWithServings: any) => ({
+                id: recipeWithServings.recipe.id,
                 content: (
                   <Flex justifyContent={'space-between'} gap={'1rem'}>
                     <Text
@@ -471,18 +491,18 @@ const MealPlan: CustomNextPage = () => {
                       as={Link}
                       sx={{ textDecoration: 'underline' }}
                       _hover={{ color: 'brand.500' }}
-                      href={recipe.link}
+                      href={recipeWithServings.recipe.link}
                       isExternal
                       fontSize={{ base: '0.9rem', md: '1rem' }}
                     >
-                      1x {recipe.name}
+                      {recipeWithServings.recipe.name}
                     </Text>
 
                     <Text
                       color={'gray.dark'}
                       fontSize={{ base: '0.9rem', md: '1rem' }}
                     >
-                      {recipe.servings} servings
+                      {recipeWithServings.servings} servings
                     </Text>
                   </Flex>
                 ),
@@ -512,7 +532,5 @@ const MealPlan: CustomNextPage = () => {
     </Layout>
   );
 };
-
 MealPlan.requireAuth = false;
-
 export default MealPlan;

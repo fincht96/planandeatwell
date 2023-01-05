@@ -1,8 +1,8 @@
-export interface Event {
-  name: string;
-  data: string;
+export interface Event<NameType = string, DataType = string> {
+  name: NameType;
+  data: DataType;
 }
 
-export interface Subscriber {
-  notify: (event: Event) => void;
+export interface Subscriber<EventType = Event> {
+  notify: (event: EventType) => void;
 }

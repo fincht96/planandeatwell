@@ -218,7 +218,7 @@ const Recipes: NextPage = (props: any) => {
                     pricePerServing={parseInt(recipe.pricePerServing)}
                     imagePath={recipe.imagePath}
                     key={recipe.id}
-                    servings={recipe.servings}
+                    baseServings={recipe.baseServings}
                     cookTime={recipe.cookTime}
                     prepTime={recipe.prepTime}
                     supermarketName={recipe.supermarketName}

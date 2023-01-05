@@ -1,57 +1,46 @@
-import { CloseIcon, CopyIcon, LinkIcon } from '@chakra-ui/icons';
 import {
-  Box,
-  Button,
-  IconButton,
   Modal,
   ModalBody,
   ModalContent,
   ModalOverlay,
   Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverCloseButton,
+  PopoverHeader,
   PopoverArrow,
   PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
+  Button,
+  Box,
   Text,
+  IconButton,
   useDisclosure,
   useMediaQuery,
 } from '@chakra-ui/react';
-import copy from 'copy-to-clipboard';
+import { CloseIcon, LinkIcon, CopyIcon } from '@chakra-ui/icons';
+import BorderBox from '../BorderBox';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import copy from 'copy-to-clipboard';
+import { RecipeViewDesktop, RecipeViewMobile } from './RecipeViews';
 import { RecipeType } from '../../types/recipe.types';
-import {
-  calcTotalIngredientsPrice,
-  roundUpQuantities,
-  scaleIngredientQuantities,
-} from '../../utils/recipeBasketHelper';
-import { roundTo2dp } from '../../utils/roundTo2dp';
-import BorderBox from '../BorderBox';
-import { RecipeViewDesktop, RecipeViewMobile } from '../shared/RecipeViews';
 
 export default function RecipeModal({
   isOpen,
   onClose,
   recipe,
-  currentServings,
-  onAddRecipeServings,
-  onRemoveRecipeServings,
+  fullPath,
 }: {
   isOpen: boolean;
   onClose: () => void;
   recipe: RecipeType;
-  currentServings: number;
-  onAddRecipeServings: (recipe: any, numServings: number) => void;
-  onRemoveRecipeServings: (recipe: any, numServings: number) => void;
+  fullPath: string;
 }) {
   const {
     onClose: onPopoverClose,
     isOpen: isPopoverOpen,
     onOpen: onPopoverOpen,
   } = useDisclosure();
-
   const [shareRecipeLinkCopied, setShareRecipeLinkCopied] =
     useState<boolean>(false);
 
@@ -65,24 +54,6 @@ export default function RecipeModal({
     }
   }, [isOpen, onPopoverClose]);
 
-  const allIngredients =
-    currentServings > 0
-      ? roundUpQuantities(
-          scaleIngredientQuantities(
-            recipe.ingredientsList,
-            recipe.baseServings,
-            currentServings,
-          ),
-        )
-      : recipe.ingredientsList;
-
-  const totalPrice = calcTotalIngredientsPrice(allIngredients);
-
-  const pricePerServing =
-    currentServings > 0
-      ? roundTo2dp(totalPrice / currentServings)
-      : recipe.pricePerServing;
-
   return (
     <>
       <Modal
@@ -93,7 +64,7 @@ export default function RecipeModal({
         size={!!isLessThan900 ? 'full' : ''}
       >
         <ModalOverlay />
-        <ModalContent maxW="65rem" height="100%" padding={0}>
+        <ModalContent p={'2rem 0'} maxW="65rem" height="100%" padding={0}>
           <ModalBody padding={0} borderWidth={'1px'} borderRadius={'lg'}>
             <BorderBox
               mb={2}
@@ -148,9 +119,7 @@ export default function RecipeModal({
                           alignItems="center"
                           justifyContent="center"
                           onClick={() => {
-                            copy(
-                              `${process.env.NEXT_PUBLIC_WWW_URL}/recipes/${recipe.id}`,
-                            );
+                            copy(`${fullPath}/${recipe.id}`);
                             setShareRecipeLinkCopied(true);
                           }}
                         >
@@ -190,18 +159,14 @@ export default function RecipeModal({
             </BorderBox>
             {!!isLessThan900
               ? RecipeViewMobile(recipe, {
-                  onAddRecipeServings,
-                  onRemoveRecipeServings,
-                  pricePerServing,
-                  currentServings,
-                  allIngredients,
+                  pricePerServing: recipe.pricePerServing,
+                  currentServings: recipe.baseServings,
+                  allIngredients: recipe.ingredientsList,
                 })
               : RecipeViewDesktop(recipe, {
-                  onAddRecipeServings,
-                  onRemoveRecipeServings,
-                  pricePerServing,
-                  currentServings,
-                  allIngredients,
+                  pricePerServing: recipe.pricePerServing,
+                  currentServings: recipe.baseServings,
+                  allIngredients: recipe.ingredientsList,
                 })}
           </ModalBody>
         </ModalContent>

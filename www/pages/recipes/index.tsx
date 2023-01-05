@@ -2,9 +2,9 @@ import Head from 'next/head';
 import Layout, { siteTitle } from '../../components/layout';
 import type { NextPage } from 'next';
 import { Box, Container, Text, Grid, Button, Flex } from '@chakra-ui/react';
-import Recipe from '../../components/recipes/Recipe';
+import RecipeCard from '../../components/recipes/RecipeCard';
 import { getRecipes } from '../../utils/api-requests/recipes';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { orderToSortBy, sortByToOrder } from '../../utils/sortByConversions';
 import { Order, OrderBy, SortBy } from '../../types/order.types';
 import { useQuery } from '@tanstack/react-query';
@@ -14,20 +14,15 @@ import {
   queryParamToStringArray,
 } from '../../utils/queryParamConversions';
 import SearchMenu from '../../components/recipes/SearchMenu';
+import { RecipeType } from '../../types/recipe.types';
 
 const Recipes: NextPage = (props: any) => {
+  const [fullPath, setFullPath] = useState<string>('');
   const router = useRouter();
   const updatedSiteTitle = `Recipes | ${siteTitle}`;
-
-  // props passed in by next server side rendering
-  const preRenderedRecipes = props.recipes;
-  const preRenderedInitialQueryParams = props.initialQueryParams;
-  const preRenderedTotalRecipesCount = props.totalCount;
-
-  // sets recipes using data provided to us by server on first render
-  const [recipes, setRecipes] = useState<Array<any>>(preRenderedRecipes);
-
-  // initializes recipeQueryParams using data provided to us by server on first render
+  const [recipes, setRecipes] = useState<Array<any>>([]);
+  const [queryParamsInitialised, setQueryParamsInitialised] = useState(false);
+  const [totalCountRecipes, setTotalCountRecipes] = useState(0);
   const [recipeQueryParams, setRecipeQueryParams] = useState<{
     limit: number;
     offset: number;
@@ -38,21 +33,52 @@ const Recipes: NextPage = (props: any) => {
     orderBy: OrderBy;
     searchTerm: string;
   }>({
-    limit: preRenderedInitialQueryParams.limit,
-    offset: preRenderedInitialQueryParams.offset,
-    meals: preRenderedInitialQueryParams.meals,
-    lifestyles: preRenderedInitialQueryParams.lifestyles,
-    freeFroms: preRenderedInitialQueryParams.freeFroms,
-    order: preRenderedInitialQueryParams.order,
-    orderBy: preRenderedInitialQueryParams.orderBy,
-    searchTerm: preRenderedInitialQueryParams.searchTerm,
+    limit: 8,
+    offset: 0,
+    meals: [],
+    lifestyles: [],
+    freeFroms: [],
+    order: 'any',
+    orderBy: 'relevance',
+    searchTerm: '',
   });
-
-  const [totalCountRecipes, setTotalCountRecipes] = useState(
-    preRenderedTotalRecipesCount,
-  );
-
   const showMore = recipes.length < totalCountRecipes;
+
+  useEffect(() => {
+    const origin =
+      typeof window !== 'undefined' && window.location.origin
+        ? window.location.origin
+        : '';
+
+    const URL = `${origin}${router.pathname}`;
+
+    setFullPath(URL); // excluding query params
+  }, [router]);
+
+  useEffect(() => {
+    if (router.isReady && !queryParamsInitialised) {
+      const meals = queryParamToStringArray(router.query['meals']);
+      const lifestyles = queryParamToStringArray(router.query['lifestyles']);
+      const freeFroms = queryParamToStringArray(router.query['freeFroms']);
+      const order = queryParamToString<Order>(router.query['order']);
+      const orderBy = queryParamToString<OrderBy>(router.query['orderBy']);
+      const searchTerm = queryParamToString(router.query['searchTerm']);
+
+      setRecipeQueryParams((current) => {
+        return {
+          ...current,
+          meals,
+          lifestyles,
+          freeFroms,
+          order,
+          orderBy,
+          searchTerm,
+        };
+      });
+
+      setQueryParamsInitialised(true);
+    }
+  }, [router.isReady, queryParamsInitialised, router.query]);
 
   useQuery(
     ['recipes', recipeQueryParams],
@@ -83,7 +109,7 @@ const Recipes: NextPage = (props: any) => {
       refetchOnMount: 'always',
       refetchOnWindowFocus: false,
       staleTime: 0,
-      enabled: true,
+      enabled: queryParamsInitialised,
       onSuccess: (data: any) => {
         setRecipes((current) => {
           if (recipeQueryParams.offset === 0) {
@@ -169,7 +195,9 @@ const Recipes: NextPage = (props: any) => {
                   query: {
                     ...unchangedQueryParams,
                     ...(newMeals.length && { meals: newMeals }),
-                    ...(newLifestyles.length && { lifestyles: newLifestyles }),
+                    ...(newLifestyles.length && {
+                      lifestyles: newLifestyles,
+                    }),
                     ...(newFreeFroms.length && { freeFroms: newFreeFroms }),
                   },
                 });
@@ -207,21 +235,15 @@ const Recipes: NextPage = (props: any) => {
           </Container>
           <Container maxW="1200px" mb={10}>
             <Grid
-              templateColumns="repeat(auto-fill, minMax(275px,1fr));"
-              gap={5}
+              templateColumns="repeat(auto-fill, minMax(220px,1fr));"
+              gap={6}
             >
-              {recipes.map((recipe: any) => {
+              {recipes.map((recipe: RecipeType) => {
                 return (
-                  <Recipe
-                    id={recipe.id}
-                    name={recipe.name}
-                    pricePerServing={parseInt(recipe.pricePerServing)}
-                    imagePath={recipe.imagePath}
+                  <RecipeCard
+                    recipe={recipe}
                     key={recipe.id}
-                    baseServings={recipe.baseServings}
-                    cookTime={recipe.cookTime}
-                    prepTime={recipe.prepTime}
-                    supermarketName={recipe.supermarketName}
+                    fullPath={fullPath}
                   />
                 );
               })}
@@ -255,45 +277,5 @@ const Recipes: NextPage = (props: any) => {
     </>
   );
 };
-
-export async function getServerSideProps(context: any) {
-  // get the query parameters from the context
-  const { order, orderBy, meals, lifestyles, freeFroms, searchTerm } =
-    context.query;
-
-  const defaultOffset = 0;
-  const defaultLimit = 8; // show max 8 recipes on the /recipes view
-
-  // use query parameters in strong format to get data from api
-  const { recipes, totalCount } = await getRecipes({
-    includeIngredientsWithRecipes: false,
-    offset: defaultOffset,
-    limit: defaultLimit,
-    order: order,
-    orderBy: orderBy,
-    meals: meals,
-    lifestyles: lifestyles,
-    freeFroms: freeFroms,
-    searchTerm: searchTerm,
-  });
-
-  // modify query param format before we pass into jsx component
-  return {
-    props: {
-      totalCount: totalCount,
-      recipes: recipes,
-      initialQueryParams: {
-        offset: defaultOffset,
-        limit: defaultLimit,
-        order: queryParamToString<Order>(order),
-        orderBy: queryParamToString<OrderBy>(orderBy),
-        searchTerm: queryParamToString(searchTerm),
-        lifestyles: queryParamToStringArray(lifestyles),
-        meals: queryParamToStringArray(meals),
-        freeFroms: queryParamToStringArray(freeFroms),
-      },
-    },
-  };
-}
 
 export default Recipes;

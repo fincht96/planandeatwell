@@ -11,20 +11,20 @@ export const addRecipeServings = (
   // if no existing ingredient found simply append
   if (!existingRecipe) {
     return [...recipeBasket, recipeToAdd];
+  } else {
+    // remove recipe found from basket
+    const newRecipeBasket = recipeBasket.filter(
+      (recipeInBasket) => recipeInBasket.recipe.id !== recipeToAdd.recipe.id,
+    );
+
+    // else append to existing recipe in basket
+    const updatedRecipe = {
+      ...existingRecipe,
+      servings: existingRecipe.servings + recipeToAdd.servings,
+    };
+
+    return [...newRecipeBasket, updatedRecipe];
   }
-
-  // remove recipe found from basket
-  const newRecipeBasket = recipeBasket.filter(
-    (recipeInBasket) => recipeInBasket.recipe.id !== recipeToAdd.recipe.id,
-  );
-
-  // else append to existing recipe in basket
-  const updatedRecipe = {
-    ...existingRecipe,
-    servings: existingRecipe.servings + recipeToAdd.servings,
-  };
-
-  return [...newRecipeBasket, updatedRecipe];
 };
 
 export const removeRecipeServings = (
@@ -38,25 +38,25 @@ export const removeRecipeServings = (
   // if no recipe found in basket
   if (!existingRecipe) {
     return recipeBasket;
+  } else {
+    // remove recipe found from basket
+    const newRecipeBasket = recipeBasket.filter(
+      (recipeInBasket) => recipeInBasket.recipe.id !== recipeToRemove.recipe.id,
+    );
+
+    const updatedRecipe = {
+      ...existingRecipe,
+      servings: (existingRecipe.servings -= recipeToRemove.servings),
+    };
+
+    // if recipe has no servings, remove from recipe basket
+    if (updatedRecipe.servings < 1) {
+      return newRecipeBasket;
+    } else {
+      // overwrite recipe in basket with new servings
+      return [...newRecipeBasket, updatedRecipe];
+    }
   }
-
-  // remove recipe found from basket
-  const newRecipeBasket = recipeBasket.filter(
-    (recipeInBasket) => recipeInBasket.recipe.id !== recipeToRemove.recipe.id,
-  );
-
-  const updatedRecipe = {
-    ...existingRecipe,
-    servings: (existingRecipe.servings -= recipeToRemove.servings),
-  };
-
-  // if recipe has no servings, remove from recipe basket
-  if (updatedRecipe.servings < 1) {
-    return newRecipeBasket;
-  }
-
-  // overwrite recipe in basket with new servings
-  return [...newRecipeBasket, updatedRecipe];
 };
 
 export const scaleIngredientQuantities = (
@@ -99,8 +99,9 @@ export const addIngredients = (
       return newIngredientsBasket.map((ingredient) => {
         if (updatedIngredient.id === ingredient.id) {
           return updatedIngredient;
+        } else {
+          return ingredient;
         }
-        return ingredient;
       });
     }
   }, ingredientsBasket);
@@ -127,10 +128,10 @@ export const removeIngredients = (
       return updatedIngredient.unitQuantity <= 0.0001
         ? newIngredientsBasket
         : [...newIngredientsBasket, updatedIngredient];
+    } else {
+      // ingredient is unaffected
+      return [...newIngredientsBasket, { ...basketIngredient }];
     }
-
-    // ingredient is unaffected
-    return [...newIngredientsBasket, { ...basketIngredient }];
   }, []);
 };
 

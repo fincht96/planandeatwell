@@ -491,7 +491,7 @@ const MealPlan: CustomNextPage = () => {
                       as={Link}
                       sx={{ textDecoration: 'underline' }}
                       _hover={{ color: 'brand.500' }}
-                      href={recipeWithServings.recipe.link}
+                      href={`${process.env.NEXT_PUBLIC_WWW_URL}/recipes/${recipeWithServings.recipe.id}?servings=${recipeWithServings.servings}`}
                       isExternal
                       fontSize={{ base: '0.9rem', md: '1rem' }}
                     >

@@ -203,15 +203,6 @@ const MealPlans: CustomNextPage = () => {
           </Text>
 
           <Grid templateColumns="repeat(auto-fill, minMax(275px,1fr));" gap={5}>
-            {mealPlans.map((mealPlan: any) => {
-              return (
-                <MealPlan
-                  key={mealPlan.uuid}
-                  uuid={mealPlan.uuid}
-                  name={mealPlan.name}
-                />
-              );
-            })}
             <Box height={'7rem'}>
               <Button
                 height={'100%'}
@@ -221,6 +212,15 @@ const MealPlans: CustomNextPage = () => {
                 <FiPlus /> Add new meal plan
               </Button>
             </Box>
+            {mealPlans.map((mealPlan: any) => {
+              return (
+                <MealPlan
+                  key={mealPlan.uuid}
+                  uuid={mealPlan.uuid}
+                  name={mealPlan.name}
+                />
+              );
+            })}
           </Grid>
         </Container>
         <Container maxW="1200px" mb={10}>

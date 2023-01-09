@@ -27,7 +27,9 @@ import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
 import { groupObjects } from '../../utils/groupObjects';
 import {
   addIngredients,
+  addPreciseQuantity,
   calcTotalIngredientsPrice,
+  getFormattedQuanityAndUnitText,
   roundUpQuantities,
   scaleIngredientQuantities,
 } from '../../utils/recipeBasketHelper';
@@ -186,7 +188,6 @@ const MealPlan: CustomNextPage = () => {
   const {
     register,
     handleSubmit,
-    watch,
     reset,
     setValue,
     formState: { errors },
@@ -204,14 +205,31 @@ const MealPlan: CustomNextPage = () => {
   const generateRowData = () => {
     if (ingredientView === 'ALL') {
       // round up unit quantities of ingredients
-      const roundedUpIngredients = roundUpQuantities(ingredients);
-      return roundedUpIngredients?.map((ingredient) => ({
+      const decoratedIngredients = addPreciseQuantity(
+        roundUpQuantities(ingredients),
+      );
+      return decoratedIngredients?.map((ingredient: IngredientDecorated) => ({
         id: ingredient.id,
         content: (
           <Flex justifyContent={'space-between'} gap={'1rem'}>
-            <Text color={'gray.dark'} fontSize={{ base: '0.9rem', md: '1rem' }}>
-              {ingredient.unitQuantity}x {ingredient.name}
-            </Text>
+            <Box display="flex" flexDirection="row">
+              <Text
+                color={'gray.dark'}
+                fontSize={{ base: '0.9rem', md: '1rem' }}
+                mr={1}
+              >
+                {ingredient.unitQuantity}x {ingredient.name}
+              </Text>
+              <Text
+                color={'gray.dark'}
+                fontSize={{ base: '0.9rem', md: '1rem' }}
+              >
+                {getFormattedQuanityAndUnitText(
+                  ingredient.preciseQuantity,
+                  ingredient.unit,
+                )}
+              </Text>
+            </Box>
             <Text color={'gray.dark'} fontSize={{ base: '0.9rem', md: '1rem' }}>
               £{ingredient.price.toFixed(2)}
             </Text>
@@ -229,6 +247,10 @@ const MealPlan: CustomNextPage = () => {
           recipeWithServings.servings,
         );
 
+        const decoratedIngredients = addPreciseQuantity(
+          roundUpQuantities(ingredients),
+        );
+
         return {
           id: recipeWithServings.recipe.id,
           content: (
@@ -244,15 +266,25 @@ const MealPlan: CustomNextPage = () => {
           ),
           subContent: (
             <Flex flexDirection={'column'} gap={'1rem'}>
-              {ingredients.map((ingredient: any) => {
+              {decoratedIngredients.map((ingredient: IngredientDecorated) => {
                 return (
                   <Flex key={ingredient.id}>
                     <Text
                       color={'gray.dark'}
                       fontSize={{ base: '0.9rem', md: '1rem' }}
+                      mr={1}
                     >
                       {convertDecimalToFraction(ingredient.unitQuantity, true)}{' '}
                       - {ingredient.name}
+                    </Text>
+                    <Text
+                      color={'gray.dark'}
+                      fontSize={{ base: '0.9rem', md: '1rem' }}
+                    >
+                      {getFormattedQuanityAndUnitText(
+                        ingredient.preciseQuantity,
+                        ingredient.unit,
+                      )}
                     </Text>
                   </Flex>
                 );
@@ -264,9 +296,11 @@ const MealPlan: CustomNextPage = () => {
     }
 
     if (ingredientView === 'CATEGORY') {
-      const roundedUpIngredients = roundUpQuantities(ingredients);
+      const decoratedIngredients = addPreciseQuantity(
+        roundUpQuantities(ingredients),
+      );
       const ingredientsGroupedByCategoryArray = groupObjects(
-        roundedUpIngredients,
+        decoratedIngredients,
         'categoryName',
       );
 
@@ -290,12 +324,24 @@ const MealPlan: CustomNextPage = () => {
                 {groupedIngredients.map((ingredient: IngredientDecorated) => {
                   return (
                     <Flex key={ingredient.id} justifyContent={'space-between'}>
-                      <Text
-                        color={'gray.dark'}
-                        fontSize={{ base: '0.9rem', md: '1rem' }}
-                      >
-                        {ingredient.unitQuantity}x {ingredient.name}
-                      </Text>
+                      <Box display="flex" flexDirection="row">
+                        <Text
+                          color={'gray.dark'}
+                          fontSize={{ base: '0.9rem', md: '1rem' }}
+                          mr={1}
+                        >
+                          {ingredient.unitQuantity}x {ingredient.name}
+                        </Text>
+                        <Text
+                          color={'gray.dark'}
+                          fontSize={{ base: '0.9rem', md: '1rem' }}
+                        >
+                          {getFormattedQuanityAndUnitText(
+                            ingredient.preciseQuantity,
+                            ingredient.unit,
+                          )}
+                        </Text>
+                      </Box>
                       <Text
                         color={'gray.dark'}
                         fontSize={{ base: '0.9rem', md: '1rem' }}

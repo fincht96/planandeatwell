@@ -1,5 +1,27 @@
 import { roundTo2dp } from './roundTo2dp';
 
+export const getFormattedQuanityAndUnitText = (
+  preciseQuantity: number,
+  unitOfMeasurement: string,
+) => {
+  const conventionalUnits: { [key: string]: string } = {
+    gram: 'g',
+    kilogram: 'kg',
+    milliliter: 'ml',
+    liter: 'l',
+  };
+
+  const isTraditional = !!Object.keys(conventionalUnits).find(
+    (unit) => unit === unitOfMeasurement,
+  );
+
+  if (isTraditional) {
+    return `(${preciseQuantity}` + `${conventionalUnits[unitOfMeasurement]})`;
+  } else {
+    return `(${preciseQuantity}` + ' ' + `${unitOfMeasurement})`;
+  }
+};
+
 export const addRecipeServings = (
   recipeBasket: Array<any>,
   recipeToAdd: { recipe: any; servings: number },
@@ -153,6 +175,15 @@ export const roundUpQuantities = (ingredients: Array<any>) => {
       ...ingredient,
       unitQuantity,
       price,
+    };
+  });
+};
+
+export const addPreciseQuantity = (ingredients: Array<any>) => {
+  return ingredients.map((ingredient) => {
+    return {
+      ...ingredient,
+      preciseQuantity: ingredient.baseValue * ingredient.unitQuantity,
     };
   });
 };

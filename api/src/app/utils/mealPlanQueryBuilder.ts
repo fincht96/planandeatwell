@@ -2,7 +2,20 @@ import { Knex } from 'knex';
 import { orderByToMealPlanColumn } from './orderByToMealPlanColumn';
 
 export const getMealPlansBaseQuery = (db: Knex) => {
-  return db('meal_plans').select('name', 'uuid', 'created_at', 'created_by');
+  return db
+    .select(
+      'meal_plans.*',
+      'meal_plan_metrics.recipes_count',
+      'meal_plan_metrics.ingredients_count',
+      'meal_plan_metrics.total_servings',
+      'meal_plan_metrics.total_price',
+    )
+    .from('meal_plans')
+    .join(
+      'meal_plan_metrics',
+      'meal_plan_metrics.meal_plan_id',
+      'meal_plans.id',
+    );
 };
 
 export const matchingCreatedByQuery =

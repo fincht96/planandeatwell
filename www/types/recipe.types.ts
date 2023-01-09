@@ -7,7 +7,6 @@ export interface RecipeType {
   baseServings: number;
   pricePerServing: number;
   imagePath: string;
-  link: string;
   prepTime: number;
   cookTime: number;
   lifestyleType: string;

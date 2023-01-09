@@ -33,10 +33,9 @@ const getRecipeListSchema = Joi.object({
 
 const insertRecipeSchema = Joi.object({
   name: Joi.string().max(200).required(),
-  servings: Joi.number().max(40).required(),
+  baseServings: Joi.number().max(40).required(),
   pricePerServing: Joi.number().min(0).max(20).required(),
   imagePath: Joi.string().max(400).required(),
-  link: Joi.string().max(400).required(),
   instructions: Joi.array().items(Joi.string()).required().min(1).messages({
     'array.min': 'Instructions cannot be empty',
   }),
@@ -69,10 +68,9 @@ const insertRecipeSchema = Joi.object({
   freeFroms: Joi.array().items(Joi.string().valid('dairyFree', 'glutenFree')),
 }).and(
   'name',
-  'servings',
+  'baseServings',
   'pricePerServing',
   'imagePath',
-  'link',
   'ingredients',
   'meals',
   'instructions',

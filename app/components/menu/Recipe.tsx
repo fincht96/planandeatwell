@@ -13,6 +13,7 @@ const Recipe = ({
   cookTime,
   prepTime,
   supermarketName,
+  ingredientsCount,
   selected,
   onClick,
 }: {
@@ -24,6 +25,7 @@ const Recipe = ({
   cookTime: number;
   prepTime: number;
   supermarketName: string;
+  ingredientsCount: number;
   selected: boolean;
   onClick: (recipeId: number) => void;
 }) => {
@@ -45,11 +47,7 @@ const Recipe = ({
           priority
         />
       </Box>
-      <Box
-        p={'4'}
-        _hover={{ bg: 'brand.50' }}
-        // bg={selected ? 'brand.100' : 'white'}
-      >
+      <Box p={'4'} _hover={{ bg: 'brand.50' }}>
         <Box noOfLines={1}>
           <Text fontSize={'1.8rem'} fontWeight={800} color="gray.dark">
             {name}
@@ -65,49 +63,35 @@ const Recipe = ({
           </Badge>
         </Box>
 
-        <Box
-          display="flex"
-          flexDirection={'row'}
-          position={'relative'}
-          my={0.5}
-        >
-          <Box>
-            <TimeIcon w={4} h={4} />
-          </Box>
-          <Box
+        <Flex my={0.5} alignItems={'center'}>
+          <TimeIcon w={4} h={4} />
+          <Text
             color={'gray.500'}
             fontWeight={'semibold'}
             letterSpacing={'wide'}
             fontSize={'sm'}
-            ml={'1.5rem'}
-            position={'absolute'}
-            bottom={'0'}
+            ml={'1rem'}
           >
             prep {prepTime} min | cook {cookTime} min
-          </Box>
-        </Box>
+          </Text>
+        </Flex>
 
-        <Box
-          display="flex"
-          flexDirection={'row'}
-          position={'relative'}
-          my={0.5}
-        >
+        <Flex alignItems={'center'}>
           <Box>
             <InfoOutlineIcon w={4} h={4} />
           </Box>
-          <Box
+
+          <Text
             color={'gray.500'}
             fontWeight={'semibold'}
             letterSpacing={'wide'}
             fontSize={'sm'}
-            ml={'1.5rem'}
-            position={'absolute'}
-            bottom={'0'}
+            ml={'1rem'}
           >
             £{pricePerServing.toFixed(2)} per serving | serves {baseServings}
-          </Box>
-        </Box>
+            <br /> {ingredientsCount} ingredients
+          </Text>
+        </Flex>
 
         <Flex justifyContent={'flex-end'}>
           <CheckCircleIcon visibility={selected ? 'visible' : 'hidden'} />

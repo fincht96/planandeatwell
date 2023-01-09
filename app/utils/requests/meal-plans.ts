@@ -59,7 +59,13 @@ export const getMealPlan = (mealPlanUuid: string) => {
 
 export const insertMealPlan = (
   token: string,
-  recipeIdList: Array<{ recipeId: number; servings: number }>,
+  mealPlan: {
+    recipeIdList: Array<{ recipeId: number; servings: number }>;
+    totalServings: number;
+    totalPrice: number;
+    ingredientsCount: number;
+    recipesCount: number;
+  },
 ) => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/meal-plan`, {
     method: 'POST',
@@ -67,7 +73,7 @@ export const insertMealPlan = (
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ recipeIdList }),
+    body: JSON.stringify(mealPlan),
   }).then(async (res) => {
     const json = await res.json();
     if (json?.errors.length) {
@@ -83,6 +89,10 @@ export const updateMealPlan = (
   newMealPlan: {
     recipeIdList?: Array<{ recipeId: number; servings: number }>;
     name?: string;
+    totalServings: number;
+    totalPrice: number;
+    ingredientsCount: number;
+    recipesCount: number;
   },
 ) => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/meal-plan/${mealPlanUuid}`, {

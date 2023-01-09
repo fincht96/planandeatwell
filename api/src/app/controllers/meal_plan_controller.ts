@@ -14,6 +14,10 @@ const insertMealPlanSchema = Joi.object({
     )
     .min(1)
     .required(),
+  totalServings: Joi.number().min(0).required(),
+  totalPrice: Joi.number().min(0).required(),
+  ingredientsCount: Joi.number().min(0).required(),
+  recipesCount: Joi.number().min(0).required(),
 });
 
 const updateMealPlanSchema = Joi.object({
@@ -26,7 +30,13 @@ const updateMealPlanSchema = Joi.object({
       }),
     )
     .min(1),
-}).or('name', 'recipeIdList');
+  totalServings: Joi.number().min(0).required(),
+  totalPrice: Joi.number().min(0).required(),
+  ingredientsCount: Joi.number().min(0).required(),
+  recipesCount: Joi.number().min(0).required(),
+})
+  .or('name', 'recipeIdList')
+  .and('totalServings', 'totalPrice', 'ingredientsCount', 'recipesCount');
 
 const getMealPlansQuerySchema = Joi.object({
   userId: Joi.number().min(1).required(),
@@ -113,11 +123,21 @@ export default class MealPlanController {
       }
 
       // insert meal plan
-      const { recipeIdList } = value;
+      const {
+        recipeIdList,
+        totalServings,
+        totalPrice,
+        ingredientsCount,
+        recipesCount,
+      } = value;
 
       const uuid = await this.mealPlanService.createPlan(
         req.user.planandeatwell_id,
         recipeIdList,
+        totalServings,
+        totalPrice,
+        ingredientsCount,
+        recipesCount,
       );
 
       await this.eventsService.insert(
@@ -158,7 +178,14 @@ export default class MealPlanController {
         throw new Error(error.message);
       }
 
-      const { name, recipeIdList } = value;
+      const {
+        name,
+        recipeIdList,
+        totalServings,
+        totalPrice,
+        ingredientsCount,
+        recipesCount,
+      } = value;
 
       // get all recipes and optional ingredients
       const { name: mealPlanName, uuid } =
@@ -167,6 +194,10 @@ export default class MealPlanController {
           uuid: mealPlanUuid,
           ...(recipeIdList && { recipeIdList }),
           ...(typeof name === 'string' && { name }),
+          totalServings,
+          totalPrice,
+          ingredientsCount,
+          recipesCount,
         });
 
       return res.status(200).json({

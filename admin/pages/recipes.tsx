@@ -143,7 +143,7 @@ const RecipeCard = ({
   recipe,
   onDelete,
 }: {
-  recipe: { id: number; name: string; link: string };
+  recipe: { id: number; name: string };
   onDelete: (recipeId: number) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -218,6 +218,8 @@ export default function Recipes() {
 
   const limit = 10;
   const showMore = recipes.length < totalCountRecipes;
+
+  const [pricePerServing, setPricePerServing] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !currentUser) {
@@ -319,6 +321,7 @@ export default function Recipes() {
       setRecipeInstructions([]);
       setSupermarkets([]);
       recipesQuery.refetch();
+      setPricePerServing(0);
     },
     onError: (error: string) => {
       toast({
@@ -432,7 +435,11 @@ export default function Recipes() {
       };
     });
 
-    const pricePerServing = calcPricePerServing(ingredientsFull, data.servings);
+    // price per serving is calculated with whole unit quantities of ingredients
+    const pricePerServing = calcPricePerServing(
+      ingredientsFull,
+      data.baseServings,
+    );
     const { file, ...newRecipe }: { file: any } = {
       ...data,
       meals,
@@ -574,6 +581,36 @@ export default function Recipes() {
     signedUploadUrlQuery.fetchStatus,
   ]);
 
+  React.useEffect(() => {
+    const subscription = watch((data) => {
+      if (
+        data.ingredients?.length &&
+        ingredients?.length &&
+        data.ingredients?.length === ingredients?.length
+      ) {
+        const ingredientsFull = data?.ingredients.map((ingredient, index) => {
+          return {
+            ...ingredient,
+            ...ingredients[index],
+          };
+        });
+
+        if (ingredientsFull.length && data.baseServings) {
+          const newPricePerServing = calcPricePerServing(
+            ingredientsFull,
+            data.baseServings,
+          );
+          setPricePerServing((prevPricePerServing) => {
+            return newPricePerServing
+              ? newPricePerServing
+              : prevPricePerServing;
+          });
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [ingredients, watch]);
+
   return (
     <Layout>
       <Head>
@@ -627,50 +664,43 @@ export default function Recipes() {
                         </FormErrorMessage>
                       </FormControl>
 
-                      <FormControl isInvalid={!!errors.servings}>
-                        <Text># servings</Text>
+                      <FormControl isInvalid={!!errors.baseServings}>
+                        <Text># base servings</Text>
                         <Input
                           variant="outline"
                           autoComplete="off"
                           bg={'#ffffff'}
-                          id={'servings'}
-                          {...register('servings', {
-                            required: '# servings is required',
+                          id={'baseServings'}
+                          {...register('baseServings', {
+                            required: '# base servings is required',
                             max: {
                               value: 24,
-                              message: 'Max number of servings is 24',
+                              message: 'Max number of base servings is 24',
                             },
                             min: {
                               value: 1,
-                              message: 'Min number of servings is 1',
+                              message: 'Min number of base servings is 1',
                             },
                             valueAsNumber: true,
                           })}
                           type={'number'}
                         />
                         <FormErrorMessage>
-                          {errors.servings && `${errors?.servings.message}`}
+                          {errors.baseServings &&
+                            `${errors?.baseServings.message}`}
                         </FormErrorMessage>
                       </FormControl>
 
-                      <FormControl isInvalid={!!errors.link}>
-                        <Text>Recipe link</Text>
+                      <FormControl>
+                        <Text>Price per serving</Text>
                         <Input
                           variant="outline"
                           autoComplete="off"
                           bg={'#ffffff'}
-                          id={'link'}
-                          {...register('link', {
-                            required: 'A recipe link is required',
-                            maxLength: {
-                              value: 500,
-                              message: 'Must be less than 500 characters',
-                            },
-                          })}
+                          value={pricePerServing}
+                          type={'number'}
+                          disabled
                         />
-                        <FormErrorMessage>
-                          {errors.link && `${errors?.link.message}`}
-                        </FormErrorMessage>
                       </FormControl>
 
                       <FormControl isInvalid={!!errors.prepTime}>

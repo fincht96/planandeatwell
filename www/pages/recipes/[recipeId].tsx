@@ -15,6 +15,7 @@ import {
   roundUpQuantities,
   scaleIngredientQuantities,
   calcTotalIngredientsPrice,
+  addPreciseQuantity,
 } from '../../utils/recipeHelper';
 import { roundTo2dp } from '../../utils/roundTo2dp';
 
@@ -38,20 +39,22 @@ const Recipe: NextPage = ({ recipe }: any) => {
 
       if (recipe.baseServings !== selectedServings) {
         // if base serving does not equal selected serving use selected servings to calculate ingredients and price per serving
-        const allIngredients = roundUpQuantities(
-          scaleIngredientQuantities(
-            recipe.ingredientsList,
-            recipe.baseServings,
-            selectedServings,
+        const decoratedIngredients = addPreciseQuantity(
+          roundUpQuantities(
+            scaleIngredientQuantities(
+              recipe.ingredientsList,
+              recipe.baseServings,
+              selectedServings,
+            ),
           ),
         );
 
-        const totalPrice = calcTotalIngredientsPrice(allIngredients);
+        const totalPrice = calcTotalIngredientsPrice(decoratedIngredients);
         const pricePerServing = roundTo2dp(totalPrice / selectedServings);
 
         // ingredients & price per serving derived from selected servings value
         setCurrentServings(selectedServings);
-        setIngredients(allIngredients);
+        setIngredients(decoratedIngredients);
         setPricePerServing(pricePerServing);
       }
     }
@@ -80,12 +83,12 @@ const Recipe: NextPage = ({ recipe }: any) => {
               ? RecipeViewMobile(recipe, {
                   pricePerServing,
                   currentServings,
-                  allIngredients: ingredients,
+                  ingredients: ingredients,
                 })
               : RecipeViewDesktop(recipe, {
                   pricePerServing,
                   currentServings,
-                  allIngredients: ingredients,
+                  ingredients: ingredients,
                 })}
           </Container>
         </Box>

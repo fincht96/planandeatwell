@@ -161,12 +161,12 @@ export default function RecipeModal({
               ? RecipeViewMobile(recipe, {
                   pricePerServing: recipe.pricePerServing,
                   currentServings: recipe.baseServings,
-                  allIngredients: recipe.ingredientsList,
+                  ingredients: recipe.ingredientsList,
                 })
               : RecipeViewDesktop(recipe, {
                   pricePerServing: recipe.pricePerServing,
                   currentServings: recipe.baseServings,
-                  allIngredients: recipe.ingredientsList,
+                  ingredients: recipe.ingredientsList,
                 })}
           </ModalBody>
         </ModalContent>

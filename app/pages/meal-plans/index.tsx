@@ -117,7 +117,7 @@ const MealPlans: CustomNextPage = () => {
               Sorry, it looks like you do not currently have any meal plans.
             </Text>
           </Box>
-          <Box height={'7rem'}>
+          <Box height={'10rem'}>
             <Button
               height={'100%'}
               onClick={() => onNavigate('/create-plan/steps')}
@@ -203,7 +203,7 @@ const MealPlans: CustomNextPage = () => {
           </Text>
 
           <Grid templateColumns="repeat(auto-fill, minMax(275px,1fr));" gap={5}>
-            <Box height={'7rem'}>
+            <Box height={'10rem'}>
               <Button
                 height={'100%'}
                 width={'100%'}
@@ -218,6 +218,10 @@ const MealPlans: CustomNextPage = () => {
                   key={mealPlan.uuid}
                   uuid={mealPlan.uuid}
                   name={mealPlan.name}
+                  recipesCount={mealPlan.recipesCount}
+                  ingredientsCount={mealPlan.ingredientsCount}
+                  totalServings={mealPlan.totalServings}
+                  totalPrice={mealPlan.totalPrice}
                 />
               );
             })}

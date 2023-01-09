@@ -99,14 +99,20 @@ const Menu: CustomNextPage = () => {
   const mealPlanMutation = useMutation({
     mutationFn: ({
       updateExisting,
-      recipeIdList,
+      mealPlan,
     }: {
       updateExisting: boolean;
-      recipeIdList: Array<{ recipeId: number; servings: number }>;
+      mealPlan: {
+        recipeIdList: Array<{ recipeId: number; servings: number }>;
+        totalServings: number;
+        totalPrice: number;
+        ingredientsCount: number;
+        recipesCount: number;
+      };
     }) => {
       return updateExisting
-        ? updateMealPlan(authToken, mealPlanQueryParams.uuid, { recipeIdList })
-        : insertMealPlan(authToken, recipeIdList);
+        ? updateMealPlan(authToken, mealPlanQueryParams.uuid, mealPlan)
+        : insertMealPlan(authToken, mealPlan);
     },
     onSuccess: (data: any) => {
       return onNavigate(`/meal-plans/${data.uuid}`);
@@ -391,12 +397,14 @@ const Menu: CustomNextPage = () => {
                 id={recipe.id}
                 key={recipe.id}
                 name={recipe.name}
-                pricePerServing={parseInt(recipe.pricePerServing)}
+                pricePerServing={recipe.pricePerServing}
                 imagePath={recipe.imagePath}
                 baseServings={recipe.baseServings}
                 cookTime={recipe.cookTime}
                 prepTime={recipe.prepTime}
                 supermarketName={recipe.supermarketName}
+                // ensures that the ingredients count is always up to date, just ensure when fetching recipes, ingredients are included
+                ingredientsCount={recipe.ingredientsList.length}
                 selected={recipeInBasket}
                 onClick={(recipeId) => {
                   setSelectedRecipe(
@@ -436,14 +444,25 @@ const Menu: CustomNextPage = () => {
         recipeList={recipeBasket}
         servings={totalServingsInBasket}
         onComplete={() => {
+          const totalServings = totalServingsInBasket;
+          const totalPrice = totalBasketPrice;
+          const ingredientsCount = ingredientsBasket.length;
+          const recipesCount = recipeBasket.length;
+
           mealPlanMutation.mutate({
             updateExisting: !!mealPlanQueryParams.uuid.length,
-            recipeIdList: recipeBasket.map((basketItem) => {
-              return {
-                recipeId: basketItem.recipe.id,
-                servings: basketItem.servings,
-              };
-            }),
+            mealPlan: {
+              recipeIdList: recipeBasket.map((basketItem) => {
+                return {
+                  recipeId: basketItem.recipe.id,
+                  servings: basketItem.servings,
+                };
+              }),
+              totalServings,
+              totalPrice,
+              ingredientsCount,
+              recipesCount,
+            },
           });
         }}
       />

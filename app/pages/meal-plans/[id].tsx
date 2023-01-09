@@ -108,8 +108,14 @@ const MealPlan: CustomNextPage = () => {
   });
 
   const mealPlanMutation = useMutation({
-    mutationFn: ({ mealPlanName }: { mealPlanName: string }) => {
-      return updateMealPlan(authToken, mealPlanUuid, { name: mealPlanName });
+    mutationFn: (mealPlan: {
+      name: string;
+      totalServings: number;
+      totalPrice: number;
+      ingredientsCount: number;
+      recipesCount: number;
+    }) => {
+      return updateMealPlan(authToken, mealPlanUuid, mealPlan);
     },
     onSuccess: (data) => {
       setMealPlanName(data.name);
@@ -120,7 +126,6 @@ const MealPlan: CustomNextPage = () => {
     id: number;
     name: string;
     servings: number;
-    link: string;
   }> = useMemo(() => {
     if (mealPlanQuery.isSuccess) {
       return mealPlanQuery.data.recipes;
@@ -194,9 +199,17 @@ const MealPlan: CustomNextPage = () => {
   } = useForm<any>({});
 
   const onSubmit: SubmitHandler<any> = (data, closeEditing) => {
+    const totalServings = recipes.reduce((total, currentRecipe) => {
+      return currentRecipe.servings + total;
+    }, 0);
+
     if (data.mealPlanName !== mealPlanName) {
       mealPlanMutation.mutate({
-        mealPlanName: data.mealPlanName,
+        name: data.mealPlanName,
+        totalServings,
+        totalPrice,
+        ingredientsCount: ingredients.length,
+        recipesCount: recipes.length,
       });
     }
     closeEditing();

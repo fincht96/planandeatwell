@@ -5,6 +5,7 @@ import {
   mealPlanQueryOrdering,
   mealPlanQuerySearch,
 } from '../utils/mealPlanQueryBuilder';
+import { roundTo2dp } from '../utils/roundTo2dp';
 import RecipeService from './recipe_service';
 
 export default class MealPlanService {
@@ -108,6 +109,10 @@ export default class MealPlanService {
   async createPlan(
     userId: number,
     recipe_id_list: Array<{ recipeId: number; servings: number }>,
+    totalServings: number,
+    totalPrice: number,
+    ingredientsCount: number,
+    recipesCount: number,
   ) {
     return await this.db.transaction(async (trx) => {
       // create a meal plan
@@ -124,7 +129,21 @@ export default class MealPlanService {
       }));
 
       await this.db('meal_plan_recipes')
-        .insert(meal_plan_recipes)
+        .insert(meal_plan_recipes, ['*'])
+        .transacting(trx);
+
+      // insert meal plan metrics
+      await this.db('meal_plan_metrics')
+        .insert(
+          {
+            meal_plan_id,
+            total_price: roundTo2dp(totalPrice),
+            recipes_count: recipesCount,
+            total_servings: totalServings,
+            ingredients_count: ingredientsCount,
+          },
+          [],
+        )
         .transacting(trx);
 
       return meal_plan_uuid;
@@ -136,11 +155,19 @@ export default class MealPlanService {
     uuid,
     recipeIdList,
     name,
+    totalServings,
+    totalPrice,
+    ingredientsCount,
+    recipesCount,
   }: {
     userId: number;
     uuid: string;
     recipeIdList?: Array<{ recipeId: number; servings: number }>;
     name?: string;
+    totalServings: number;
+    totalPrice: number;
+    ingredientsCount: number;
+    recipesCount: number;
   }) {
     return await this.db.transaction(async (trx) => {
       // find meal plan with uuid and created by user
@@ -177,8 +204,21 @@ export default class MealPlanService {
         await this.db('meal_plans')
           .where('uuid', uuid)
           .andWhere('created_by', userId)
-          .update({ name });
+          .update({ name })
+          .transacting(trx);
       }
+
+      // update meal plan metrics
+      await this.db('meal_plan_metrics')
+        .update({
+          meal_plan_id: planId,
+          total_price: roundTo2dp(totalPrice),
+          recipes_count: recipesCount,
+          total_servings: totalServings,
+          ingredients_count: ingredientsCount,
+        })
+        .where('meal_plan_metrics.meal_plan_id', planId)
+        .transacting(trx);
 
       const mealPlan = await this.db('meal_plans')
         .select('id', 'name')

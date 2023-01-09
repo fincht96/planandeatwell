@@ -4,7 +4,11 @@ import { Ingredient } from '../types/ingredient.types';
 import snakeize from 'snakeize';
 // @ts-ignore
 import camelize from 'camelize';
-import { toSnakeCase } from '../utils/toSnakeCase';
+import {
+  getIngredientsBaseQuery,
+  ingredientQueryOrdering,
+  matchingIngredientIds,
+} from '../utils/ingredientsQueryBuilder';
 
 export default class IngredientsService {
   private db: Knex;
@@ -21,23 +25,33 @@ export default class IngredientsService {
       return queryBuilder;
     };
 
-  async getIngredients(orderOptions: {
-    orderBy?: 'createdAt';
-    order?: 'asc' | 'desc';
+  async getIngredients({
+    offset = 0,
+    limit = 10,
+    order = 'any',
+    orderBy = 'relevance',
+    ingredientIds = [],
+  }: {
+    ingredientIds?: Array<number>;
+    offset?: number;
+    limit?: number;
+    order?: 'asc' | 'desc' | 'any';
+    orderBy?: 'relevance' | 'createdAt';
   }) {
-    const { orderBy, order } = orderOptions;
-    return this.db
-      .select(
-        '*',
-        this.db.raw(
-          'CAST(ingredients.price_per_unit as FLOAT), CAST(ingredients.base_value as FLOAT)',
-        ),
+    return getIngredientsBaseQuery(this.db)
+      .modify(matchingIngredientIds({ ingredientIds }))
+      .modify(
+        ingredientQueryOrdering({
+          order,
+          orderBy,
+        }),
       )
-      .from('ingredients')
-      .modify((qb) => {
-        if (!!orderBy && !!order) {
-          qb.orderBy(toSnakeCase(orderBy), order);
+      .modify((queryBuilder: Knex.QueryBuilder) => {
+        // only use offset/limit if not returning matching ingredientIds
+        if (!ingredientIds.length) {
+          queryBuilder.offset(offset).limit(limit);
         }
+        return queryBuilder;
       });
   }
 

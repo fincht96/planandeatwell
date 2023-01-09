@@ -121,6 +121,8 @@ export default class RecipeService {
                   CAST(recipe_ingredients.unit_quantity as FLOAT),
                   ingredients.name,
                   CAST(ingredients.price_per_unit as FLOAT),
+                  CAST(ingredients.base_value as FLOAT),
+                  ingredients.unit,
                   supermarkets.name as supermarket_name,
                   categories.name as category_name
                 from

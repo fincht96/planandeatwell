@@ -3,10 +3,9 @@ import { Ingredient } from './ingredient.types';
 export interface Recipe {
   id?: number;
   name: string;
-  servings: number;
+  baseServings: number;
   pricePerServing: number;
   imagePath: string;
-  link: string;
   prepTime: number;
   cookTime: number;
   meals: Array<

@@ -6,6 +6,7 @@ import snakeize from 'snakeize';
 import camelize from 'camelize';
 import { toSnakeCase } from '../utils/toSnakeCase';
 import { orderByToRecipeColumn } from '../utils/orderByToRecipeColumn';
+import { roundTo2dp } from '../utils/roundTo2dp';
 
 export default class RecipeService {
   private db: Knex;
@@ -102,15 +103,15 @@ export default class RecipeService {
           recipes.name,
           recipes.base_servings,
           recipes.created_at,
-          CAST(recipes.price_per_serving as FLOAT),
           recipes.image_path,
-          recipes.link,
           recipes.meal_type,
           recipes.lifestyle_type,
           recipes.free_from_type,
           recipes.prep_time,
           recipes.cook_time,
           supermarkets.name as supermarket_name,
+          recipe_metrics.price_per_serving,
+          recipe_metrics.ingredients_count,
           (
             select
               json_agg(ingredients)
@@ -152,11 +153,22 @@ export default class RecipeService {
         from
           recipes
         inner join supermarkets on supermarkets.id = recipes.supermarket_id
+        inner join recipe_metrics on recipe_metrics.recipe_id = recipes.id
       ) as recipes) as recipes
   `);
-    return this.db
-      .select('*')
-      .from(includeIngredientsWithRecipes ? rawQuery : 'recipes');
+
+    if (includeIngredientsWithRecipes) {
+      return this.db.select('*').from(rawQuery);
+    } else {
+      return this.db
+        .select(
+          'recipes.*',
+          'recipe_metrics.ingredients_count',
+          'recipe_metrics.price_per_serving',
+        )
+        .from('recipes')
+        .join('recipe_metrics', 'recipe_metrics.recipe_id', 'recipes.id');
+    }
   };
 
   async get({
@@ -239,10 +251,9 @@ export default class RecipeService {
     return await this.db.transaction(async (trx) => {
       const {
         name,
-        servings,
+        base_servings,
         price_per_serving,
         image_path,
-        link,
         ingredients,
         meals,
         lifestyles,
@@ -262,10 +273,8 @@ export default class RecipeService {
         .insert(
           {
             name,
-            servings,
-            price_per_serving,
+            base_servings,
             image_path,
-            link,
             meal_type: [...meals],
             lifestyle_type: [...lifestyles],
             free_from_type: [...freeFromsSnakeCase],
@@ -277,7 +286,7 @@ export default class RecipeService {
         )
         .transacting(trx);
 
-      // insert meal_plan_recipes with associated meal_plan.id
+      // map ingredients associated with recipe
       const { id: recipe_id } = result[0];
       const recipe_ingredients = ingredients.map(
         ({
@@ -311,6 +320,18 @@ export default class RecipeService {
 
       await this.db('recipe_instructions')
         .insert(recipe_instructions)
+        .transacting(trx);
+
+      // insert recipe metrics
+      await this.db('recipe_metrics')
+        .insert(
+          {
+            recipe_id,
+            ingredients_count: ingredients.length,
+            price_per_serving: roundTo2dp(price_per_serving),
+          },
+          [],
+        )
         .transacting(trx);
 
       return recipe_id;

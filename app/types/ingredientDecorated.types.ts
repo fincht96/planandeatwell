@@ -6,6 +6,6 @@ export interface IngredientDecorated {
   pricePerUnit: number;
   unitQuantity: number;
   categoryName: string;
-  preciseQuantity: number;
+  scalarQuantity: number;
   unit: string;
 }

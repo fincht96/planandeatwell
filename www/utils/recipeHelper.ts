@@ -1,7 +1,7 @@
 import { roundTo2dp } from './roundTo2dp';
 
-export const getFormattedQuanityAndUnitText = (
-  preciseQuantity: number,
+export const getFormattedQuantityAndUnitText = (
+  scalarQuantity: number,
   unitOfMeasurement: string,
 ) => {
   const conventionalUnits: { [key: string]: string } = {
@@ -16,9 +16,9 @@ export const getFormattedQuanityAndUnitText = (
   );
 
   if (isTraditional) {
-    return `(${preciseQuantity}` + `${conventionalUnits[unitOfMeasurement]})`;
+    return `(${scalarQuantity}` + `${conventionalUnits[unitOfMeasurement]})`;
   } else {
-    return `(${preciseQuantity}` + ' ' + `${unitOfMeasurement})`;
+    return `(${scalarQuantity}` + ' ' + `${unitOfMeasurement})`;
   }
 };
 
@@ -59,11 +59,13 @@ export const roundUpQuantities = (ingredients: Array<any>) => {
   });
 };
 
-export const addPreciseQuantity = (ingredients: Array<any>) => {
-  return ingredients.map((ingredient) => {
-    return {
-      ...ingredient,
-      preciseQuantity: ingredient.baseValue * ingredient.unitQuantity,
-    };
-  });
+export const addScalarQuantity = (ingredients: Array<any>) => {
+  return [
+    ...ingredients.map((ingredient) => {
+      return {
+        ...ingredient,
+        scalarQuantity: ingredient.baseValue * ingredient.unitQuantity,
+      };
+    }),
+  ];
 };

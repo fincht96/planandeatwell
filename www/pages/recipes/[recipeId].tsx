@@ -15,7 +15,7 @@ import {
   roundUpQuantities,
   scaleIngredientQuantities,
   calcTotalIngredientsPrice,
-  addPreciseQuantity,
+  addScalarQuantity,
 } from '../../utils/recipeHelper';
 import { roundTo2dp } from '../../utils/roundTo2dp';
 
@@ -39,7 +39,7 @@ const Recipe: NextPage = ({ recipe }: any) => {
 
       if (recipe.baseServings !== selectedServings) {
         // if base serving does not equal selected serving use selected servings to calculate ingredients and price per serving
-        const decoratedIngredients = addPreciseQuantity(
+        const decoratedIngredients = addScalarQuantity(
           roundUpQuantities(
             scaleIngredientQuantities(
               recipe.ingredientsList,
@@ -83,12 +83,12 @@ const Recipe: NextPage = ({ recipe }: any) => {
               ? RecipeViewMobile(recipe, {
                   pricePerServing,
                   currentServings,
-                  ingredients: ingredients,
+                  ingredients,
                 })
               : RecipeViewDesktop(recipe, {
                   pricePerServing,
                   currentServings,
-                  ingredients: ingredients,
+                  ingredients,
                 })}
           </Container>
         </Box>

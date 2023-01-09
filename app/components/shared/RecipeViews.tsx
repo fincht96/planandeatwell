@@ -17,7 +17,7 @@ import dynamic from 'next/dynamic';
 import { InstructionType } from '../../types/instruction.types';
 import { RecipeType } from '../../types/recipe.types';
 import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
-import { getFormattedQuanityAndUnitText } from '../../utils/recipeBasketHelper';
+import { getFormattedQuantityAndUnitText } from '../../utils/recipeBasketHelper';
 import BorderBox from '../BorderBox';
 
 // run import only on client
@@ -198,9 +198,9 @@ export const RecipeViewDesktop = (
                     </Text>
                     <Box ml={1}>
                       <Text fontWeight={600}>
-                        {getFormattedQuanityAndUnitText(
+                        {getFormattedQuantityAndUnitText(
                           currentServings > 0
-                            ? ingredient.preciseQuantity
+                            ? ingredient.scalarQuantity
                             : ingredient.baseValue,
                           ingredient.unit,
                         )}
@@ -399,9 +399,9 @@ export const RecipeViewMobile = (
                             </Text>
                             <Box ml={1}>
                               <Text fontWeight={600}>
-                                {getFormattedQuanityAndUnitText(
+                                {getFormattedQuantityAndUnitText(
                                   currentServings > 0
-                                    ? ingredient.preciseQuantity
+                                    ? ingredient.scalarQuantity
                                     : ingredient.baseValue,
                                   ingredient.unit,
                                 )}

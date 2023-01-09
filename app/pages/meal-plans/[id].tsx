@@ -27,9 +27,9 @@ import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
 import { groupObjects } from '../../utils/groupObjects';
 import {
   addIngredients,
-  addPreciseQuantity,
+  addScalarQuantity,
   calcTotalIngredientsPrice,
-  getFormattedQuanityAndUnitText,
+  getFormattedQuantityAndUnitText,
   roundUpQuantities,
   scaleIngredientQuantities,
 } from '../../utils/recipeBasketHelper';
@@ -218,7 +218,7 @@ const MealPlan: CustomNextPage = () => {
   const generateRowData = () => {
     if (ingredientView === 'ALL') {
       // round up unit quantities of ingredients
-      const decoratedIngredients = addPreciseQuantity(
+      const decoratedIngredients = addScalarQuantity(
         roundUpQuantities(ingredients),
       );
       return decoratedIngredients?.map((ingredient: IngredientDecorated) => ({
@@ -237,8 +237,8 @@ const MealPlan: CustomNextPage = () => {
                 color={'gray.dark'}
                 fontSize={{ base: '0.9rem', md: '1rem' }}
               >
-                {getFormattedQuanityAndUnitText(
-                  ingredient.preciseQuantity,
+                {getFormattedQuantityAndUnitText(
+                  ingredient.scalarQuantity,
                   ingredient.unit,
                 )}
               </Text>
@@ -260,7 +260,7 @@ const MealPlan: CustomNextPage = () => {
           recipeWithServings.servings,
         );
 
-        const decoratedIngredients = addPreciseQuantity(
+        const decoratedIngredients = addScalarQuantity(
           roundUpQuantities(ingredients),
         );
 
@@ -294,8 +294,8 @@ const MealPlan: CustomNextPage = () => {
                       color={'gray.dark'}
                       fontSize={{ base: '0.9rem', md: '1rem' }}
                     >
-                      {getFormattedQuanityAndUnitText(
-                        ingredient.preciseQuantity,
+                      {getFormattedQuantityAndUnitText(
+                        ingredient.scalarQuantity,
                         ingredient.unit,
                       )}
                     </Text>
@@ -309,7 +309,7 @@ const MealPlan: CustomNextPage = () => {
     }
 
     if (ingredientView === 'CATEGORY') {
-      const decoratedIngredients = addPreciseQuantity(
+      const decoratedIngredients = addScalarQuantity(
         roundUpQuantities(ingredients),
       );
       const ingredientsGroupedByCategoryArray = groupObjects(
@@ -349,8 +349,8 @@ const MealPlan: CustomNextPage = () => {
                           color={'gray.dark'}
                           fontSize={{ base: '0.9rem', md: '1rem' }}
                         >
-                          {getFormattedQuanityAndUnitText(
-                            ingredient.preciseQuantity,
+                          {getFormattedQuantityAndUnitText(
+                            ingredient.scalarQuantity,
                             ingredient.unit,
                           )}
                         </Text>

@@ -23,9 +23,8 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { RecipeType } from '../../types/recipe.types';
 import {
-  addPreciseQuantity,
+  addScalarQuantity,
   calcTotalIngredientsPrice,
-  roundUpQuantities,
   scaleIngredientQuantities,
 } from '../../utils/recipeBasketHelper';
 import { roundTo2dp } from '../../utils/roundTo2dp';
@@ -68,13 +67,11 @@ export default function RecipeModal({
 
   const decoratedIngredients =
     currentServings > 0
-      ? addPreciseQuantity(
-          roundUpQuantities(
-            scaleIngredientQuantities(
-              recipe.ingredientsList,
-              recipe.baseServings,
-              currentServings,
-            ),
+      ? addScalarQuantity(
+          scaleIngredientQuantities(
+            recipe.ingredientsList,
+            recipe.baseServings,
+            currentServings,
           ),
         )
       : recipe.ingredientsList;

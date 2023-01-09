@@ -7,6 +7,8 @@ import {
 } from '../utils/mealPlanQueryBuilder';
 import { roundTo2dp } from '../utils/roundTo2dp';
 import RecipeService from './recipe_service';
+// @ts-ignore
+import camelize from 'camelize';
 
 export default class MealPlanService {
   constructor(
@@ -227,5 +229,16 @@ export default class MealPlanService {
 
       return { uuid, name: mealPlan[0].name };
     });
+  }
+
+  async removeMealPlan(mealPlanUuid: string): Promise<any> {
+    try {
+      const result = await this.db('meal_plans')
+        .where('uuid', mealPlanUuid)
+        .del(['*']);
+      return camelize(result[0]);
+    } catch (error: any) {
+      return error.message;
+    }
   }
 }

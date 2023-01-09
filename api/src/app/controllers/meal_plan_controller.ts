@@ -48,6 +48,9 @@ const getMealPlansQuerySchema = Joi.object({
   includeCount: Joi.boolean().default(false),
 });
 
+const removeMealPlanSchema = Joi.object({
+  mealPlanUuid: Joi.string().min(1).required(),
+});
 export default class MealPlanController {
   constructor(
     private readonly mealPlanService: MealPlanService,
@@ -202,6 +205,31 @@ export default class MealPlanController {
 
       return res.status(200).json({
         result: { name: mealPlanName, uuid },
+        errors: [],
+      });
+    } catch (e: any) {
+      await this.eventsService.insert('MEAL_PLAN', 'ERROR', e.message ?? '');
+      return res.status(400).json({
+        errors: [e?.message],
+      });
+    }
+  }
+
+  async removeMealPlan(req: Request, res: Response) {
+    try {
+      const { error, value } = removeMealPlanSchema.validate(req.params);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // remove meal plan from db
+      const removedMealPlan = await this.mealPlanService.removeMealPlan(
+        value.mealPlanUuid,
+      );
+
+      return res.status(200).json({
+        result: removedMealPlan,
         errors: [],
       });
     } catch (e: any) {

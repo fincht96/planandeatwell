@@ -102,6 +102,13 @@ router.put(
   },
 );
 
+router.delete(
+  '/meal-plan/:mealPlanUuid',
+  isAuthenticated('user'),
+  (req: Request, res: Response) =>
+    req.container.resolve('mealPlanController').removeMealPlan(req, res),
+);
+
 /** storage */
 
 router.get(

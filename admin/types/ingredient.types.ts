@@ -4,4 +4,7 @@ export interface Ingredient {
   pricePerUnit: number;
   productId: number;
   categoryId: number;
+  supermarketId: number;
+  baseValue: number;
+  unit: string;
 }

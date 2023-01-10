@@ -91,6 +91,8 @@ const IngredientCard = ({
 IngredientCard.displayName = 'IngredientCard';
 
 export default function Ingredients() {
+  const [showCustomunitField, setShowCustomunitField] =
+    useState<boolean>(false);
   const { currentUser, idToken, authLoading } = useAuth();
   const [ingredients, setIngredients] = useState<Array<Ingredient>>([]);
   const [categories, setCategories] = useState<Array<Category>>([]);
@@ -234,12 +236,38 @@ export default function Ingredients() {
   const {
     register,
     handleSubmit,
-    reset,
+    resetField,
     formState: { errors },
-  } = useForm();
+    reset,
+    clearErrors,
+  } = useForm({
+    shouldUnregister: true, // when input is unmounted the field should be removed i.e. customUnit should be removed on unmount
+  });
+
+  const handleUnitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.value) {
+      resetField('customUnit');
+      setShowCustomunitField(false);
+      return;
+    }
+
+    if (event.target.value && event.target.value === 'create custom unit') {
+      clearErrors('unit');
+      setShowCustomunitField(true);
+    } else {
+      // submit the chosen traditional unit
+      clearErrors('unit');
+      resetField('customUnit');
+      setShowCustomunitField(false);
+    }
+  };
 
   // submit ingredient
   const onSubmit = (data: any): void => {
+    if (data.customUnit) {
+      data.unit = data.customUnit;
+      delete data.customUnit;
+    }
     insertIngredientMutation.mutate({ ingredient: data });
   };
 
@@ -297,7 +325,7 @@ export default function Ingredients() {
                           },
                           min: {
                             value: 0,
-                            message: 'Max price is 0',
+                            message: 'Min price is 0',
                           },
                           valueAsNumber: true,
                         })}
@@ -330,6 +358,95 @@ export default function Ingredients() {
                         {errors.productId && `${errors?.productId.message}`}
                       </FormErrorMessage>
                     </FormControl>
+
+                    <FormControl isInvalid={!!errors.baseValue}>
+                      <FormLabel>Base unit value for ingredient</FormLabel>
+                      <Input
+                        variant="outline"
+                        autoComplete="off"
+                        bg={'#ffffff'}
+                        id={'baseValue'}
+                        type={'number'}
+                        step="any"
+                        {...register('baseValue', {
+                          required: 'Base value of ingredient is required',
+                          max: {
+                            value: 10000,
+                            message: 'Max base value is 10000',
+                          },
+                          min: {
+                            value: 1,
+                            message: 'Min base value is 1',
+                          },
+                          valueAsNumber: true,
+                        })}
+                      />
+                      <FormErrorMessage>
+                        {errors.baseValue && `${errors?.baseValue.message}`}
+                      </FormErrorMessage>
+                    </FormControl>
+
+                    <FormControl isInvalid={!!errors.unit}>
+                      <FormLabel>Unit of measurement</FormLabel>
+                      <Select
+                        autoComplete="off"
+                        id={'unit'}
+                        placeholder="Select unit of measurement"
+                        variant="outline"
+                        bg={'#ffffff'}
+                        {...register('unit', {
+                          required: 'Unit of measurement is required',
+                        })}
+                        onChange={handleUnitChange}
+                      >
+                        {[
+                          'kilogram',
+                          'gram',
+                          'milliliter',
+                          'liter',
+                          'create custom unit',
+                        ].map((unit, index) => {
+                          return (
+                            <option key={index} value={unit}>
+                              {unit}
+                            </option>
+                          );
+                        })}
+                      </Select>
+                      <FormErrorMessage>
+                        {errors.unit && `${errors?.unit.message}`}
+                      </FormErrorMessage>
+                    </FormControl>
+                    {showCustomunitField && (
+                      <FormControl isInvalid={!!errors.customUnit}>
+                        <FormLabel>Custom unit of measurement</FormLabel>
+                        <Input
+                          variant="outline"
+                          autoComplete="off"
+                          bg={'#ffffff'}
+                          id={'customUnit'}
+                          {...register('customUnit', {
+                            required:
+                              'Please provide a custom unit of measurement i.e. pepper',
+                            minLength: {
+                              value: 1,
+                              message: `Must be more than 1 character`,
+                            },
+                            maxLength: {
+                              value: 50,
+                              message: 'Must be less than 50 characters',
+                            },
+                            pattern: /^[a-zA-Z]+$/,
+                          })}
+                        />
+                        <FormErrorMessage>
+                          {errors?.customUnit?.type === 'required' &&
+                            `${errors?.customUnit.message}`}
+                          {errors?.customUnit?.type === 'pattern' &&
+                            'you must provide letters only and ensure there is only one word'}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
 
                     <FormControl isInvalid={!!errors.categoryId}>
                       <FormLabel>Category name</FormLabel>

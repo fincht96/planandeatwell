@@ -23,8 +23,8 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { RecipeType } from '../../types/recipe.types';
 import {
+  addScalarQuantity,
   calcTotalIngredientsPrice,
-  roundUpQuantities,
   scaleIngredientQuantities,
 } from '../../utils/recipeBasketHelper';
 import { roundTo2dp } from '../../utils/roundTo2dp';
@@ -65,9 +65,9 @@ export default function RecipeModal({
     }
   }, [isOpen, onPopoverClose]);
 
-  const allIngredients =
+  const decoratedIngredients =
     currentServings > 0
-      ? roundUpQuantities(
+      ? addScalarQuantity(
           scaleIngredientQuantities(
             recipe.ingredientsList,
             recipe.baseServings,
@@ -76,7 +76,7 @@ export default function RecipeModal({
         )
       : recipe.ingredientsList;
 
-  const totalPrice = calcTotalIngredientsPrice(allIngredients);
+  const totalPrice = calcTotalIngredientsPrice(decoratedIngredients);
 
   const pricePerServing =
     currentServings > 0
@@ -194,14 +194,14 @@ export default function RecipeModal({
                   onRemoveRecipeServings,
                   pricePerServing,
                   currentServings,
-                  allIngredients,
+                  ingredients: decoratedIngredients,
                 })
               : RecipeViewDesktop(recipe, {
                   onAddRecipeServings,
                   onRemoveRecipeServings,
                   pricePerServing,
                   currentServings,
-                  allIngredients,
+                  ingredients: decoratedIngredients,
                 })}
           </ModalBody>
         </ModalContent>

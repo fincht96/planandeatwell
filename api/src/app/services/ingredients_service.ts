@@ -63,7 +63,7 @@ export default class IngredientsService {
             ingredients.id,
             CAST(recipe_ingredients.unit_quantity as FLOAT),
             ingredients.name,
-            CAST(ingredients.price_per_unit as FLOAT) 
+            CAST(ingredients.price_per_unit as FLOAT)
         FROM
             recipe_ingredients
         INNER JOIN 
@@ -107,12 +107,27 @@ export default class IngredientsService {
     // convert recipe to snake case
     const ingredientSnake = snakeize(ingredient);
     return await this.db.transaction(async (trx) => {
-      const { name, price_per_unit, product_id, category_id, supermarket_id } =
-        ingredientSnake;
+      const {
+        name,
+        price_per_unit,
+        product_id,
+        category_id,
+        supermarket_id,
+        base_value,
+        unit,
+      } = ingredientSnake;
       // insert ingredient
       const result = await this.db('ingredients')
         .insert(
-          { name, price_per_unit, product_id, category_id, supermarket_id },
+          {
+            name,
+            price_per_unit,
+            product_id,
+            category_id,
+            supermarket_id,
+            base_value,
+            unit,
+          },
           ['*'],
         )
         .transacting(trx);

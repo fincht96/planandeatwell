@@ -1,5 +1,27 @@
 import { roundTo2dp } from './roundTo2dp';
 
+export const getFormattedQuantityAndUnitText = (
+  quantity: number,
+  unitOfMeasurement: string,
+) => {
+  const conventionalUnits: { [key: string]: string } = {
+    gram: 'g',
+    kilogram: 'kg',
+    milliliter: 'ml',
+    liter: 'l',
+  };
+
+  const isTraditional = !!Object.keys(conventionalUnits).find(
+    (unit) => unit === unitOfMeasurement,
+  );
+
+  if (isTraditional) {
+    return `(${quantity}` + `${conventionalUnits[unitOfMeasurement]})`;
+  } else {
+    return `(${quantity}` + ' ' + `${unitOfMeasurement})`;
+  }
+};
+
 export const scaleIngredientQuantities = (
   ingredients: Array<any>,
   baseServings: number,
@@ -35,4 +57,19 @@ export const roundUpQuantities = (ingredients: Array<any>) => {
       price,
     };
   });
+};
+
+export const addScalarQuantity = (ingredients: Array<any>) => {
+  return [
+    ...ingredients.map((ingredient) => {
+      return {
+        ...ingredient,
+        scalarQuantity: ingredient.baseValue * ingredient.unitQuantity,
+      };
+    }),
+  ];
+};
+
+export const toTwoSignificantFigures = (num: number) => {
+  return Number(num.toPrecision(2));
 };

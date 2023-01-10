@@ -16,6 +16,10 @@ import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
 import dynamic from 'next/dynamic';
 import { RecipeType } from '../../types/recipe.types';
 import { InstructionType } from '../../types/instruction.types';
+import {
+  getFormattedQuantityAndUnitText,
+  toTwoSignificantFigures,
+} from '../../utils/recipeHelper';
 
 // run import only on client
 const Interweave = dynamic<any>(
@@ -31,11 +35,11 @@ export const RecipeViewDesktop = (
   {
     pricePerServing,
     currentServings,
-    allIngredients,
+    ingredients,
   }: {
     pricePerServing: number;
     currentServings: number;
-    allIngredients: Array<any>;
+    ingredients: Array<any>;
   },
 ) => {
   return (
@@ -157,12 +161,27 @@ export const RecipeViewDesktop = (
               </Text>
             </Box>
             <Box>
-              {allIngredients.map((ingredient: any) => {
+              {ingredients.map((ingredient: any) => {
                 return (
-                  <Box key={ingredient.id} mb={2.5}>
+                  <Box
+                    key={ingredient.id}
+                    mb={2.5}
+                    display="flex"
+                    flexDirection="row"
+                  >
                     <Text>
                       {Math.ceil(ingredient.unitQuantity)} x {ingredient.name}
                     </Text>
+                    <Box ml={1}>
+                      <Text fontWeight={600}>
+                        {getFormattedQuantityAndUnitText(
+                          ingredient.scalarQuantity
+                            ? toTwoSignificantFigures(ingredient.scalarQuantity)
+                            : ingredient.baseValue,
+                          ingredient.unit,
+                        )}
+                      </Text>
+                    </Box>
                   </Box>
                 );
               })}
@@ -180,11 +199,11 @@ export const RecipeViewMobile = (
   {
     pricePerServing,
     currentServings,
-    allIngredients,
+    ingredients,
   }: {
     pricePerServing: number;
     currentServings: number;
-    allIngredients: Array<any>;
+    ingredients: Array<any>;
   },
 ) => {
   return (
@@ -318,13 +337,30 @@ export const RecipeViewMobile = (
                       </Text>
                     </Box>
                     <Box>
-                      {allIngredients.map((ingredient: any) => {
+                      {ingredients.map((ingredient: any) => {
                         return (
-                          <Box key={ingredient.id} mb={2.5}>
+                          <Box
+                            key={ingredient.id}
+                            mb={2.5}
+                            display="flex"
+                            flexDirection="row"
+                          >
                             <Text>
                               {Math.ceil(ingredient.unitQuantity)} x{' '}
                               {ingredient.name}
                             </Text>
+                            <Box ml={1}>
+                              <Text fontWeight={600}>
+                                {getFormattedQuantityAndUnitText(
+                                  ingredient.scalarQuantity
+                                    ? toTwoSignificantFigures(
+                                        ingredient.scalarQuantity,
+                                      )
+                                    : ingredient.baseValue,
+                                  ingredient.unit,
+                                )}
+                              </Text>
+                            </Box>
                           </Box>
                         );
                       })}

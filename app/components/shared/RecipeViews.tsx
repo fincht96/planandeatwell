@@ -17,6 +17,10 @@ import dynamic from 'next/dynamic';
 import { InstructionType } from '../../types/instruction.types';
 import { RecipeType } from '../../types/recipe.types';
 import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
+import {
+  getFormattedQuantityAndUnitText,
+  toTwoSignificantFigures,
+} from '../../utils/recipeBasketHelper';
 import BorderBox from '../BorderBox';
 
 // run import only on client
@@ -35,13 +39,13 @@ export const RecipeViewDesktop = (
     onRemoveRecipeServings,
     pricePerServing,
     currentServings,
-    allIngredients,
+    ingredients,
   }: {
     onAddRecipeServings: (recipe: any, numServings: number) => void;
     onRemoveRecipeServings: (recipe: any, numServings: number) => void;
     pricePerServing: number;
     currentServings: number;
-    allIngredients: Array<any>;
+    ingredients: Array<any>;
   },
 ) => {
   return (
@@ -184,12 +188,32 @@ export const RecipeViewDesktop = (
               </Text>
             </Box>
             <Box>
-              {allIngredients.map((ingredient: any) => {
+              {ingredients.map((ingredient: any) => {
                 return (
-                  <Box key={ingredient.id} mb={2.5}>
+                  <Box
+                    key={ingredient.id}
+                    mb={2.5}
+                    display="flex"
+                    flexDirection="row"
+                  >
                     <Text>
-                      {Math.ceil(ingredient.unitQuantity)} x {ingredient.name}
+                      {currentServings > 0
+                        ? `${Math.ceil(ingredient.unitQuantity)}x `
+                        : ''}
+                      {ingredient.name}
                     </Text>
+                    <Box ml={1}>
+                      <Text fontWeight={600}>
+                        {currentServings > 0
+                          ? getFormattedQuantityAndUnitText(
+                              toTwoSignificantFigures(
+                                ingredient.scalarQuantity,
+                              ),
+                              ingredient.unit,
+                            )
+                          : ''}
+                      </Text>
+                    </Box>
                   </Box>
                 );
               })}
@@ -209,13 +233,13 @@ export const RecipeViewMobile = (
     onRemoveRecipeServings,
     pricePerServing,
     currentServings,
-    allIngredients,
+    ingredients,
   }: {
     onAddRecipeServings: (recipe: any, numServings: number) => void;
     onRemoveRecipeServings: (recipe: any, numServings: number) => void;
     pricePerServing: number;
     currentServings: number;
-    allIngredients: Array<any>;
+    ingredients: Array<any>;
   },
 ) => {
   return (
@@ -369,13 +393,32 @@ export const RecipeViewMobile = (
                       </Text>
                     </Box>
                     <Box>
-                      {allIngredients.map((ingredient: any) => {
+                      {ingredients.map((ingredient: any) => {
                         return (
-                          <Box key={ingredient.id} mb={2.5}>
+                          <Box
+                            key={ingredient.id}
+                            mb={2.5}
+                            display="flex"
+                            flexDirection="row"
+                          >
                             <Text>
-                              {Math.ceil(ingredient.unitQuantity)} x{' '}
+                              {currentServings > 0
+                                ? `${Math.ceil(ingredient.unitQuantity)}x `
+                                : ''}
                               {ingredient.name}
                             </Text>
+                            <Box ml={1}>
+                              <Text fontWeight={600}>
+                                {currentServings > 0
+                                  ? getFormattedQuantityAndUnitText(
+                                      toTwoSignificantFigures(
+                                        ingredient.scalarQuantity,
+                                      ),
+                                      ingredient.unit,
+                                    )
+                                  : ''}
+                              </Text>
+                            </Box>
                           </Box>
                         );
                       })}

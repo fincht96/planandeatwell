@@ -27,6 +27,7 @@ const getRecipeListSchema = Joi.object({
   orderBy: Joi.string().valid('relevance', 'price', 'createdAt'),
   searchTerm: Joi.string().min(2).max(200),
   recipeIds: Joi.array().items(Joi.number()),
+  supermarketId: Joi.string().optional(),
 })
   .and('limit', 'offset')
   .and('order', 'orderBy');
@@ -93,6 +94,7 @@ export default class RecipeController {
 
   async getRecipeList(req: Request, res: Response) {
     try {
+      let supermarketId;
       let meals: Array<string> = [];
       let lifestyles: Array<string> = [];
       let freeFroms: Array<string> = [];
@@ -116,12 +118,17 @@ export default class RecipeController {
         freeFroms = `${req.query.freeFroms}`.split(',');
       }
 
+      if (req.query?.supermarketId) {
+        supermarketId = `${req.query.supermarketId}`;
+      }
+
       const { error, value } = getRecipeListSchema.validate({
         ...req.query,
         meals,
         lifestyles,
         freeFroms,
         recipeIds,
+        supermarketId,
       });
 
       if (error) {

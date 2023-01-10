@@ -9,6 +9,7 @@ import {
   Link,
   Select,
   Text,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -18,8 +19,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FiLink2 } from 'react-icons/fi';
 import { MdModeEdit } from 'react-icons/md';
+import { TiDeleteOutline } from 'react-icons/ti';
 import Editable from '../../components/Editable';
 import Layout from '../../components/layout';
+import ConfirmCancelModal from '../../components/shared/ConfirmCancelModal';
 import { useAuth } from '../../contexts/auth-context';
 import { CustomNextPage } from '../../types/CustomNextPage';
 import { IngredientDecorated } from '../../types/ingredientDecorated.types';
@@ -36,7 +39,11 @@ import {
   scaleIngredientQuantities,
   toTwoSignificantFigures,
 } from '../../utils/recipeBasketHelper';
-import { getMealPlan, updateMealPlan } from '../../utils/requests/meal-plans';
+import {
+  deleteMealPlan,
+  getMealPlan,
+  updateMealPlan,
+} from '../../utils/requests/meal-plans';
 
 const ContentBox = ({
   title,
@@ -388,6 +395,8 @@ const MealPlan: CustomNextPage = () => {
 
   const rowData = generateRowData();
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <Layout includeNavBar={editMode}>
       <Head>
@@ -483,6 +492,59 @@ const MealPlan: CustomNextPage = () => {
               </Flex>
             </Button>
           )}
+          <Button
+            colorScheme="red"
+            color={'white'}
+            fontSize={'1rem'}
+            fontWeight={400}
+            minW={'min-content'}
+            onClick={() => {
+              onOpen();
+            }}
+          >
+            <Flex
+              justifyContent={'space-between'}
+              gap={'0.5rem'}
+              alignItems={'center'}
+            >
+              <Icon
+                as={TiDeleteOutline}
+                width={{ base: '1.5rem' }}
+                height={{ base: '1.5rem' }}
+                color={'white'}
+              />
+              <Text>Delete meal plan</Text>
+            </Flex>
+          </Button>
+          <ConfirmCancelModal
+            isOpen={isOpen}
+            onClose={onClose}
+            headerText="Are you sure you want to delete this meal plan?"
+            confirmColorScheme={'red'}
+            handleConfirmClick={async () => {
+              const response = await deleteMealPlan(authToken, mealPlanUuid);
+
+              if (response.uuid) {
+                toast({
+                  position: 'top',
+                  title: 'Meal plan deleted succesfully',
+                  status: 'success',
+                  duration: 1000,
+                  isClosable: true,
+                });
+                onClose();
+                router.push('/meal-plans');
+              } else {
+                toast({
+                  position: 'top',
+                  title: `Meal plan delete error: ${response}`,
+                  status: 'error',
+                  duration: 1000,
+                  isClosable: true,
+                });
+              }
+            }}
+          />
         </Flex>
         <Grid
           templateColumns={{

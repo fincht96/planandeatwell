@@ -110,3 +110,18 @@ export const updateMealPlan = (
     return camelize(json.result);
   });
 };
+
+export const deleteMealPlan = (token: string, mealPlanUuid: string): any => {
+  return fetch(`${process.env.NEXT_PUBLIC_API_URL}/meal-plan/${mealPlanUuid}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(async (res) => {
+    const json = await res.json();
+    if (json?.errors.length) {
+      throw json.errors[0];
+    }
+    return camelize(json.result);
+  });
+};

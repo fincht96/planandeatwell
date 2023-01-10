@@ -64,6 +64,7 @@ const Menu: CustomNextPage = () => {
     order: Order;
     orderBy: OrderBy;
     searchTerm: string;
+    supermarketId: string | undefined;
   }>({
     limit: 8,
     offset: 0,
@@ -73,6 +74,10 @@ const Menu: CustomNextPage = () => {
     order: 'any',
     orderBy: 'relevance',
     searchTerm: '',
+    supermarketId:
+      typeof router.query['supermarketId'] === 'string'
+        ? router.query['supermarketId']
+        : undefined,
   });
   const [queryParamsInitialised, setQueryParamsInitialised] = useState(false);
   const [totalCountRecipes, setTotalCountRecipes] = useState(0);
@@ -100,6 +105,7 @@ const Menu: CustomNextPage = () => {
     mutationFn: ({
       updateExisting,
       mealPlan,
+      supermarketId,
     }: {
       updateExisting: boolean;
       mealPlan: {
@@ -109,10 +115,11 @@ const Menu: CustomNextPage = () => {
         ingredientsCount: number;
         recipesCount: number;
       };
+      supermarketId: string;
     }) => {
       return updateExisting
         ? updateMealPlan(authToken, mealPlanQueryParams.uuid, mealPlan)
-        : insertMealPlan(authToken, mealPlan);
+        : insertMealPlan(authToken, { ...mealPlan, supermarketId });
     },
     onSuccess: (data: any) => {
       return onNavigate(`/meal-plans/${data.uuid}`);
@@ -135,6 +142,7 @@ const Menu: CustomNextPage = () => {
         order,
         orderBy,
         searchTerm,
+        supermarketId,
       } = recipeQueryParams;
       return getRecipes({
         includeIngredientsWithRecipes: true,
@@ -146,6 +154,7 @@ const Menu: CustomNextPage = () => {
         order,
         orderBy,
         searchTerm,
+        supermarketId,
       });
     },
     {
@@ -168,8 +177,8 @@ const Menu: CustomNextPage = () => {
   useQuery({
     queryKey: ['mealPlanQuery', mealPlanQueryParams.uuid],
     queryFn: () => {
-      const uuid = mealPlanQueryParams.uuid;
-      return getMealPlan(uuid);
+      const mealPlanUuid = mealPlanQueryParams.uuid;
+      return getMealPlan({ mealPlanUuid });
     },
     staleTime: 0,
     refetchOnMount: 'always',
@@ -227,6 +236,7 @@ const Menu: CustomNextPage = () => {
         ...current,
         uuid,
       }));
+
       setQueryParamsInitialised(true);
     }
   }, [router.isReady, queryParamsInitialised, router.query]);
@@ -448,6 +458,7 @@ const Menu: CustomNextPage = () => {
           const totalPrice = totalBasketPrice;
           const ingredientsCount = ingredientsBasket.length;
           const recipesCount = recipeBasket.length;
+          const supermarketId = router.query['supermarketId'] as string;
 
           mealPlanMutation.mutate({
             updateExisting: !!mealPlanQueryParams.uuid.length,
@@ -463,6 +474,7 @@ const Menu: CustomNextPage = () => {
               ingredientsCount,
               recipesCount,
             },
+            supermarketId,
           });
         }}
       />

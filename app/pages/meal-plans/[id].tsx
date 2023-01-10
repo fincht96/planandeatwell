@@ -26,6 +26,7 @@ import ConfirmCancelModal from '../../components/shared/ConfirmCancelModal';
 import { useAuth } from '../../contexts/auth-context';
 import { CustomNextPage } from '../../types/CustomNextPage';
 import { IngredientDecorated } from '../../types/ingredientDecorated.types';
+import { MealPlanWithSupermarketDetailsType } from '../../types/mealPlan.types';
 import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
 import { groupObjects } from '../../utils/groupObjects';
 import {
@@ -98,6 +99,8 @@ const ContentBox = ({
 type PermittedIngredientsViewStates = 'ALL' | 'RECIPE' | 'CATEGORY';
 
 const MealPlan: CustomNextPage = () => {
+  const [mealPlan, setMealPlan] =
+    useState<MealPlanWithSupermarketDetailsType | null>(null);
   const { authToken, user, authClaims } = useAuth();
   const toast = useToast();
   const router = useRouter();
@@ -111,10 +114,14 @@ const MealPlan: CustomNextPage = () => {
 
   const mealPlanQuery = useQuery({
     queryKey: [`recipesQuery-${mealPlanUuid}`],
-    queryFn: () => getMealPlan(mealPlanUuid),
+    queryFn: () =>
+      getMealPlan({ mealPlanUuid, includeSupermarketDetails: true }),
     refetchOnMount: 'always',
     staleTime: Infinity,
     enabled: !!mealPlanUuid.length,
+    onSuccess: (data: MealPlanWithSupermarketDetailsType) => {
+      setMealPlan(data);
+    },
   });
 
   const mealPlanMutation = useMutation({
@@ -402,13 +409,15 @@ const MealPlan: CustomNextPage = () => {
       <Head>
         <title>Meal Plan | Plan and Eat Well</title>
       </Head>
-
       <Container my={'2rem'} maxW={'1100px'}>
+        <Box>
+          <Text>Ingredients from: {mealPlan?.supermarketName}</Text>
+        </Box>
         <Flex
           justifyContent={'space-between'}
           alignItems={'center'}
           gap={'5rem'}
-          mb={'2rem'}
+          my={'1rem'}
         >
           <Box flex={1}>
             <Editable
@@ -461,61 +470,62 @@ const MealPlan: CustomNextPage = () => {
             </Flex>
           </Button>
           {editMode && (
-            <Button
-              bg={'#ffffff'}
-              border={'solid 1px'}
-              borderColor={'brand.500'}
-              color={'brand.500'}
-              fontSize={'1rem'}
-              fontWeight={400}
-              minW={'min-content'}
-              onClick={() => {
-                onNavigate('/create-plan/menu', {
-                  supermarket: 'aldi',
-                  servings: 4,
-                  meal_plan_uuid: mealPlanUuid,
-                });
-              }}
-            >
-              <Flex
-                justifyContent={'space-between'}
-                alignItems={'center'}
-                gap={'0.5rem'}
+            <>
+              <Button
+                bg={'#ffffff'}
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                color={'brand.500'}
+                fontSize={'1rem'}
+                fontWeight={400}
+                minW={'min-content'}
+                onClick={() => {
+                  onNavigate('/create-plan/menu', {
+                    supermarketId: mealPlan?.supermarketId.toString(),
+                    meal_plan_uuid: mealPlanUuid,
+                  });
+                }}
               >
-                <Icon
-                  as={MdModeEdit}
-                  width={{ base: '1.2rem' }}
-                  height={{ base: '1.2rem' }}
-                  color={'brand.500'}
-                />
-                <Text>Edit meal plan</Text>
-              </Flex>
-            </Button>
-          )}
-          <Button
-            colorScheme="red"
-            color={'white'}
-            fontSize={'1rem'}
-            fontWeight={400}
-            minW={'min-content'}
-            onClick={() => {
-              onOpen();
-            }}
-          >
-            <Flex
-              justifyContent={'space-between'}
-              gap={'0.5rem'}
-              alignItems={'center'}
-            >
-              <Icon
-                as={TiDeleteOutline}
-                width={{ base: '1.5rem' }}
-                height={{ base: '1.5rem' }}
+                <Flex
+                  justifyContent={'space-between'}
+                  alignItems={'center'}
+                  gap={'0.5rem'}
+                >
+                  <Icon
+                    as={MdModeEdit}
+                    width={{ base: '1.2rem' }}
+                    height={{ base: '1.2rem' }}
+                    color={'brand.500'}
+                  />
+                  <Text>Edit meal plan</Text>
+                </Flex>
+              </Button>
+              <Button
+                colorScheme="red"
                 color={'white'}
-              />
-              <Text>Delete meal plan</Text>
-            </Flex>
-          </Button>
+                fontSize={'1rem'}
+                fontWeight={400}
+                minW={'min-content'}
+                onClick={() => {
+                  onOpen();
+                }}
+              >
+                <Flex
+                  justifyContent={'space-between'}
+                  gap={'0.5rem'}
+                  alignItems={'center'}
+                >
+                  <Icon
+                    as={TiDeleteOutline}
+                    width={{ base: '1.5rem' }}
+                    height={{ base: '1.5rem' }}
+                    color={'white'}
+                  />
+                  <Text>Delete meal plan</Text>
+                </Flex>
+              </Button>
+            </>
+          )}
           <ConfirmCancelModal
             isOpen={isOpen}
             onClose={onClose}

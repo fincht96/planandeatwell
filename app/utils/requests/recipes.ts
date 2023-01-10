@@ -21,6 +21,7 @@ export const getRecipes = ({
   order,
   orderBy,
   searchTerm,
+  supermarketId,
 }: {
   includeIngredientsWithRecipes: boolean;
   offset: number;
@@ -31,6 +32,7 @@ export const getRecipes = ({
   order?: string | undefined;
   orderBy?: string | undefined;
   searchTerm?: string | undefined;
+  supermarketId?: string | undefined;
 }) => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/recipes`);
   const params = new URLSearchParams({
@@ -43,6 +45,7 @@ export const getRecipes = ({
     ...(order && { order }),
     ...(orderBy && { orderBy }),
     ...(searchTerm && { searchTerm }),
+    ...(supermarketId && { supermarketId }),
   });
 
   url.search = params.toString();

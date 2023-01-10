@@ -226,6 +226,7 @@ export default class MealPlanController {
       // remove meal plan from db
       const removedMealPlan = await this.mealPlanService.removeMealPlan(
         value.mealPlanUuid,
+        req.user.planandeatwell_id,
       );
 
       return res.status(200).json({

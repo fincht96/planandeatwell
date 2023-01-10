@@ -40,12 +40,10 @@ const Recipe: NextPage = ({ recipe }: any) => {
       if (recipe.baseServings !== selectedServings) {
         // if base serving does not equal selected serving use selected servings to calculate ingredients and price per serving
         const decoratedIngredients = addScalarQuantity(
-          roundUpQuantities(
-            scaleIngredientQuantities(
-              recipe.ingredientsList,
-              recipe.baseServings,
-              selectedServings,
-            ),
+          scaleIngredientQuantities(
+            recipe.ingredientsList,
+            recipe.baseServings,
+            selectedServings,
           ),
         );
 

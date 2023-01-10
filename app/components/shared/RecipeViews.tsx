@@ -17,7 +17,10 @@ import dynamic from 'next/dynamic';
 import { InstructionType } from '../../types/instruction.types';
 import { RecipeType } from '../../types/recipe.types';
 import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
-import { getFormattedQuantityAndUnitText } from '../../utils/recipeBasketHelper';
+import {
+  getFormattedQuantityAndUnitText,
+  toTwoSignificantFigures,
+} from '../../utils/recipeBasketHelper';
 import BorderBox from '../BorderBox';
 
 // run import only on client
@@ -194,16 +197,21 @@ export const RecipeViewDesktop = (
                     flexDirection="row"
                   >
                     <Text>
-                      {Math.ceil(ingredient.unitQuantity)} x {ingredient.name}
+                      {currentServings > 0
+                        ? `${Math.ceil(ingredient.unitQuantity)}x `
+                        : ''}
+                      {ingredient.name}
                     </Text>
                     <Box ml={1}>
                       <Text fontWeight={600}>
-                        {getFormattedQuantityAndUnitText(
-                          currentServings > 0
-                            ? ingredient.scalarQuantity
-                            : ingredient.baseValue,
-                          ingredient.unit,
-                        )}
+                        {currentServings > 0
+                          ? getFormattedQuantityAndUnitText(
+                              toTwoSignificantFigures(
+                                ingredient.scalarQuantity,
+                              ),
+                              ingredient.unit,
+                            )
+                          : ''}
                       </Text>
                     </Box>
                   </Box>
@@ -394,17 +402,21 @@ export const RecipeViewMobile = (
                             flexDirection="row"
                           >
                             <Text>
-                              {Math.ceil(ingredient.unitQuantity)} x{' '}
+                              {currentServings > 0
+                                ? `${Math.ceil(ingredient.unitQuantity)}x `
+                                : ''}
                               {ingredient.name}
                             </Text>
                             <Box ml={1}>
                               <Text fontWeight={600}>
-                                {getFormattedQuantityAndUnitText(
-                                  currentServings > 0
-                                    ? ingredient.scalarQuantity
-                                    : ingredient.baseValue,
-                                  ingredient.unit,
-                                )}
+                                {currentServings > 0
+                                  ? getFormattedQuantityAndUnitText(
+                                      toTwoSignificantFigures(
+                                        ingredient.scalarQuantity,
+                                      ),
+                                      ingredient.unit,
+                                    )
+                                  : ''}
                               </Text>
                             </Box>
                           </Box>

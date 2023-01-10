@@ -30,8 +30,11 @@ import {
   addScalarQuantity,
   calcTotalIngredientsPrice,
   getFormattedQuantityAndUnitText,
+  getIngredientPrice,
+  roundUpIngredientUnitQuantity,
   roundUpQuantities,
   scaleIngredientQuantities,
+  toTwoSignificantFigures,
 } from '../../utils/recipeBasketHelper';
 import { getMealPlan, updateMealPlan } from '../../utils/requests/meal-plans';
 
@@ -218,9 +221,8 @@ const MealPlan: CustomNextPage = () => {
   const generateRowData = () => {
     if (ingredientView === 'ALL') {
       // round up unit quantities of ingredients
-      const decoratedIngredients = addScalarQuantity(
-        roundUpQuantities(ingredients),
-      );
+      const decoratedIngredients = addScalarQuantity(ingredients);
+
       return decoratedIngredients?.map((ingredient: IngredientDecorated) => ({
         id: ingredient.id,
         content: (
@@ -231,20 +233,20 @@ const MealPlan: CustomNextPage = () => {
                 fontSize={{ base: '0.9rem', md: '1rem' }}
                 mr={1}
               >
-                {ingredient.unitQuantity}x {ingredient.name}
+                {roundUpIngredientUnitQuantity(ingredient)}x {ingredient.name}
               </Text>
               <Text
                 color={'gray.dark'}
                 fontSize={{ base: '0.9rem', md: '1rem' }}
               >
                 {getFormattedQuantityAndUnitText(
-                  ingredient.scalarQuantity,
+                  toTwoSignificantFigures(ingredient.scalarQuantity),
                   ingredient.unit,
                 )}
               </Text>
             </Box>
             <Text color={'gray.dark'} fontSize={{ base: '0.9rem', md: '1rem' }}>
-              £{ingredient.price.toFixed(2)}
+              £{getIngredientPrice(ingredient)}
             </Text>
           </Flex>
         ),
@@ -260,9 +262,7 @@ const MealPlan: CustomNextPage = () => {
           recipeWithServings.servings,
         );
 
-        const decoratedIngredients = addScalarQuantity(
-          roundUpQuantities(ingredients),
-        );
+        const decoratedIngredients = addScalarQuantity(ingredients);
 
         return {
           id: recipeWithServings.recipe.id,
@@ -295,7 +295,7 @@ const MealPlan: CustomNextPage = () => {
                       fontSize={{ base: '0.9rem', md: '1rem' }}
                     >
                       {getFormattedQuantityAndUnitText(
-                        ingredient.scalarQuantity,
+                        toTwoSignificantFigures(ingredient.scalarQuantity),
                         ingredient.unit,
                       )}
                     </Text>
@@ -309,9 +309,7 @@ const MealPlan: CustomNextPage = () => {
     }
 
     if (ingredientView === 'CATEGORY') {
-      const decoratedIngredients = addScalarQuantity(
-        roundUpQuantities(ingredients),
-      );
+      const decoratedIngredients = addScalarQuantity(ingredients);
       const ingredientsGroupedByCategoryArray = groupObjects(
         decoratedIngredients,
         'categoryName',
@@ -343,14 +341,15 @@ const MealPlan: CustomNextPage = () => {
                           fontSize={{ base: '0.9rem', md: '1rem' }}
                           mr={1}
                         >
-                          {ingredient.unitQuantity}x {ingredient.name}
+                          {roundUpIngredientUnitQuantity(ingredient)}x{' '}
+                          {ingredient.name}
                         </Text>
                         <Text
                           color={'gray.dark'}
                           fontSize={{ base: '0.9rem', md: '1rem' }}
                         >
                           {getFormattedQuantityAndUnitText(
-                            ingredient.scalarQuantity,
+                            toTwoSignificantFigures(ingredient.scalarQuantity),
                             ingredient.unit,
                           )}
                         </Text>
@@ -359,7 +358,7 @@ const MealPlan: CustomNextPage = () => {
                         color={'gray.dark'}
                         fontSize={{ base: '0.9rem', md: '1rem' }}
                       >
-                        £{ingredient.price.toFixed(2)}
+                        £{getIngredientPrice(ingredient)}
                       </Text>
                     </Flex>
                   );

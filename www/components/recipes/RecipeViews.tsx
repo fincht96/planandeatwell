@@ -16,7 +16,10 @@ import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
 import dynamic from 'next/dynamic';
 import { RecipeType } from '../../types/recipe.types';
 import { InstructionType } from '../../types/instruction.types';
-import { getFormattedQuantityAndUnitText } from '../../utils/recipeHelper';
+import {
+  getFormattedQuantityAndUnitText,
+  toTwoSignificantFigures,
+} from '../../utils/recipeHelper';
 
 // run import only on client
 const Interweave = dynamic<any>(
@@ -173,7 +176,7 @@ export const RecipeViewDesktop = (
                       <Text fontWeight={600}>
                         {getFormattedQuantityAndUnitText(
                           ingredient.scalarQuantity
-                            ? ingredient.scalarQuantity
+                            ? toTwoSignificantFigures(ingredient.scalarQuantity)
                             : ingredient.baseValue,
                           ingredient.unit,
                         )}
@@ -350,7 +353,9 @@ export const RecipeViewMobile = (
                               <Text fontWeight={600}>
                                 {getFormattedQuantityAndUnitText(
                                   ingredient.scalarQuantity
-                                    ? ingredient.scalarQuantity
+                                    ? toTwoSignificantFigures(
+                                        ingredient.scalarQuantity,
+                                      )
                                     : ingredient.baseValue,
                                   ingredient.unit,
                                 )}

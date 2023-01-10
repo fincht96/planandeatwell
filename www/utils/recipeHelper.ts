@@ -1,7 +1,7 @@
 import { roundTo2dp } from './roundTo2dp';
 
 export const getFormattedQuantityAndUnitText = (
-  scalarQuantity: number,
+  quantity: number,
   unitOfMeasurement: string,
 ) => {
   const conventionalUnits: { [key: string]: string } = {
@@ -16,9 +16,9 @@ export const getFormattedQuantityAndUnitText = (
   );
 
   if (isTraditional) {
-    return `(${scalarQuantity}` + `${conventionalUnits[unitOfMeasurement]})`;
+    return `(${quantity}` + `${conventionalUnits[unitOfMeasurement]})`;
   } else {
-    return `(${scalarQuantity}` + ' ' + `${unitOfMeasurement})`;
+    return `(${quantity}` + ' ' + `${unitOfMeasurement})`;
   }
 };
 
@@ -68,4 +68,8 @@ export const addScalarQuantity = (ingredients: Array<any>) => {
       };
     }),
   ];
+};
+
+export const toTwoSignificantFigures = (num: number) => {
+  return Number(num.toPrecision(2));
 };

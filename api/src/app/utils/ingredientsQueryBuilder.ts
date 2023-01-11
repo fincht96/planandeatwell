@@ -31,3 +31,12 @@ export const ingredientQueryOrdering =
 
     return queryBuilder;
   };
+
+export const matchingSupermarketId =
+  ({ supermarketId }: { supermarketId: number | null }) =>
+  (queryBuilder: Knex.QueryBuilder) => {
+    if (supermarketId) {
+      queryBuilder.andWhere('ingredients.supermarket_id', supermarketId);
+    }
+    return queryBuilder;
+  };

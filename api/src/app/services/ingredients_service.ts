@@ -16,15 +16,6 @@ export default class IngredientsService {
     this.db = db;
   }
 
-  private matchingSupermarketId =
-    ({ supermarketId }: { supermarketId: number | null }) =>
-    (queryBuilder: Knex.QueryBuilder) => {
-      if (supermarketId) {
-        queryBuilder.andWhere('ingredients.supermarket_id', supermarketId);
-      }
-      return queryBuilder;
-    };
-
   async getIngredients({
     offset = 0,
     limit = 10,

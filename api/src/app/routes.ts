@@ -82,7 +82,7 @@ router.get(
   },
 );
 
-router.get('/meal-plan/:id', (req: Request, res: Response) => {
+router.get('/meal-plan/:mealPlanUuid', (req: Request, res: Response) => {
   req.container.resolve('mealPlanController').getMealPlan(req, res);
 });
 
@@ -95,7 +95,7 @@ router.post(
 );
 
 router.put(
-  '/meal-plan/:id',
+  '/meal-plan/:mealPlanUuid',
   isAuthenticated('user'),
   (req: Request, res: Response) => {
     req.container.resolve('mealPlanController').updateMealPlan(req, res);

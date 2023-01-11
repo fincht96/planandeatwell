@@ -8,8 +8,8 @@ import { CustomNextPage } from '../../types/CustomNextPage';
 const Steps: CustomNextPage = () => {
   const router = useRouter();
 
-  const onNavigate = (pathname: string, query: any) => {
-    router.push({ pathname, query });
+  const onNavigate = (pathname: string) => {
+    router.push(pathname);
   };
 
   return (
@@ -71,7 +71,7 @@ const Steps: CustomNextPage = () => {
               fontSize={{ base: '1.2rem', md: '1.5rem' }}
               fontWeight={600}
               padding={'1.5rem 1rem'}
-              onClick={() => onNavigate('/create-plan/menu', router.query)}
+              onClick={() => onNavigate('/supermarket')}
             >
               Get started
             </Button>

@@ -10,6 +10,7 @@ const MealPlan = ({
   ingredientsCount,
   totalServings,
   totalPrice,
+  supermarketName,
 }: {
   uuid: string;
   name: string;
@@ -17,6 +18,7 @@ const MealPlan = ({
   ingredientsCount: number;
   totalServings: number;
   totalPrice: number;
+  supermarketName: string;
 }) => {
   return (
     <BorderBox
@@ -40,7 +42,8 @@ const MealPlan = ({
             fontSize={'sm'}
           >
             {recipesCount} recipes | {ingredientsCount} ingredients <br />
-            {totalServings} servings | total price £{totalPrice}
+            {totalServings} servings | total price £{totalPrice} <br />
+            ingredients from {supermarketName}
           </Text>
         </Flex>
 

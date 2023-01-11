@@ -84,6 +84,7 @@ const MealPlans: CustomNextPage = () => {
           limit,
           offset,
           includeCount: true,
+          includeSupermarketDetails: true,
         });
       }
     },
@@ -222,6 +223,7 @@ const MealPlans: CustomNextPage = () => {
                   ingredientsCount={mealPlan.ingredientsCount}
                   totalServings={mealPlan.totalServings}
                   totalPrice={mealPlan.totalPrice}
+                  supermarketName={mealPlan.supermarketName}
                 />
               );
             })}

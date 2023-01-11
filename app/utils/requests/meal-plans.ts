@@ -9,6 +9,7 @@ export const getMealPlans = ({
   orderBy,
   searchTerm,
   includeCount,
+  includeSupermarketDetails,
 }: {
   token: string;
   userId: number;
@@ -18,6 +19,7 @@ export const getMealPlans = ({
   orderBy?: string | undefined;
   searchTerm?: string | undefined;
   includeCount?: boolean | undefined;
+  includeSupermarketDetails?: boolean | undefined;
 }) => {
   const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/meal-plans`);
   const params = new URLSearchParams({
@@ -28,6 +30,9 @@ export const getMealPlans = ({
     ...(orderBy && { orderBy }),
     ...(searchTerm && { searchTerm }),
     ...(includeCount && { includeCount: includeCount.toString() }),
+    ...(includeSupermarketDetails && {
+      includeSupermarketDetails: includeSupermarketDetails.toString(),
+    }),
   });
 
   url.search = params.toString();
@@ -45,10 +50,26 @@ export const getMealPlans = ({
   });
 };
 
-export const getMealPlan = (mealPlanUuid: string) => {
-  return fetch(
+export const getMealPlan = ({
+  mealPlanUuid,
+  includeSupermarketDetails,
+}: {
+  mealPlanUuid: string;
+  includeSupermarketDetails?: boolean | undefined;
+}) => {
+  const url = new URL(
     `${process.env.NEXT_PUBLIC_API_URL}/meal-plan/${mealPlanUuid}`,
-  ).then(async (res) => {
+  );
+
+  const params = new URLSearchParams({
+    ...(includeSupermarketDetails && {
+      includeSupermarketDetails: includeSupermarketDetails.toString(),
+    }),
+  });
+
+  url.search = params.toString();
+
+  return fetch(url).then(async (res) => {
     const json = await res.json();
     if (json?.errors.length) {
       throw json.errors[0];
@@ -65,6 +86,7 @@ export const insertMealPlan = (
     totalPrice: number;
     ingredientsCount: number;
     recipesCount: number;
+    supermarketId: string;
   },
 ) => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/meal-plan`, {
@@ -93,6 +115,7 @@ export const updateMealPlan = (
     totalPrice: number;
     ingredientsCount: number;
     recipesCount: number;
+    supermarketId?: string | undefined;
   },
 ) => {
   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/meal-plan/${mealPlanUuid}`, {

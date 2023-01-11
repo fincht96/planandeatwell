@@ -4,6 +4,7 @@ import {
   matchingCreatedByQuery,
   mealPlanQueryOrdering,
   mealPlanQuerySearch,
+  getMealPlanQuery,
 } from '../utils/mealPlanQueryBuilder';
 import { roundTo2dp } from '../utils/roundTo2dp';
 import RecipeService from './recipe_service';
@@ -42,6 +43,7 @@ export default class MealPlanService {
     order = 'any',
     orderBy = 'relevance',
     searchTerm = '',
+    includeSupermarketDetails = false,
   }: {
     userId: number;
     offset?: number;
@@ -49,9 +51,10 @@ export default class MealPlanService {
     order?: 'asc' | 'desc' | 'any';
     orderBy?: 'relevance' | 'createdAt';
     searchTerm?: string;
+    includeSupermarketDetails?: boolean;
   }) {
     return (
-      getMealPlansBaseQuery(this.db)
+      getMealPlansBaseQuery(this.db, includeSupermarketDetails)
         // only single userId is used, though multiple userIds is supported
         .modify(matchingCreatedByQuery({ userIds: [userId] }))
         .modify(
@@ -70,11 +73,21 @@ export default class MealPlanService {
     );
   }
 
-  async getPlan(uuid: string) {
-    // get meal plan
-    const mealPlanResult = await this.db('meal_plans')
-      .select(this.db.raw('id, created_at, created_by::INTEGER, name, uuid'))
-      .where('uuid', uuid);
+  async getPlan({
+    mealPlanUuid,
+    includeSupermarketDetails = false,
+  }: {
+    mealPlanUuid: string;
+    includeSupermarketDetails?: boolean;
+  }) {
+    // get single meal plan using a meal plan uuid
+    const mealPlanQueryBuilder = getMealPlanQuery(
+      this.db,
+      includeSupermarketDetails,
+    ).where('uuid', mealPlanUuid);
+
+    const mealPlanResult = await mealPlanQueryBuilder;
+
     const { id: planId } = mealPlanResult[0];
 
     // get recipe ids and # servings associated with meal plan
@@ -115,11 +128,15 @@ export default class MealPlanService {
     totalPrice: number,
     ingredientsCount: number,
     recipesCount: number,
+    supermarketId: number,
   ) {
     return await this.db.transaction(async (trx) => {
       // create a meal plan
       const result = await this.db('meal_plans')
-        .insert({ created_by: userId }, ['id', 'uuid'])
+        .insert({ created_by: userId, supermarket_id: supermarketId }, [
+          'id',
+          'uuid',
+        ])
         .transacting(trx);
 
       // insert meal_plan_recipes with associated meal_plan.id and # servings
@@ -161,6 +178,7 @@ export default class MealPlanService {
     totalPrice,
     ingredientsCount,
     recipesCount,
+    supermarketId,
   }: {
     userId: number;
     uuid: string;
@@ -170,6 +188,7 @@ export default class MealPlanService {
     totalPrice: number;
     ingredientsCount: number;
     recipesCount: number;
+    supermarketId?: number | undefined;
   }) {
     return await this.db.transaction(async (trx) => {
       // find meal plan with uuid and created by user
@@ -207,6 +226,15 @@ export default class MealPlanService {
           .where('uuid', uuid)
           .andWhere('created_by', userId)
           .update({ name })
+          .transacting(trx);
+      }
+
+      // update supermarket id (useful if in the future we want to allow users to alter supermarket of their meal plan)
+      if (supermarketId) {
+        await this.db('meal_plans')
+          .where('uuid', uuid)
+          .andWhere('created_by', userId)
+          .update({ supermarket_id: supermarketId })
           .transacting(trx);
       }
 

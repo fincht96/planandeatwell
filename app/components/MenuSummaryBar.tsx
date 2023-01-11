@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  useColorModeValue,
-  useDisclosure,
-  useMediaQuery,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, useColorModeValue } from '@chakra-ui/react';
 import CartMenu from './CartMenu';
 
 export default function MenuSummaryBar({
@@ -21,9 +14,6 @@ export default function MenuSummaryBar({
   servings: any;
   onComplete: any;
 }) {
-  const { isOpen, onToggle } = useDisclosure();
-  const [isLessThan500] = useMediaQuery('(max-width: 500px)');
-
   return (
     <Box
       sx={{

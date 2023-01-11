@@ -4,6 +4,11 @@ import MealPlanService from '../services/meal_plan_service';
 import validator from 'validator';
 import Joi from 'joi';
 
+const getMealPlanSchema = Joi.object({
+  mealPlanUuid: Joi.string().required(),
+  includeSupermarketDetails: Joi.boolean().default(false),
+});
+
 const insertMealPlanSchema = Joi.object({
   recipeIdList: Joi.array()
     .items(
@@ -18,6 +23,7 @@ const insertMealPlanSchema = Joi.object({
   totalPrice: Joi.number().min(0).required(),
   ingredientsCount: Joi.number().min(0).required(),
   recipesCount: Joi.number().min(0).required(),
+  supermarketId: Joi.number().min(1).required(),
 });
 
 const updateMealPlanSchema = Joi.object({
@@ -34,6 +40,7 @@ const updateMealPlanSchema = Joi.object({
   totalPrice: Joi.number().min(0).required(),
   ingredientsCount: Joi.number().min(0).required(),
   recipesCount: Joi.number().min(0).required(),
+  supermarketId: Joi.string().optional(),
 })
   .or('name', 'recipeIdList')
   .and('totalServings', 'totalPrice', 'ingredientsCount', 'recipesCount');
@@ -46,6 +53,7 @@ const getMealPlansQuerySchema = Joi.object({
   orderBy: Joi.string().valid('relevance', 'createdAt'),
   searchTerm: Joi.string().min(2).max(200),
   includeCount: Joi.boolean().default(false),
+  includeSupermarketDetails: Joi.boolean().default(false),
 });
 
 const removeMealPlanSchema = Joi.object({
@@ -72,6 +80,7 @@ export default class MealPlanController {
       }
 
       const mealPlans = await this.mealPlanService.getManyPlans(value);
+
       let count = null;
 
       if (value.includeCount) {
@@ -95,14 +104,19 @@ export default class MealPlanController {
 
   async getMealPlan(req: Request, res: Response) {
     try {
-      // validate params
-      const mealPlanUuid = req.params.id + '';
+      // validate param and queries
+      const mealPlanUuid = req.params.mealPlanUuid + '';
 
-      if (!validator.isUUID(mealPlanUuid)) {
-        throw new Error('Invalid meal plan UUID argument');
+      const { error, value } = getMealPlanSchema.validate({
+        ...req.query,
+        mealPlanUuid,
+      });
+
+      if (error) {
+        throw new Error(error.message);
       }
 
-      const plan = await this.mealPlanService.getPlan(mealPlanUuid);
+      const plan = await this.mealPlanService.getPlan(value);
 
       return res.status(200).json({
         result: plan,
@@ -132,6 +146,7 @@ export default class MealPlanController {
         totalPrice,
         ingredientsCount,
         recipesCount,
+        supermarketId,
       } = value;
 
       const uuid = await this.mealPlanService.createPlan(
@@ -141,6 +156,7 @@ export default class MealPlanController {
         totalPrice,
         ingredientsCount,
         recipesCount,
+        supermarketId,
       );
 
       await this.eventsService.insert(
@@ -166,8 +182,8 @@ export default class MealPlanController {
 
   async updateMealPlan(req: Request, res: Response) {
     try {
-      // validate params
-      const mealPlanUuid = req.params.id + '';
+      // validate param
+      const mealPlanUuid = req.params.mealPlanUuid + '';
 
       if (!validator.isUUID(mealPlanUuid)) {
         throw new Error('Invalid meal plan UUID argument');
@@ -188,6 +204,7 @@ export default class MealPlanController {
         totalPrice,
         ingredientsCount,
         recipesCount,
+        supermarketId,
       } = value;
 
       // get all recipes and optional ingredients
@@ -201,6 +218,7 @@ export default class MealPlanController {
           totalPrice,
           ingredientsCount,
           recipesCount,
+          supermarketId,
         });
 
       return res.status(200).json({

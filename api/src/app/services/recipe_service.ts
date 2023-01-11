@@ -73,6 +73,15 @@ export default class RecipeService {
       return queryBuilder;
     };
 
+  private recipeQueryWhereSupermarketId =
+    ({ supermarketId }: { supermarketId: string | undefined }) =>
+    (queryBuilder: Knex.QueryBuilder) => {
+      if (supermarketId) {
+        queryBuilder.where('recipes.supermarket_id', supermarketId);
+      }
+      return queryBuilder;
+    };
+
   private recipeQueryOrdering =
     ({
       order,
@@ -109,6 +118,7 @@ export default class RecipeService {
           recipes.free_from_type,
           recipes.prep_time,
           recipes.cook_time,
+          recipes.supermarket_id,
           supermarkets.name as supermarket_name,
           recipe_metrics.price_per_serving,
           recipe_metrics.ingredients_count,
@@ -184,6 +194,7 @@ export default class RecipeService {
     orderBy = 'relevance',
     searchTerm = '',
     recipeIds = [],
+    supermarketId,
   }: {
     includeIngredientsWithRecipes: boolean;
     offset?: number;
@@ -197,6 +208,7 @@ export default class RecipeService {
     orderBy?: 'relevance' | 'price' | 'createdAt';
     searchTerm?: string;
     recipeIds?: Array<number>;
+    supermarketId?: string | undefined;
   }) {
     const recipesQueryBuilder = this.getRecipesQuery(
       includeIngredientsWithRecipes,
@@ -220,12 +232,14 @@ export default class RecipeService {
           orderBy,
         }),
       )
+      .modify(this.recipeQueryWhereSupermarketId({ supermarketId }))
       .offset(offset)
       .limit(limit);
 
     const countBuilder = this.db
       .count('*')
       .from('recipes')
+      .modify(this.recipeQueryWhereSupermarketId({ supermarketId }))
       .modify(this.matchingRecipeIds({ recipeIds }))
       .modify(
         this.recipeQueryFilters({

@@ -375,7 +375,9 @@ on
 group by 
 	recipe_id, base_servings
 ) as all_recipe_metrics
-ON CONFLICT (id) DO UPDATE SET price_per_serving=EXCLUDED.price_per_serving;
+ON CONFLICT (id) DO UPDATE SET 
+  price_per_serving=EXCLUDED.price_per_serving, 
+  ingredients_count=EXCLUDED.ingredients_count;
 `);
   }
 }

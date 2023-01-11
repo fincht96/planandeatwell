@@ -71,3 +71,25 @@ export const deleteIngredient = (token: string, id: number) => {
     return camelize(json.result);
   });
 };
+
+export const updateIngredientPrices = (
+  token: string,
+  supermarketId: number,
+) => {
+  return fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredients/update-prices`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      supermarketId,
+    }),
+  }).then(async (res) => {
+    const json = await res.json();
+    if (json?.errors.length) {
+      throw json.errors[0];
+    }
+    return camelize(json.result);
+  });
+};

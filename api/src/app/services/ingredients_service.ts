@@ -8,11 +8,20 @@ import {
   getIngredientsBaseQuery,
   ingredientQueryOrdering,
   matchingIngredientIds,
+  matchingSupermarketId,
 } from '../utils/ingredientsQueryBuilder';
+import FetchService from './fetch_service';
+import RecipeService from './recipe_service';
+import MealPlanService from './meal_plan_service';
 
 export default class IngredientsService {
   private db: Knex;
-  constructor(db: Knex) {
+  constructor(
+    db: Knex,
+    private fetchService: FetchService,
+    private recipeService: RecipeService,
+    private mealPlanService: MealPlanService,
+  ) {
     this.db = db;
   }
 
@@ -90,7 +99,7 @@ export default class IngredientsService {
     return this.db
       .select('*')
       .from(rawQuery)
-      .modify(this.matchingSupermarketId({ supermarketId }))
+      .modify(matchingSupermarketId({ supermarketId }))
       .limit(30);
   }
 
@@ -131,5 +140,45 @@ export default class IngredientsService {
       .where('id', ingredientId)
       .del(['*']);
     return camelize(result[0]);
+  }
+
+  async updateIngredientPrices(supermarketId: number) {
+    // get latest ingredient prices
+    const productIdListResult = await this.db
+      .select('product_id')
+      .from('ingredients')
+      .where('supermarket_id', supermarketId);
+
+    const productIdsAndPricePerUnit = await this.fetchService.ingredientPrices(
+      supermarketId,
+      productIdListResult.map((row) => row.product_id),
+    );
+
+    // update all ingredient prices
+    await this.db.transaction((trx) => {
+      const queries = productIdsAndPricePerUnit.map(
+        ({
+          productId,
+          pricePerUnit,
+        }: {
+          productId: string;
+          pricePerUnit: number;
+        }) =>
+          this.db('ingredients')
+            .where('product_id', productId)
+            .update({
+              price_per_unit: pricePerUnit,
+              updated_at: this.db.fn.now(),
+            })
+            .transacting(trx),
+      );
+      return Promise.all(queries).then(trx.commit).catch(trx.rollback);
+    });
+
+    // update all recipe metrics
+    await this.recipeService.updateRecipeMetrics();
+
+    // update all meal plan metrics
+    await this.mealPlanService.updateMealPlanMetrics();
   }
 }

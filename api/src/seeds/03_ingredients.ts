@@ -17,6 +17,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 1,
       unit: 'kilogram',
+      product_id: '4088600185125',
     },
     {
       name: 'Everyday Essentials Greek Style Salad Cheese 200g',
@@ -25,6 +26,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 2,
       base_value: 200,
       unit: 'gram',
+      product_id: '4088600285450',
     },
 
     {
@@ -34,6 +36,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 2,
       base_value: 1,
       unit: 'aubergine',
+      product_id: '821996',
     },
 
     {
@@ -43,6 +46,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 8,
       unit: 'roll',
+      product_id: '4088600111827',
     },
 
     {
@@ -52,6 +56,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 3,
       base_value: 500,
       unit: 'gram',
+      product_id: '4088600184951',
     },
 
     {
@@ -61,6 +66,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 3,
       base_value: 3,
       unit: 'pepper',
+      product_id: '4088600084398',
     },
 
     {
@@ -70,6 +76,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 65,
       unit: 'gram',
+      product_id: '4088600469751',
     },
 
     {
@@ -79,6 +86,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 700,
       unit: 'gram',
+      product_id: '4088600255057',
     },
 
     {
@@ -88,6 +96,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 750,
       unit: 'milliliter',
+      product_id: '4088600307800',
     },
 
     {
@@ -97,6 +106,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 340,
       unit: 'gram',
+      product_id: '4088600174303',
     },
 
     {
@@ -106,6 +116,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 200,
       unit: 'gram',
+      product_id: '4088600005201',
     },
 
     {
@@ -115,6 +126,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 2,
       base_value: 5,
       unit: 'lime',
+      product_id: '4088600187693',
     },
 
     {
@@ -124,6 +136,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 60,
       unit: 'gram',
+      product_id: '4088600268811',
     },
 
     {
@@ -133,6 +146,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 2,
       base_value: 500,
       unit: 'gram',
+      product_id: '4088600103723',
     },
 
     {
@@ -142,6 +156,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 250,
       unit: 'gram',
+      product_id: '4088600268774',
     },
 
     {
@@ -151,6 +166,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 4,
       unit: 'garlic',
+      product_id: '4088600185071',
     },
 
     {
@@ -160,6 +176,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 30,
       unit: 'gram',
+      product_id: '4088600028101',
     },
 
     {
@@ -169,6 +186,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 4,
       unit: 'lemon',
+      product_id: '4088600081250',
     },
 
     {
@@ -178,6 +196,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 3,
       base_value: 1,
       unit: 'kilogram',
+      product_id: '4088600185118',
     },
 
     {
@@ -187,6 +206,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 900,
       unit: 'gram',
+      product_id: '4088600221267',
     },
 
     {
@@ -196,15 +216,17 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 2,
       base_value: 200,
       unit: 'gram',
+      product_id: '4088600421599',
     },
 
     {
-      name: "Nature's Pick Baby Spinach 240g",
+      name: "Nature's Pick The Salad Box Baby Spinach 240g",
       price_per_unit: 0.76,
       category_id: 3,
       supermarket_id: 1,
       base_value: 240,
       unit: 'gram',
+      product_id: '4088600009575',
     },
 
     {
@@ -214,6 +236,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 100,
       unit: 'gram',
+      product_id: '4088600123622',
     },
 
     {
@@ -223,6 +246,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 2,
       base_value: 250,
       unit: 'gram',
+      product_id: '4088600268781',
     },
 
     {
@@ -232,6 +256,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 230,
       unit: 'gram',
+      product_id: '4088600457581',
     },
 
     {
@@ -241,6 +266,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 240,
       unit: 'gram',
+      product_id: '4088600022239',
     },
 
     {
@@ -250,6 +276,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 3,
       base_value: 250,
       unit: 'gram',
+      product_id: '4088600317670',
     },
 
     {
@@ -259,6 +286,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 8,
       unit: 'gram',
+      product_id: '4088600373324',
     },
 
     {
@@ -268,6 +296,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 3,
       base_value: 480,
       unit: 'gram',
+      product_id: '4088600304670',
     },
 
     {
@@ -277,6 +306,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 2,
       base_value: 300,
       unit: 'milliliter',
+      product_id: '4088600032245',
     },
 
     {
@@ -286,6 +316,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 250,
       unit: 'milliliter',
+      product_id: '4088600099071',
     },
 
     {
@@ -295,6 +326,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 2,
       base_value: 2.5,
       unit: 'kilogram',
+      product_id: '4088600069852',
     },
 
     {
@@ -304,6 +336,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 1,
       base_value: 400,
       unit: 'gram',
+      product_id: '4088600048451',
     },
 
     {
@@ -313,6 +346,7 @@ export async function seed(knex: Knex): Promise<void> {
       supermarket_id: 2,
       base_value: 1,
       unit: 'kilogram',
+      product_id: '4088600032887',
     },
   ]);
 }

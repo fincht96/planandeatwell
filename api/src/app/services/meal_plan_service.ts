@@ -242,4 +242,88 @@ export default class MealPlanService {
       return error.message;
     }
   }
+
+  async updateMealPlanMetrics() {
+    return this.db.raw(`
+insert into meal_plan_metrics
+select ROW_NUMBER() OVER ( ORDER BY meal_plan_id ASC ) row_number, meal_plan_id, recipes_count, ingredients_count, total_servings, total_price
+from
+(
+  select 
+	 recipe_metrics.meal_plan_id, recipes_count, ingredients_count, total_servings, total_price
+from
+(
+select 
+	count(ingredient_id) as ingredients_count, meal_plan_id, sum(total_ingredient_price) as total_price 
+from
+(
+select 
+	ingredient_id, meal_plan_id, 
+  	sum(ingredient_quantity) as total_ingredient_quantity,
+  	ceiling(sum(ingredient_quantity)) * ingredient_price_per_unit as total_ingredient_price
+from
+(select
+ 	recipes.id as recipe_id,
+    meal_plan_recipes.meal_plan_id,
+    ingredients.id as ingredient_id,
+    recipe_ingredients.unit_quantity * (meal_plan_recipes.servings/ recipes.base_servings) as ingredient_quantity,
+    recipe_ingredients.unit_quantity * (meal_plan_recipes.servings/ recipes.base_servings) * ingredients.price_per_unit as total_ingredient_price,
+ 	ingredients.price_per_unit as ingredient_price_per_unit
+from
+	recipes
+join
+	meal_plan_recipes
+on
+	meal_plan_recipes.recipe_id = recipes.id
+join
+   	meal_plans
+on
+   meal_plans.id = meal_plan_recipes.meal_plan_id
+join 
+	recipe_ingredients
+on 
+	recipe_ingredients.recipe_id = recipes.id
+join 
+	ingredients
+on 
+	ingredients.id = recipe_ingredients.ingredient_id) as meal_plan_ingredients
+group by
+	ingredient_id, meal_plan_id, ingredient_price_per_unit
+) as aggregated_meal_plan_ingredients
+group by
+	meal_plan_id
+) as ingredient_metrics
+join
+(
+  select
+ 	count(recipes.id) as recipes_count,
+    meal_plans.id as meal_plan_id,
+  	sum(meal_plan_recipes.servings) as total_servings 
+from
+	recipes
+join
+	meal_plan_recipes
+on
+	meal_plan_recipes.recipe_id = recipes.id
+join
+   	meal_plans
+on
+   meal_plans.id = meal_plan_recipes.meal_plan_id 
+group by
+	meal_plans.id
+  
+) as recipe_metrics
+on 
+	recipe_metrics.meal_plan_id = ingredient_metrics.meal_plan_id
+) as meal_plan_metric_data
+
+
+ON CONFLICT (id) 
+DO UPDATE SET 
+	recipes_count = EXCLUDED.recipes_count, 
+    ingredients_count=EXCLUDED.ingredients_count, 
+    total_servings=EXCLUDED.total_servings , 
+    total_price=EXCLUDED.total_price;
+`);
+  }
 }

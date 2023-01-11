@@ -27,7 +27,6 @@ import { useAuth } from '../../contexts/auth-context';
 import { CustomNextPage } from '../../types/CustomNextPage';
 import { IngredientDecorated } from '../../types/ingredientDecorated.types';
 import { MealPlanWithSupermarketDetailsType } from '../../types/mealPlan.types';
-import { convertDecimalToFraction } from '../../utils/convertDecimalToFraction';
 import { groupObjects } from '../../utils/groupObjects';
 import {
   addIngredients,
@@ -301,17 +300,11 @@ const MealPlan: CustomNextPage = () => {
                       fontSize={{ base: '0.9rem', md: '1rem' }}
                       mr={1}
                     >
-                      {convertDecimalToFraction(ingredient.unitQuantity, true)}{' '}
-                      - {ingredient.name}
-                    </Text>
-                    <Text
-                      color={'gray.dark'}
-                      fontSize={{ base: '0.9rem', md: '1rem' }}
-                    >
                       {getFormattedQuantityAndUnitText(
                         toTwoSignificantFigures(ingredient.scalarQuantity),
                         ingredient.unit,
-                      )}
+                      )}{' '}
+                      - {ingredient.name}
                     </Text>
                   </Flex>
                 );

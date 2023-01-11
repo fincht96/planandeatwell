@@ -2,7 +2,7 @@ import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.table('ingredients', (table) => {
-    table.bigInteger('product_id').unique().unsigned();
+    table.string('product_id').unique();
   });
 }
 

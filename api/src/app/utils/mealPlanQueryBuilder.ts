@@ -3,7 +3,7 @@ import { orderByToMealPlanColumn } from './orderByToMealPlanColumn';
 
 export const getMealPlanQuery = (
   db: Knex,
-  includeSupermarketDetails: boolean | undefined,
+  includeSupermarketDetails: boolean,
 ) => {
   const rawQuery = db.raw(`
     (
@@ -33,7 +33,7 @@ export const getMealPlanQuery = (
 
 export const getMealPlansBaseQuery = (
   db: Knex,
-  includeSupermarketDetails: boolean | undefined,
+  includeSupermarketDetails: boolean,
 ) => {
   if (includeSupermarketDetails) {
     return db

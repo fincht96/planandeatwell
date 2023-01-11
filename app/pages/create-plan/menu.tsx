@@ -459,7 +459,7 @@ const Menu: CustomNextPage = () => {
           const totalPrice = totalBasketPrice;
           const ingredientsCount = ingredientsBasket.length;
           const recipesCount = recipeBasket.length;
-          const supermarketId = router.query['supermarketId'] as string;
+          const supermarketId = recipeQueryParams.supermarketId;
 
           mealPlanMutation.mutate({
             updateExisting: !!mealPlanQueryParams.uuid.length,

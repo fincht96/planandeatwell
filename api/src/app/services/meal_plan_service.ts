@@ -43,7 +43,7 @@ export default class MealPlanService {
     order = 'any',
     orderBy = 'relevance',
     searchTerm = '',
-    includeSupermarketDetails,
+    includeSupermarketDetails = false,
   }: {
     userId: number;
     offset?: number;
@@ -51,7 +51,7 @@ export default class MealPlanService {
     order?: 'asc' | 'desc' | 'any';
     orderBy?: 'relevance' | 'createdAt';
     searchTerm?: string;
-    includeSupermarketDetails?: boolean | undefined;
+    includeSupermarketDetails?: boolean;
   }) {
     return (
       getMealPlansBaseQuery(this.db, includeSupermarketDetails)
@@ -75,10 +75,10 @@ export default class MealPlanService {
 
   async getPlan({
     mealPlanUuid,
-    includeSupermarketDetails,
+    includeSupermarketDetails = false,
   }: {
     mealPlanUuid: string;
-    includeSupermarketDetails: boolean | undefined;
+    includeSupermarketDetails?: boolean;
   }) {
     // get single meal plan using a meal plan uuid
     const mealPlanQueryBuilder = getMealPlanQuery(

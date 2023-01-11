@@ -64,7 +64,7 @@ const Menu: CustomNextPage = () => {
     order: Order;
     orderBy: OrderBy;
     searchTerm: string;
-    supermarketId: string | undefined;
+    supermarketId: string;
   }>({
     limit: 8,
     offset: 0,
@@ -74,10 +74,7 @@ const Menu: CustomNextPage = () => {
     order: 'any',
     orderBy: 'relevance',
     searchTerm: '',
-    supermarketId:
-      typeof router.query['supermarketId'] === 'string'
-        ? router.query['supermarketId']
-        : undefined,
+    supermarketId: '',
   });
   const [queryParamsInitialised, setQueryParamsInitialised] = useState(false);
   const [totalCountRecipes, setTotalCountRecipes] = useState(0);
@@ -105,7 +102,6 @@ const Menu: CustomNextPage = () => {
     mutationFn: ({
       updateExisting,
       mealPlan,
-      supermarketId,
     }: {
       updateExisting: boolean;
       mealPlan: {
@@ -114,12 +110,15 @@ const Menu: CustomNextPage = () => {
         totalPrice: number;
         ingredientsCount: number;
         recipesCount: number;
+        supermarketId: string;
       };
-      supermarketId: string;
     }) => {
-      return updateExisting
-        ? updateMealPlan(authToken, mealPlanQueryParams.uuid, mealPlan)
-        : insertMealPlan(authToken, { ...mealPlan, supermarketId });
+      if (updateExisting) {
+        const { supermarketId, ...newMealPlan } = mealPlan;
+        return updateMealPlan(authToken, mealPlanQueryParams.uuid, newMealPlan);
+      } else {
+        return insertMealPlan(authToken, mealPlan);
+      }
     },
     onSuccess: (data: any) => {
       return onNavigate(`/meal-plans/${data.uuid}`);
@@ -219,6 +218,7 @@ const Menu: CustomNextPage = () => {
       const orderBy = queryParamToString<OrderBy>(router.query['orderBy']);
       const searchTerm = queryParamToString(router.query['searchTerm']);
       const uuid = queryParamToString(router.query['meal_plan_uuid']);
+      const supermarketId = queryParamToString(router.query['supermarketId']);
 
       setRecipeQueryParams((current) => {
         return {
@@ -229,6 +229,7 @@ const Menu: CustomNextPage = () => {
           order,
           orderBy,
           searchTerm,
+          supermarketId,
         };
       });
 
@@ -473,8 +474,8 @@ const Menu: CustomNextPage = () => {
               totalPrice,
               ingredientsCount,
               recipesCount,
+              supermarketId,
             },
-            supermarketId,
           });
         }}
       />

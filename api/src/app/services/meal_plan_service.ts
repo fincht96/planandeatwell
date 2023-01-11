@@ -233,11 +233,31 @@ export default class MealPlanService {
 
   async removeMealPlan(mealPlanUuid: string, userId: number): Promise<any> {
     try {
-      const result = await this.db('meal_plans')
-        .where('uuid', mealPlanUuid)
-        .andWhere('created_by', userId)
-        .del(['*']);
-      return camelize(result[0]);
+      return await this.db.transaction(async (trx) => {
+        // find meal plan with uuid and created by user
+        const mealPlanResponse = await this.db('meal_plans')
+          .select('id')
+          .where('uuid', mealPlanUuid)
+          .andWhere('created_by', userId)
+          .transacting(trx);
+
+        const { id: planId } = mealPlanResponse[0];
+
+        // delete meal plan
+        const result = await this.db('meal_plans')
+          .where('uuid', mealPlanUuid)
+          .andWhere('created_by', userId)
+          .del(['*'])
+          .transacting(trx);
+
+        // delete associated meal plan metrics
+        await this.db('meal_plan_metrics')
+          .where('meal_plan_metrics.meal_plan_id', planId)
+          .del(['*'])
+          .transacting(trx);
+
+        return camelize(result[0]);
+      });
     } catch (error: any) {
       return error.message;
     }

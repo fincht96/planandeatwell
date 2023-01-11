@@ -84,7 +84,7 @@ export const mealPlanQuerySearch =
   ({ searchTerm }: { searchTerm: string }) =>
   (queryBuilder: Knex.QueryBuilder) => {
     if (searchTerm.length) {
-      queryBuilder.whereRaw(`name ILIKE ?`, [`%${searchTerm}%`]);
+      queryBuilder.whereRaw(`meal_plans.name ILIKE ?`, [`%${searchTerm}%`]);
     }
     return queryBuilder;
   };

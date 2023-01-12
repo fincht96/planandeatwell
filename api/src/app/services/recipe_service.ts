@@ -358,4 +358,51 @@ export default class RecipeService {
     const result = await this.db('recipes').where('id', recipeId).del(['*']);
     return camelize(result[0]);
   }
+
+  async updateRecipeMetrics() {
+    return this.db.raw(`
+insert into recipe_metrics 
+select 
+  ROW_NUMBER() OVER (
+    ORDER BY 
+      recipe_id ASC
+  ) row_number, 
+  recipe_id, 
+  ingredients_count, 
+  price_per_serving 
+from 
+  (
+    select 
+      recipe_id as recipe_id, 
+      sum(total_price) as total_price, 
+      count(recipe_id) as ingredients_count, 
+      round(
+        sum(total_price) / base_servings, 
+        2
+      ) as price_per_serving 
+    from 
+      (
+        select 
+          ingredients.name, 
+          recipe_ingredients.recipe_id, 
+          CEILING(
+            recipe_ingredients.unit_quantity
+          ) * ingredients.price_per_unit AS total_price, 
+          recipes.base_servings 
+        from 
+          ingredients 
+          join recipe_ingredients on recipe_ingredients.ingredient_id = ingredients.id 
+          join recipes on recipes.id = recipe_ingredients.recipe_id
+      ) as priced_ingredients 
+    group by 
+      recipe_id, 
+      base_servings
+  ) as all_recipe_metrics ON CONFLICT (id) DO 
+UPDATE 
+SET 
+  price_per_serving = EXCLUDED.price_per_serving, 
+  ingredients_count = EXCLUDED.ingredients_count;
+
+`);
+  }
 }

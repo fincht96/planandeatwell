@@ -36,6 +36,10 @@ const removeIngredientSchema = Joi.object({
   id: Joi.number().min(1).required(),
 });
 
+const updatePricesSchema = Joi.object({
+  supermarketId: Joi.number().min(1).required(),
+});
+
 export default class IngredientsController {
   constructor(
     private readonly ingredientsService: IngredientsService,
@@ -147,6 +151,28 @@ export default class IngredientsController {
 
       return res.status(200).json({
         result: removedIngredient,
+        errors: [],
+      });
+    } catch (e: any) {
+      await this.eventsService.insert('INGREDIENTS', 'ERROR', e.message ?? '');
+      return res.status(400).json({
+        errors: [e?.message],
+      });
+    }
+  }
+
+  async updatePrices(req: Request, res: Response) {
+    try {
+      const { error, value } = updatePricesSchema.validate(req.body);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      await this.ingredientsService.updateIngredientPrices(value.supermarketId);
+
+      return res.status(200).json({
+        result: '',
         errors: [],
       });
     } catch (e: any) {

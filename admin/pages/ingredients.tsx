@@ -23,6 +23,7 @@ import {
   deleteIngredient,
   getIngredients,
   insertIngredient,
+  updateIngredientPrices,
 } from '../utils/requests/ingredients';
 import { getSupermarkets } from '../utils/requests/supermarkets';
 
@@ -271,6 +272,35 @@ export default function Ingredients() {
     insertIngredientMutation.mutate({ ingredient: data });
   };
 
+  const updateLatestIngredientPrices = () => {
+    setIsLoading(true);
+    const aldiSuperMarketId = 1;
+    updateIngredientPrices(idToken, aldiSuperMarketId)
+      .then(() => {
+        toast({
+          position: 'top',
+          title: 'Success!',
+          description: `Ingredient prices updated`,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      })
+      .catch((e) => {
+        toast({
+          position: 'top',
+          title: 'Error!',
+          description: `Error updating ingredient prices`,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
     <Layout>
       <Head>
@@ -288,6 +318,13 @@ export default function Ingredients() {
               <Flex justifyContent={'space-between'} gap={'2rem'}>
                 <Box flex={2}>
                   <Stack spacing={'1rem'} maxW={'30rem'} mb={'2rem'}>
+                    <Button
+                      colorScheme={'blue'}
+                      onClick={() => updateLatestIngredientPrices()}
+                      isLoading={isLoading}
+                    >
+                      Update ingredient prices
+                    </Button>
                     <FormControl isInvalid={!!errors.name}>
                       <FormLabel>Name</FormLabel>
                       <Input

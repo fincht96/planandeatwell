@@ -52,6 +52,13 @@ router.delete(
     req.container.resolve('ingredientsController').removeIngredient(req, res),
 );
 
+router.put(
+  '/ingredients/update-prices',
+  isAuthenticated('admin'),
+  (req: Request, res: Response) =>
+    req.container.resolve('ingredientsController').updatePrices(req, res),
+);
+
 /** recipes */
 
 router.get('/recipes', (req: Request, res: Response) =>

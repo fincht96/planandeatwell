@@ -21,7 +21,6 @@ import { getMealPlans } from '../../utils/requests/meal-plans';
 const MealPlans: CustomNextPage = () => {
   const router = useRouter();
   const { authClaims, authToken } = useAuth();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [queryParamsInitialised, setQueryParamsInitialised] = useState(false);
   const [totalCountMealPlans, setTotalCountMealPlans] = useState(0);
   const [mealPlans, setMealPlans] = useState<
@@ -69,8 +68,8 @@ const MealPlans: CustomNextPage = () => {
     }
   }, [router.isReady, queryParamsInitialised, router.query]);
 
-  useQuery(
-    ['recipes', authClaims?.userId, authToken, mealPlansQueryParams],
+  const mealPlanQuery = useQuery(
+    ['meal-plan-query', authClaims?.userId, authToken, mealPlansQueryParams],
     () => {
       const { order, orderBy, searchTerm, limit, offset } =
         mealPlansQueryParams;
@@ -102,7 +101,6 @@ const MealPlans: CustomNextPage = () => {
           }
           return [...current, ...data.mealPlans];
         });
-        setIsLoading(false);
       },
     },
   );
@@ -256,6 +254,22 @@ const MealPlans: CustomNextPage = () => {
     );
   };
 
+  const mealPlansView = () => {
+    if (mealPlanQuery.isLoading) {
+      return <CenteredLoadingSpinner />;
+    }
+
+    // no meal plans found and no search term
+    if (
+      !mealPlanQuery.data.mealPlans.length &&
+      !mealPlansQueryParams.searchTerm.length
+    ) {
+      return showNoMealPlans();
+    }
+
+    return showMealPlans();
+  };
+
   return (
     <Layout>
       <Head>
@@ -263,13 +277,7 @@ const MealPlans: CustomNextPage = () => {
       </Head>
 
       <Container my={'2rem'} maxW={'1200px'}>
-        {isLoading ? (
-          <CenteredLoadingSpinner />
-        ) : !!mealPlans.length ? (
-          showMealPlans()
-        ) : (
-          showNoMealPlans()
-        )}
+        {mealPlansView()}
       </Container>
     </Layout>
   );

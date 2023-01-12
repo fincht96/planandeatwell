@@ -46,7 +46,10 @@ export default class FetchService {
       });
   }
 
-  ingredientPrices = (supermarketId: number, productIDList: Array<string>) => {
+  fetchIngredientPrices = (
+    supermarketId: number,
+    productIDList: Array<string>,
+  ) => {
     switch (supermarketId) {
       case 1: {
         return this.aldiIngredientPrices(productIDList);

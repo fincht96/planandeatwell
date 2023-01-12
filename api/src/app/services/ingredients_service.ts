@@ -149,10 +149,11 @@ export default class IngredientsService {
       .from('ingredients')
       .where('supermarket_id', supermarketId);
 
-    const productIdsAndPricePerUnit = await this.fetchService.ingredientPrices(
-      supermarketId,
-      productIdListResult.map((row) => row.product_id),
-    );
+    const productIdsAndPricePerUnit =
+      await this.fetchService.fetchIngredientPrices(
+        supermarketId,
+        productIdListResult.map((row) => row.product_id),
+      );
 
     // update all ingredient prices
     await this.db.transaction((trx) => {

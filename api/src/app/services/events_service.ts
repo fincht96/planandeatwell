@@ -9,7 +9,11 @@ export default class EventsService {
   async insert(event_type: string, event_name: string, event_message: string) {
     try {
       await this.db('events')
-        .insert({ event_type, event_name, event_message })
+        .insert({
+          event_type,
+          event_name,
+          event_message: event_message.slice(0, 255),
+        })
         .returning('*');
 
       return {

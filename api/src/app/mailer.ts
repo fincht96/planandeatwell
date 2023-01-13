@@ -34,7 +34,7 @@ export default class Mailer {
     }
 
     this.transporter = nodemailer.createTransport(options);
-    console.log('this.transporter ', await this.transporter.verify());
+    // verify nodemailer is operational, throw error to sentry if not
   }
 
   async sendMail(

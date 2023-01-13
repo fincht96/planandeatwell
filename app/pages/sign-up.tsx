@@ -219,7 +219,6 @@ const SignUp: CustomNextPage = () => {
                 </FormControl>
                 <Stack spacing={10} pt={2}>
                   <Button
-                    loadingText="Submitting"
                     size="lg"
                     bg={'brand.500'}
                     color={'white'}
@@ -227,6 +226,7 @@ const SignUp: CustomNextPage = () => {
                       bg: 'brand.600',
                     }}
                     type="submit"
+                    isLoading={signUpMutation.isLoading}
                   >
                     Sign up
                   </Button>

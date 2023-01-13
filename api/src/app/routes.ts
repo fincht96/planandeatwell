@@ -13,12 +13,6 @@ router.get('/ping', (req: Request, res: Response) => {
   res.sendStatus(200);
 });
 
-/** email */
-
-router.post('/email', (req: Request, res: Response) => {
-  req.container.resolve('emailController').registerCustomerEmail(req, res);
-});
-
 /** supermarkets */
 
 router.get('/supermarkets', (req: Request, res: Response) =>

@@ -1,7 +1,5 @@
-import { Text, Stack, Container, Grid, GridItem, Box } from "@chakra-ui/react";
-import Image from "next/image";
-
-import SignupForm from "../SignupForm";
+import { Text, Stack, Container, Grid, GridItem, Box } from '@chakra-ui/react';
+import Image from 'next/image';
 
 const Result = () => {
   return (
@@ -15,21 +13,15 @@ const Result = () => {
         and all the necessary ingredients from your chosen supermarket.
       </Text>
 
-      <Box display={"flex"} justifyContent={"center"} mb={20}>
+      <Box display={'flex'} justifyContent={'center'} mb={20}>
         <Image
           priority
           src="/images/casserole-dish.png"
           width={700}
           height={467}
-          alt={"people"}
+          alt={'people'}
         />
       </Box>
-
-      <Text fontSize="24px" color="gray.dark" fontWeight={500} sx={{ mb: 5 }}>
-        Like what you hear?
-      </Text>
-
-      <SignupForm />
     </Container>
   );
 };

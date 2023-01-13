@@ -178,7 +178,7 @@ Instagram: https://www.instagram.com/planandeatwell
  <br>
  </div>
  <div>
- <img src="https://drive.google.com/uc?export=view&amp;id=11xVdxkMyehmxlT4Q-RMlVtbkS8MjUVhp" width="400" height="97">
+ <img src="cid:logo_footer@planandeatwell.uk" width="400" height="97">
  <br>
  </div>
  <div>

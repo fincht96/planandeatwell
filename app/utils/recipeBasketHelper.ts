@@ -68,7 +68,7 @@ export const removeRecipeServings = (
 
     const updatedRecipe = {
       ...existingRecipe,
-      servings: (existingRecipe.servings -= recipeToRemove.servings),
+      servings: existingRecipe.servings - recipeToRemove.servings,
     };
 
     // if recipe has no servings, remove from recipe basket

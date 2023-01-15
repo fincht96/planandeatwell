@@ -11,12 +11,13 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
+  Icon,
   Text,
-  useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
+import { RiShoppingBasketFill } from 'react-icons/ri';
 
-export default function MenuSummaryBar({
+const RecipeBasketButton = ({
   currentPrice,
   ingredientList,
   recipeList,
@@ -32,91 +33,28 @@ export default function MenuSummaryBar({
   onComplete: any;
   onAddRecipeServings: (recipe, servings) => void;
   onRemoveRecipeServings: (recipe, servings) => void;
-}) {
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
-      <Box
-        sx={{
-          position: 'fixed',
-          left: '0px',
-          bottom: '0px',
-          width: '100%',
-          zIndex: '3',
-        }}
+      <Button
+        leftIcon={<Icon as={RiShoppingBasketFill} color={'brand.500'} />}
+        border={'solid 1px'}
+        borderColor={'gray.200'}
+        bg={'white'}
+        fontWeight={400}
+        color={'gray.600'}
+        onClick={() => onOpen()}
+        disabled={!recipeList.length}
       >
-        <Flex
-          bg={useColorModeValue('#D9D9D9', 'gray.800')}
-          color={useColorModeValue('gray.600', 'white')}
-          minH={'60px'}
-          py={{ base: 2 }}
-          px={{ base: 4 }}
-          borderBottom={1}
-          borderStyle={'solid'}
-          borderColor={useColorModeValue('gray.200', 'gray.900')}
-          justifyContent={{ base: 'center', md: 'flex-end' }}
-          display={{ base: 'none', md: 'flex' }}
-        >
-          <Button
-            colorScheme="brand"
-            fontSize={'1.2rem'}
-            fontWeight={600}
-            padding={'1.5rem 1.5rem'}
-            disabled={!recipeList.length}
-            onClick={onComplete}
-          >
-            Checkout
-          </Button>
-        </Flex>
+        <Text as={'span'} fontWeight={600}>
+          £{currentPrice}
+        </Text>
+        &nbsp;({servings} servings)
+      </Button>
 
-        <Flex
-          bg={useColorModeValue('#D9D9D9', 'gray.800')}
-          color={useColorModeValue('gray.600', 'white')}
-          minH={'60px'}
-          py={{ base: 2 }}
-          px={{ base: 4 }}
-          borderBottom={1}
-          borderStyle={'solid'}
-          borderColor={useColorModeValue('gray.200', 'gray.900')}
-          justifyContent={'center'}
-          display={{ base: recipeList.length ? 'flex' : 'none', md: 'none' }}
-        >
-          <Button
-            colorScheme="brand"
-            fontSize={'1rem'}
-            fontWeight={600}
-            padding={'1.5rem 1.5rem'}
-            disabled={!recipeList.length}
-            onClick={() => onOpen()}
-            width={'100%'}
-          >
-            <Flex
-              justifyContent={'space-between'}
-              alignItems={'center'}
-              width={'100%'}
-            >
-              <Box
-                boxSizing={'border-box'}
-                bg={'brand.600'}
-                p={'0.2rem'}
-                fontWeight={600}
-              >
-                {servings}
-              </Box>
-              <Text>View Basket</Text>
-              <Text>£{currentPrice}</Text>
-            </Flex>
-          </Button>
-        </Flex>
-      </Box>
-
-      <Drawer
-        onClose={onClose}
-        isOpen={isOpen}
-        size={'full'}
-        placement={'bottom'}
-      >
+      <Drawer onClose={onClose} isOpen={isOpen} size={'md'}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
@@ -229,4 +167,8 @@ export default function MenuSummaryBar({
       </Drawer>
     </>
   );
-}
+};
+
+RecipeBasketButton.displayName = 'RecipeBasketButton';
+
+export default RecipeBasketButton;

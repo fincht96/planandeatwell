@@ -10,7 +10,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
-import Layout from '../../components/layout';
 import Recipe from '../../components/menu/Recipe';
 import SearchMenu from '../../components/menu/SearchMenu';
 import { Order, OrderBy, SortBy } from '../../types/menuOrder.types';
@@ -30,6 +29,7 @@ import {
 import { getRecipes } from '../../utils/requests/recipes';
 import { roundTo2dp } from '../../utils/roundTo2dp';
 
+import MenuLayout from '../../components/menu/MenuLayout';
 import RecipeModal from '../../components/menu/RecipeModal';
 import MenuSummaryBar from '../../components/MenuSummaryBar';
 import { useAuth } from '../../contexts/auth-context';
@@ -252,8 +252,93 @@ const Menu: CustomNextPage = () => {
     }
   }, [onOpen, selectedRecipe]);
 
+  const onAddRecipeServings = (recipe: any, servings: number) => {
+    setRecipeBasket((currentRecipeBasket) => {
+      const newRecipesBasket = addRecipeServings(currentRecipeBasket, {
+        recipe,
+        servings,
+      });
+      newRecipesBasket.sort((a, b) => a.recipe.id - b.recipe.id);
+      return newRecipesBasket;
+    });
+
+    setExactIngredientsBasket((currentExactIngredientsBasket) => {
+      const ingredientsToAdd = scaleIngredientQuantities(
+        recipe.ingredientsList,
+        recipe.baseServings,
+        servings,
+      );
+      const newIngredientsBasket = addIngredients(
+        currentExactIngredientsBasket,
+        ingredientsToAdd,
+      );
+      newIngredientsBasket.sort((a, b) => a.id - b.id);
+      return newIngredientsBasket;
+    });
+  };
+
+  const onRemoveRecipeServings = (recipe: any, servings: number) => {
+    setRecipeBasket((currentRecipeBasket) => {
+      const newRecipesBasket = removeRecipeServings(currentRecipeBasket, {
+        recipe,
+        servings,
+      });
+      newRecipesBasket.sort((a, b) => a.recipe.id - b.recipe.id);
+      return newRecipesBasket;
+    });
+
+    setExactIngredientsBasket((currentExactIngredientsBasket) => {
+      const ingredientsToRemove = scaleIngredientQuantities(
+        recipe.ingredientsList,
+        recipe.baseServings,
+        servings,
+      );
+      const newIngredientsBasket = removeIngredients(
+        currentExactIngredientsBasket,
+        ingredientsToRemove,
+      );
+      newIngredientsBasket.sort((a, b) => a.id - b.id);
+      return newIngredientsBasket;
+    });
+  };
+
+  const mealPlanBasketProps = () => {
+    return {
+      currentPrice: totalBasketPrice,
+      ingredientList: ingredientsBasket,
+      recipeList: recipeBasket,
+      servings: totalServingsInBasket,
+      onComplete: () => {
+        const totalServings = totalServingsInBasket;
+        const totalPrice = totalBasketPrice;
+        const ingredientsCount = ingredientsBasket.length;
+        const recipesCount = recipeBasket.length;
+        const supermarketId = recipeQueryParams.supermarketId;
+
+        mealPlanMutation.mutate({
+          updateExisting: !!mealPlanQueryParams.uuid.length,
+          mealPlan: {
+            recipeIdList: recipeBasket.map((basketItem) => {
+              return {
+                recipeId: basketItem.recipe.id,
+                servings: basketItem.servings,
+              };
+            }),
+            totalServings,
+            totalPrice,
+            ingredientsCount,
+            recipesCount,
+            supermarketId,
+          },
+        });
+      },
+      onAddRecipeServings,
+      onRemoveRecipeServings,
+    };
+  };
+
   return (
-    <Layout>
+    <MenuLayout {...mealPlanBasketProps()}>
       <Head>
         <title>Menu | Plan and Eat Well</title>
       </Head>
@@ -272,44 +357,8 @@ const Menu: CustomNextPage = () => {
                 recipeInBasket.recipe.id === selectedRecipe?.id,
             )?.servings ?? 0
           }
-          onAddRecipeServings={(recipe: any, servings: number) => {
-            const newRecipesBasket = addRecipeServings(recipeBasket, {
-              recipe,
-              servings,
-            });
-            const ingredientsToAdd = scaleIngredientQuantities(
-              recipe.ingredientsList,
-              recipe.baseServings,
-              servings,
-            );
-
-            const newIngredientsBasket = addIngredients(
-              exactIngredientsBasket,
-              ingredientsToAdd,
-            );
-
-            setRecipeBasket(newRecipesBasket);
-            setExactIngredientsBasket(newIngredientsBasket);
-          }}
-          onRemoveRecipeServings={(recipe: any, servings: number) => {
-            const newRecipesBasket = removeRecipeServings(recipeBasket, {
-              recipe,
-              servings,
-            });
-            const ingredientsToRemove = scaleIngredientQuantities(
-              recipe.ingredientsList,
-              recipe.baseServings,
-              servings,
-            );
-
-            const newIngredientsBasket = removeIngredients(
-              exactIngredientsBasket,
-              ingredientsToRemove,
-            );
-
-            setRecipeBasket(newRecipesBasket);
-            setExactIngredientsBasket(newIngredientsBasket);
-          }}
+          onAddRecipeServings={onAddRecipeServings}
+          onRemoveRecipeServings={onRemoveRecipeServings}
         />
       )}
 
@@ -449,37 +498,8 @@ const Menu: CustomNextPage = () => {
           </Flex>
         )}
       </Container>
-      <MenuSummaryBar
-        currentPrice={totalBasketPrice}
-        ingredientList={ingredientsBasket}
-        recipeList={recipeBasket}
-        servings={totalServingsInBasket}
-        onComplete={() => {
-          const totalServings = totalServingsInBasket;
-          const totalPrice = totalBasketPrice;
-          const ingredientsCount = ingredientsBasket.length;
-          const recipesCount = recipeBasket.length;
-          const supermarketId = recipeQueryParams.supermarketId;
-
-          mealPlanMutation.mutate({
-            updateExisting: !!mealPlanQueryParams.uuid.length,
-            mealPlan: {
-              recipeIdList: recipeBasket.map((basketItem) => {
-                return {
-                  recipeId: basketItem.recipe.id,
-                  servings: basketItem.servings,
-                };
-              }),
-              totalServings,
-              totalPrice,
-              ingredientsCount,
-              recipesCount,
-              supermarketId,
-            },
-          });
-        }}
-      />
-    </Layout>
+      <MenuSummaryBar {...mealPlanBasketProps()} />
+    </MenuLayout>
   );
 };
 

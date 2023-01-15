@@ -23,7 +23,7 @@ import { useRouter } from 'next/router';
 import { ReactNode, ReactText } from 'react';
 import { IconType } from 'react-icons';
 import { BiBookContent } from 'react-icons/bi';
-import { FiBell, FiChevronDown, FiMenu, FiSettings } from 'react-icons/fi';
+import { FiChevronDown, FiMenu, FiSettings } from 'react-icons/fi';
 import { IoAddOutline } from 'react-icons/io5';
 import { useAuth } from '../contexts/auth-context';
 import ChakraNextLink from './NextChakraLink';
@@ -65,7 +65,6 @@ export default function SidebarWithHeader({
           <SidebarContent onClose={onClose} />
         </DrawerContent>
       </Drawer>
-      {/* mobilenav */}
       <MobileNav onOpen={onOpen} />
       <Box ml={{ base: 0, md: 60 }} py="4">
         {children}
@@ -174,12 +173,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       />
 
       <HStack spacing={{ base: '0', md: '6' }}>
-        <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="open menu"
-          icon={<FiBell />}
-        />
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton
@@ -214,10 +207,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
-              {/* <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
-              <MenuDivider /> */}
               <MenuItem
                 onClick={() => {
                   if (signOut) {

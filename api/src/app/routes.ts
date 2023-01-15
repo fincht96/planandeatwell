@@ -1,5 +1,4 @@
 import express, { Request, Response, NextFunction } from 'express';
-// const {isAdmin, isUser} from './middleware/authentication'
 const router = express.Router();
 
 const isAuthenticated =

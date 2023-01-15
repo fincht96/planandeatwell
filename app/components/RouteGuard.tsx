@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/auth-context';
 import { Event } from '../types/eventBus.types';
 
 // if logged in don't allow access to the sign in / sign up pages
-const userInaccessibleRoutes = ['SignIn', 'SignUp'];
+const userInaccessibleRoutes = ['SignIn', 'SignUp', 'ResetPassword'];
 
 export function RouteGuard({
   children,

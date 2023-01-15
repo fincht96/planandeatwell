@@ -22,6 +22,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Layout from '../components/layout';
+import ChakraNextLink from '../components/NextChakraLink';
 import { useAuth } from '../contexts/auth-context';
 import { CustomNextPage } from '../types/CustomNextPage';
 import { Event } from '../types/eventBus.types';
@@ -33,6 +34,14 @@ const SignIn: CustomNextPage = () => {
 
   const { isOpen: isNewAccountAlertVisible, onClose: onCloseNewAccountAlert } =
     useDisclosure({ defaultIsOpen: false, isOpen: !!router.query.newAccount });
+
+  const {
+    isOpen: userRequestedPasswordReset,
+    onClose: onCloseRequestedPasswordReset,
+  } = useDisclosure({
+    defaultIsOpen: false,
+    isOpen: !!router.query.userRequestPasswordReset,
+  });
 
   const {
     isOpen: signInErrorAlertVisible,
@@ -85,6 +94,22 @@ const SignIn: CustomNextPage = () => {
       <Head>
         <title>Sign In | Plan and Eat Well</title>
       </Head>
+
+      {userRequestedPasswordReset && (
+        <Alert
+          status="success"
+          as={Flex}
+          justifyContent={'space-between'}
+          alignItems={'center'}
+        >
+          <Flex>
+            <AlertIcon />
+            Success, you will receive an email with instructions on how to reset
+            your password in a few minutes! 😅
+          </Flex>
+          <CloseButton onClick={onCloseRequestedPasswordReset} />
+        </Alert>
+      )}
 
       {isNewAccountAlertVisible && (
         <Alert
@@ -166,7 +191,12 @@ const SignIn: CustomNextPage = () => {
                     justify={'flex-end'}
                     gap={'1rem'}
                   >
-                    <Link color={'brand.400'}>Forgot password?</Link>
+                    <ChakraNextLink
+                      color={'brand.400'}
+                      href={'/reset-password'}
+                    >
+                      Forgot password?
+                    </ChakraNextLink>
                   </Flex>
                   <Button
                     bg={'brand.500'}

@@ -32,15 +32,20 @@ const SignIn: CustomNextPage = () => {
   const { signIn, unsubscribe, subscribe } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const { isOpen: isNewAccountAlertVisible, onClose: onCloseNewAccountAlert } =
-    useDisclosure({ defaultIsOpen: false, isOpen: !!router.query.newAccount });
+  const {
+    isOpen: isNewAccountAlertVisible,
+    onClose: onCloseNewAccountAlert,
+    onOpen: onShowNewAccount,
+  } = useDisclosure({
+    defaultIsOpen: false,
+  });
 
   const {
     isOpen: userRequestedPasswordReset,
     onClose: onCloseRequestedPasswordReset,
+    onOpen: onShowRequestedPasswordReset,
   } = useDisclosure({
     defaultIsOpen: false,
-    isOpen: !!router.query.userRequestPasswordReset,
   });
 
   const {
@@ -50,6 +55,20 @@ const SignIn: CustomNextPage = () => {
   } = useDisclosure({
     defaultIsOpen: false,
   });
+
+  useEffect(() => {
+    !!router.query.userRequestPasswordReset
+      ? onShowRequestedPasswordReset()
+      : onCloseRequestedPasswordReset();
+
+    !!router.query.newAccount ? onShowNewAccount() : onCloseNewAccountAlert();
+  }, [
+    onCloseNewAccountAlert,
+    onCloseRequestedPasswordReset,
+    onShowNewAccount,
+    onShowRequestedPasswordReset,
+    router.query,
+  ]);
 
   useEffect(() => {
     const authSubscriber = {

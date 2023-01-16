@@ -150,7 +150,9 @@ export const RecipeViewDesktop = (
                 color={'white'}
                 _hover={{ background: 'brand.600' }}
                 _active={{ background: 'brand.600' }}
-                onClick={() => onRemoveRecipeServings(recipe, 4)}
+                onClick={() =>
+                  onRemoveRecipeServings(recipe, recipe.baseServings)
+                }
               >
                 <MinusIcon />
               </Button>
@@ -165,7 +167,7 @@ export const RecipeViewDesktop = (
                 color={'white'}
                 _hover={{ background: 'brand.600' }}
                 _active={{ background: 'brand.600' }}
-                onClick={() => onAddRecipeServings(recipe, 4)}
+                onClick={() => onAddRecipeServings(recipe, recipe.baseServings)}
               >
                 <AddIcon />
               </Button>
@@ -347,7 +349,9 @@ export const RecipeViewMobile = (
                         color={'white'}
                         _hover={{ background: 'brand.600' }}
                         _active={{ background: 'brand.600' }}
-                        onClick={() => onRemoveRecipeServings(recipe, 4)}
+                        onClick={() =>
+                          onRemoveRecipeServings(recipe, recipe.baseServings)
+                        }
                       >
                         <MinusIcon />
                       </Button>
@@ -366,7 +370,9 @@ export const RecipeViewMobile = (
                         color={'white'}
                         _hover={{ background: 'brand.600' }}
                         _active={{ background: 'brand.600' }}
-                        onClick={() => onAddRecipeServings(recipe, 4)}
+                        onClick={() =>
+                          onAddRecipeServings(recipe, recipe.baseServings)
+                        }
                       >
                         <AddIcon />
                       </Button>

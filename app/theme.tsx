@@ -17,10 +17,12 @@ const theme = extendTheme({
     md: '768px',
     lg: '1006px',
     xl: '1200px',
+    '1xl': '1350px',
+    '2xl': '1400px',
   },
   fonts: {
-    heading: `Roboto, sans-serif`,
-    body: `Roboto, sans-serif`,
+    heading: `'Inter', sans-serif`,
+    body: `'Inter', sans-serif`,
   },
   colors: {
     transparent: 'transparent',
@@ -28,7 +30,10 @@ const theme = extendTheme({
     white: '#fff',
     gray: {
       bg: 'F#CFCFC',
+      searchBoxGray: 'rgba(228, 228, 228, 0.3)',
+      lighterGray: '#F7FAFC',
       light: '#aaaaaa',
+      bone: '#808191',
       normal: '#777777',
       dark: '#444444',
     },

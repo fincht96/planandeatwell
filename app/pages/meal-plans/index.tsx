@@ -1,9 +1,17 @@
-import { Box, Button, Container, Flex, Grid, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Grid,
+  Text,
+  useMediaQuery,
+} from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { FiPlus } from 'react-icons/fi';
+import { SlPlus } from 'react-icons/sl';
 import CenteredLoadingSpinner from '../../components/CenteredLoadingSpinner';
 import Layout from '../../components/layout';
 import MealPlan from '../../components/meal-plans/MealPlan';
@@ -19,8 +27,9 @@ import { queryParamToString } from '../../utils/queryParamConversions';
 import { getMealPlans } from '../../utils/requests/meal-plans';
 
 const MealPlans: CustomNextPage = () => {
+  const [isLessThan768] = useMediaQuery('(max-width: 768px)');
   const router = useRouter();
-  const { authClaims, authToken } = useAuth();
+  const { authClaims, authToken, user } = useAuth();
   const [queryParamsInitialised, setQueryParamsInitialised] = useState(false);
   const [totalCountMealPlans, setTotalCountMealPlans] = useState(0);
   const [mealPlans, setMealPlans] = useState<
@@ -112,16 +121,41 @@ const MealPlans: CustomNextPage = () => {
       <>
         <Container maxW="1200px" mb={10}>
           <Box textAlign={'left'}>
-            <Text fontSize={'2rem'} color="gray.dark" fontWeight={500}>
-              Sorry, it looks like you do not currently have any meal plans.
+            <Text
+              fontSize="2.5rem"
+              color="black"
+              fontWeight={700}
+              textAlign={isLessThan768 ? 'center' : 'left'}
+            >
+              Oops, you have no meal plans...
             </Text>
           </Box>
-          <Box height={'10rem'}>
+        </Container>
+        <Container maxW="1200px" mb={10}>
+          <Box
+            height={{
+              '2xl': '18rem',
+              base: '19rem',
+            }}
+          >
             <Button
-              height={'100%'}
+              height={{ base: '100%', lg: '80%' }}
+              width={{ base: '100%', lg: '80%' }}
               onClick={() => onNavigate('/create-plan/steps')}
             >
-              <FiPlus /> Add new meal plan
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Box display="flex" justifyContent="center">
+                  <SlPlus fontSize="1.3rem" color="black" />
+                </Box>
+                <Box mt="1rem">
+                  <Text>Create new meal plan</Text>
+                </Box>
+              </Box>
             </Button>
           </Box>
         </Container>
@@ -130,102 +164,130 @@ const MealPlans: CustomNextPage = () => {
   };
 
   const showMealPlans = () => {
+    const userFirstName = user?.displayName?.split(' ')[0];
     return (
       <>
         <Container maxW="1200px" mb={10}>
           <Box textAlign={'left'}>
-            <Text fontSize={'2rem'} color="gray.dark" fontWeight={500}>
-              My meal plans
+            <Text
+              noOfLines={2}
+              fontSize="2.5rem"
+              color="black"
+              fontWeight={700}
+              textAlign={isLessThan768 ? 'center' : 'left'}
+            >
+              {userFirstName ? `${userFirstName}'s` : 'User'} meal plans
             </Text>
           </Box>
         </Container>
 
         <Container maxW="1200px" mb={10}>
-          <SearchMenu
-            mb={'2rem'}
-            sortBy={orderToSortBy(
-              mealPlansQueryParams.order,
-              mealPlansQueryParams.orderBy,
-            )}
-            searchTerm={mealPlansQueryParams.searchTerm}
-            onSearch={({ searchTerm }: { searchTerm: string }) => {
-              setMealPlansQueryParams((current) => {
-                return {
-                  ...current,
-                  offset: 0,
-                  searchTerm,
-                };
-              });
-
-              const { searchTerm: oldSearchTerm, ...unchangedQueryParams } =
-                router.query;
-              router.push({
-                query: {
-                  ...unchangedQueryParams,
-                  ...(searchTerm.length && { searchTerm }),
-                },
-              });
-            }}
-            onSortByChange={(sortBy: SortBy) => {
-              const orderAndOrderBy = sortByToOrder(sortBy);
-              setMealPlansQueryParams((current) => {
-                return {
-                  ...current,
-                  ...orderAndOrderBy,
-                  offset: 0,
-                };
-              });
-
-              router.push({
-                query: {
-                  ...router.query,
-                  ...orderAndOrderBy,
-                },
-              });
-            }}
-          />
-
-          <Text
-            fontSize={'1rem'}
-            color="gray.dark"
-            fontWeight={600}
-            mb={'2rem'}
-            borderBottom={'solid 1px'}
-            borderTop={'solid 1px'}
-            borderColor={'gray.100'}
-            py={'1rem'}
+          <Box
+            borderRadius="1.5rem"
+            padding="3rem 2rem 2.5rem"
+            background="white"
+            boxShadow="rgb(0 0 0 / 10%) 0px 3.5px 6px"
           >
-            Results&nbsp;
-            <Text as={'span'} fontWeight={400}>
-              ({totalCountMealPlans})
-            </Text>
-          </Text>
+            <Box>
+              <SearchMenu
+                showMobileView={isLessThan768}
+                mb={'2rem'}
+                sortBy={orderToSortBy(
+                  mealPlansQueryParams.order,
+                  mealPlansQueryParams.orderBy,
+                )}
+                searchTerm={mealPlansQueryParams.searchTerm}
+                onSearch={({ searchTerm }: { searchTerm: string }) => {
+                  setMealPlansQueryParams((current) => {
+                    return {
+                      ...current,
+                      offset: 0,
+                      searchTerm,
+                    };
+                  });
 
-          <Grid templateColumns="repeat(auto-fill, minMax(275px,1fr));" gap={5}>
-            <Box height={'10rem'}>
-              <Button
-                height={'100%'}
-                width={'100%'}
-                onClick={() => onNavigate('/create-plan/steps')}
-              >
-                <FiPlus /> Add new meal plan
-              </Button>
+                  const { searchTerm: oldSearchTerm, ...unchangedQueryParams } =
+                    router.query;
+                  router.push({
+                    query: {
+                      ...unchangedQueryParams,
+                      ...(searchTerm.length && { searchTerm }),
+                    },
+                  });
+                }}
+                onSortByChange={(sortBy: SortBy) => {
+                  const orderAndOrderBy = sortByToOrder(sortBy);
+                  setMealPlansQueryParams((current) => {
+                    return {
+                      ...current,
+                      ...orderAndOrderBy,
+                      offset: 0,
+                    };
+                  });
+
+                  router.push({
+                    query: {
+                      ...router.query,
+                      ...orderAndOrderBy,
+                    },
+                  });
+                }}
+              />
             </Box>
-            {mealPlans.map((mealPlan: any) => {
-              return (
-                <MealPlan
-                  key={mealPlan.uuid}
-                  uuid={mealPlan.uuid}
-                  name={mealPlan.name}
-                  recipesCount={mealPlan.recipesCount}
-                  ingredientsCount={mealPlan.ingredientsCount}
-                  totalServings={mealPlan.totalServings}
-                  totalPrice={mealPlan.totalPrice}
-                  supermarketName={mealPlan.supermarketName}
-                />
-              );
-            })}
-          </Grid>
+            <Box>
+              <Text fontSize={'sm'} color="black" fontWeight={600} mb={'2rem'}>
+                Results&nbsp;
+                <Text as={'span'} fontWeight={600} color="black">
+                  ({totalCountMealPlans})
+                </Text>
+              </Text>
+            </Box>
+            <Grid
+              templateColumns="repeat(auto-fill, minMax(275px,1fr));"
+              gap={5}
+            >
+              <Box
+                height={{
+                  '2xl': '19.5rem',
+                  base: '20rem',
+                }}
+              >
+                <Button
+                  height={'100%'}
+                  width={'100%'}
+                  onClick={() => onNavigate('/create-plan/steps')}
+                >
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Box display="flex" justifyContent="center">
+                      <SlPlus fontSize="1.3rem" color="black" />
+                    </Box>
+                    <Box mt="1rem">
+                      <Text>Create new meal plan</Text>
+                    </Box>
+                  </Box>
+                </Button>
+              </Box>
+              {mealPlans.map((mealPlan: any) => {
+                return (
+                  <MealPlan
+                    key={mealPlan.uuid}
+                    uuid={mealPlan.uuid}
+                    name={mealPlan.name}
+                    recipesCount={mealPlan.recipesCount}
+                    ingredientsCount={mealPlan.ingredientsCount}
+                    totalServings={mealPlan.totalServings}
+                    totalPrice={mealPlan.totalPrice}
+                    supermarketName={mealPlan.supermarketName}
+                  />
+                );
+              })}
+            </Grid>
+          </Box>
         </Container>
         <Container maxW="1200px" mb={10}>
           {showMore && !!mealPlans.length && (
@@ -275,14 +337,9 @@ const MealPlans: CustomNextPage = () => {
       <Head>
         <title>Meal Plans | Plan and Eat Well</title>
       </Head>
-
-      <Container my={'2rem'} maxW={'1200px'}>
-        {mealPlansView()}
-      </Container>
+      <Container maxW={'1200px'}>{mealPlansView()}</Container>
     </Layout>
   );
 };
-
 MealPlans.requireAuth = true;
-
 export default MealPlans;

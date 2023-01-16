@@ -29,7 +29,6 @@ interface LinkItemProps {
   href: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-  // { name: 'Home', icon: FiHome },
   { name: 'Recipes', icon: FiMenu, href: '/recipes' },
   { name: 'Ingredients', icon: FiMenu, href: '/ingredients' },
 ];
@@ -97,7 +96,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       h="full"
       {...rest}
     >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+      <Flex
+        h="6.5rem"
+        alignItems="center"
+        mx="8"
+        justifyContent="space-between"
+      >
         <Logo />
         <CloseButton display={{ base: 'flex', lg: 'none' }} onClick={onClose} />
       </Flex>
@@ -118,11 +122,7 @@ interface NavItemProps extends FlexProps {
 }
 const NavItem = ({ icon, href, children, ...rest }: NavItemProps) => {
   return (
-    <NextLink
-      href={href}
-      style={{ textDecoration: 'none', boxShadow: 'none' }}
-      // _focus={{ boxShadow: 'none' }}
-    >
+    <NextLink href={href} style={{ textDecoration: 'none', boxShadow: 'none' }}>
       <Flex
         align="center"
         p="4"

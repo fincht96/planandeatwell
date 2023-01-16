@@ -4,6 +4,7 @@ import { NextComponentType, NextPageContext } from 'next';
 import type { AppProps } from 'next/app';
 import { RouteGuard } from '../components/RouteGuard';
 import { AuthProvider } from '../contexts/auth-context';
+import Fonts from '../Fonts';
 import '../styles/globals.css';
 import theme from '../theme';
 
@@ -20,6 +21,7 @@ function MyApp({
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider theme={theme}>
+        <Fonts />
         <AuthProvider>
           <RouteGuard
             isProtectedComponent={Component.requireAuth}

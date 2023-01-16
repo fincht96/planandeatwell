@@ -22,21 +22,28 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ReactNode, ReactText } from 'react';
 import { IconType } from 'react-icons';
-import { BiBookContent } from 'react-icons/bi';
-import { FiBell, FiChevronDown, FiMenu, FiSettings } from 'react-icons/fi';
-import { IoAddOutline } from 'react-icons/io5';
+import {
+  SlMenu,
+  SlNotebook,
+  SlPlus,
+  SlSettings,
+  SlUserFollowing,
+} from 'react-icons/sl';
 import { useAuth } from '../contexts/auth-context';
 import ChakraNextLink from './NextChakraLink';
-
 interface LinkItemProps {
   name: string;
   icon: IconType;
   href: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Create a meal plan', icon: IoAddOutline, href: '/create-plan' },
-  { name: 'My meal plans', icon: BiBookContent, href: '/meal-plans' },
-  { name: 'Settings', icon: FiSettings, href: '#' },
+  {
+    name: 'Create meal plan',
+    icon: SlPlus,
+    href: '/create-plan',
+  },
+  { name: 'My meal plans', icon: SlNotebook, href: '/meal-plans' },
+  { name: 'Settings', icon: SlSettings, href: '#' },
 ];
 
 export default function SidebarWithHeader({
@@ -47,7 +54,7 @@ export default function SidebarWithHeader({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box minH="100vh" bg={useColorModeValue('white', 'gray.900')}>
+    <Box minH="100vh" bg={useColorModeValue('gray.lighterGray', 'gray.900')}>
       <SidebarContent
         onClose={() => onClose}
         display={{ base: 'none', md: 'block' }}
@@ -84,18 +91,26 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
     <Box
       transition="3s ease"
-      bg={useColorModeValue('white', 'gray.900')}
+      bg={useColorModeValue('gray.lighterGray', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-      w={{ base: 'full', md: 60 }}
+      w={{ base: 'full', md: '16rem' }}
       pos="fixed"
       h="full"
       {...rest}
     >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+      <Flex
+        h="6.5rem"
+        alignItems="center"
+        mx="8"
+        justifyContent="space-between"
+      >
         <Image src="/images/logo.png" height={45} width={176} alt={'logo'} />
-
-        <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
+        <CloseButton
+          display={{ base: 'flex', md: 'none' }}
+          onClick={onClose}
+          size="1rem"
+        />
       </Flex>
       {LinkItems.map((link) => {
         return (
@@ -131,17 +146,33 @@ const NavItem = ({
     <ChakraNextLink href={href} style={{ textDecoration: 'none' }}>
       <Flex
         align="center"
-        p="4"
-        mx="4"
-        borderRadius="lg"
+        p="1.25rem"
+        mx="1.25rem"
+        borderRadius="xl"
         role="group"
         cursor="pointer"
-        bg={selected ? 'gray.100' : 'white'}
-        fontWeight={selected ? '600' : '400'}
+        bg={selected ? 'brand.500' : 'gray.lighterGray'}
+        height="3.5rem"
         {...rest}
       >
-        {icon && <Icon mr="4" fontSize="16" as={icon} />}
-        {children}
+        {icon && (
+          <Icon
+            mr="4"
+            fontSize="1.3rem"
+            as={icon}
+            color={selected ? 'white' : 'gray.bone'}
+          />
+        )}
+        <Text
+          fontSize="sm"
+          fontWeight="600"
+          color={selected ? 'white' : 'gray.bone'}
+          _hover={{
+            color: selected ? 'white' : 'brand.500',
+          }}
+        >
+          {children}
+        </Text>
       </Flex>
     </ChakraNextLink>
   );
@@ -159,39 +190,36 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       px={{ base: 4, md: 4 }}
       height="20"
       alignItems="center"
-      bg={useColorModeValue('white', 'gray.900')}
-      borderBottomWidth="1px"
-      borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
+      bg={useColorModeValue('gray.lighterGray', 'gray.900')}
       justifyContent={{ base: 'space-between', md: 'flex-end' }}
       {...rest}
     >
       <IconButton
         display={{ base: 'flex', md: 'none' }}
         onClick={onOpen}
-        variant="outline"
+        variant="unstyled"
         aria-label="open menu"
-        icon={<FiMenu />}
+        icon={<SlMenu fontSize="1.3rem" color="black" />}
       />
 
       <HStack spacing={{ base: '0', md: '6' }}>
-        <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="open menu"
-          icon={<FiBell />}
-        />
-        <Flex alignItems={'center'}>
+        <Flex alignItems={'center'} p="0.3rem">
           <Menu>
             <MenuButton
-              py={2}
+              borderRadius="lg"
+              p="1.25rem"
               transition="all 0.3s"
               _focus={{ boxShadow: 'none' }}
+              _hover={{ background: 'brand.100' }}
             >
               <HStack>
+                <Box>
+                  <SlUserFollowing fontSize="1.3rem" />
+                </Box>
                 <VStack alignItems="flex-start" spacing="1px" ml="2">
                   <Text
-                    fontSize="1.2rem"
-                    color="gray.600"
+                    fontSize="sm"
+                    fontWeight="700"
                     overflow={'hidden'}
                     textOverflow={'ellipsis'}
                     maxW={{
@@ -205,19 +233,12 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                     {user?.displayName ?? 'User'}
                   </Text>
                 </VStack>
-                <Box>
-                  <FiChevronDown />
-                </Box>
               </HStack>
             </MenuButton>
             <MenuList
-              bg={useColorModeValue('white', 'gray.900')}
+              bg={useColorModeValue('gray.lighterGray', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
-              {/* <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
-              <MenuDivider /> */}
               <MenuItem
                 onClick={() => {
                   if (signOut) {

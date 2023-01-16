@@ -18,6 +18,7 @@ export const AuthContext = createContext<{
   user: User | null;
   signIn: ((email: string, password: string) => void) | null;
   signOut: (() => void) | null;
+  sendPasswordResetEmail: ((userEmail: string) => void) | null;
   initialized: boolean;
   redirectPath: string;
   setRedirectPath: Dispatch<SetStateAction<string>> | null;
@@ -29,6 +30,7 @@ export const AuthContext = createContext<{
   user: null,
   signIn: null,
   signOut: null,
+  sendPasswordResetEmail: null,
   initialized: false,
   redirectPath: '',
   setRedirectPath: null,
@@ -88,6 +90,10 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
     return auth.signOut();
   };
 
+  const sendPasswordResetEmail = (userEmail: string) => {
+    return auth.sendPasswordResetEmail(userEmail);
+  };
+
   const value = {
     authToken,
     authClaims,
@@ -95,6 +101,7 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
     user,
     signIn,
     signOut,
+    sendPasswordResetEmail,
     redirectPath,
     setRedirectPath,
     subscribe: auth.subscribe,

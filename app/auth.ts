@@ -1,5 +1,6 @@
 import {
   IdTokenResult,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   Unsubscribe,
@@ -94,6 +95,19 @@ class Auth {
     signOut(auth).catch(() => {
       this._notify({ name: 'onError', data: 'Firebase sign out error' });
     });
+  }
+
+  async sendPasswordResetEmail(userEmail: string) {
+    sendPasswordResetEmail(auth, userEmail)
+      .then(() => {
+        this._notify({ name: 'onPasswordResetEmailSent', data: '' });
+      })
+      .catch(() => {
+        this._notify({
+          name: 'onError',
+          data: 'Error sending password reset email',
+        });
+      });
   }
 
   init() {

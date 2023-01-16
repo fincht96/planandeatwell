@@ -139,8 +139,8 @@ const MealPlans: CustomNextPage = () => {
             }}
           >
             <Button
-              height={isLessThan768 ? '100%' : '80%'}
-              width={isLessThan768 ? '100%' : '80%'}
+              height={{ base: '100%', lg: '80%' }}
+              width={{ base: '100%', lg: '80%' }}
               onClick={() => onNavigate('/create-plan/steps')}
             >
               <Box

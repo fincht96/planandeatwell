@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Text } from '@chakra-ui/react';
+import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import BorderBox from '../BorderBox';
 
@@ -30,7 +30,6 @@ const MealPlan = ({
       overflow={'hidden'}
       display={'flex'}
       p={'2rem'}
-      border="solid"
     >
       <Box position="relative" width="100%">
         <Box mb="1.5rem">
@@ -43,9 +42,9 @@ const MealPlan = ({
           >
             {name}
           </Text>
-          <Text color={'black'} fontWeight={'600'} fontSize={'sm'}>
-            Ingredients from {supermarketName}
-          </Text>
+          <Badge variant={'solid'} colorScheme="orange">
+            {supermarketName}
+          </Badge>
         </Box>
 
         <Flex flexDirection="column">

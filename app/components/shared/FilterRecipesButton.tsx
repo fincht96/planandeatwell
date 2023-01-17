@@ -9,14 +9,12 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
-  Select,
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
 import { useEffect, useRef } from 'react';
-import { IoOptions } from 'react-icons/io5';
-
 import { useForm } from 'react-hook-form';
+import { SlEqualizer } from 'react-icons/sl';
 import {
   convertBoolObjToStringArray,
   convertStringArrayToBoolObj,
@@ -27,20 +25,22 @@ import {
   mealDefaults,
 } from '../../utils/filterDefaults';
 import { toTitleCase } from '../../utils/toTitleCase';
-import SearchField from '../shared/SearchField';
-import FilterCheckBox from './FilterCheckBox';
+import FilterCheckBox from '../menu/FilterCheckBox';
 
-const SearchMenu = (props) => {
+const FilterRecipesButton = (props: any) => {
   const {
-    onSearch,
     onFiltersChange,
-    onSortByChange,
     mealsFilters,
     lifestyleFilters,
     freeFromFilters,
-    sortBy,
-    searchTerm,
-    ...rest
+    btnHeight,
+    btnBgColor,
+    btnTextColor,
+    btnBorderColor,
+    btnFontWeight,
+    btnFontSize,
+    btnParentWidth,
+    btnWidth,
   } = props;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -52,7 +52,7 @@ const SearchMenu = (props) => {
   const { register, handleSubmit, watch, reset, setValue, getValues } =
     useForm();
 
-  const onFilterMenuSubmit = (data) => {
+  const onFilterMenuSubmit = (data: any) => {
     onFiltersChange({
       meals: convertBoolObjToStringArray(data.meals),
       lifestyles: convertBoolObjToStringArray(data.lifestyles),
@@ -68,10 +68,6 @@ const SearchMenu = (props) => {
   };
 
   useEffect(() => {
-    if (getValues('sortBy') !== sortBy) {
-      setValue('sortBy', sortBy);
-    }
-
     if (isOpen) {
       reset({
         meals: {
@@ -94,50 +90,31 @@ const SearchMenu = (props) => {
     mealsFilters,
     lifestyleFilters,
     freeFromFilters,
-    sortBy,
-    searchTerm,
     getValues,
     setValue,
   ]);
 
   return (
-    <Box {...rest}>
-      <SearchField value={searchTerm} onSearchSubmit={onSearch} mb={'2rem'} />
-      <Flex
-        mb={'2rem'}
-        gap={'1rem'}
-        justifyContent={'space-between'}
-        alignItems={'center'}
+    <Box width={btnParentWidth}>
+      <Button
+        width={btnWidth}
+        cursor="pointer"
+        _hover={{
+          bg: 'brand.100',
+          color: 'black',
+        }}
+        fontSize={btnFontSize}
+        fontWeight={btnFontWeight}
+        borderColor={btnBorderColor}
+        color={btnTextColor}
+        bg={btnBgColor}
+        height={btnHeight}
+        ref={btnRef}
+        onClick={onOpen}
+        rightIcon={<SlEqualizer fontSize="1rem" color="black" />}
       >
-        <Button
-          ref={btnRef}
-          colorScheme="brand"
-          onClick={onOpen}
-          leftIcon={<IoOptions />}
-          fontWeight={'normal'}
-          height={'2rem'}
-        >
-          Filters ({filtersCount})
-        </Button>
-
-        <Flex gap={'1rem'} alignItems={'center'} boxSizing={'content-box'}>
-          <Select
-            minW={'12rem'}
-            bg={'white'}
-            {...register(`sortBy`)}
-            onChange={(e) => {
-              onSortByChange(e.target.value);
-            }}
-            height={'2rem'}
-            color={'gray.dark'}
-          >
-            <option value="relevance">Relevance</option>
-            <option value="newest">Newest</option>
-            <option value="priceAscending">Price Ascending</option>
-            <option value="priceDescending">Price Descending</option>
-          </Select>
-        </Flex>
-      </Flex>
+        Filters ({filtersCount})
+      </Button>
 
       <Drawer
         isOpen={isOpen}
@@ -150,13 +127,23 @@ const SearchMenu = (props) => {
       >
         <form onSubmit={handleSubmit(onFilterMenuSubmit)} autoComplete="off">
           <DrawerOverlay />
-          <DrawerContent>
+          <DrawerContent bg="gray.lighterGray">
             <DrawerCloseButton />
-            <DrawerHeader>Filters</DrawerHeader>
-
+            <DrawerHeader>
+              <Text fontSize="2xl" fontWeight="600">
+                Filters
+              </Text>
+            </DrawerHeader>
             <DrawerBody>
               <Box mb={'2rem'}>
-                <Text>Meal type</Text>
+                <Text
+                  fontSize="sm"
+                  fontWeight="600"
+                  color="gray.dark"
+                  mb="0.5rem"
+                >
+                  Meal types
+                </Text>
                 <Flex flexWrap={'wrap'}>
                   {Object.keys(mealDefaults.meals).map((meal: string) => {
                     return (
@@ -173,7 +160,14 @@ const SearchMenu = (props) => {
               </Box>
 
               <Box mb={'2rem'}>
-                <Text>Lifestyle</Text>
+                <Text
+                  fontSize="sm"
+                  fontWeight="600"
+                  color="gray.dark"
+                  mb="0.5rem"
+                >
+                  Lifestyle types
+                </Text>
                 <Flex flexWrap={'wrap'}>
                   {Object.keys(lifestyleDefaults.lifestyles).map(
                     (lifestyle: string) => {
@@ -192,7 +186,14 @@ const SearchMenu = (props) => {
               </Box>
 
               <Box>
-                <Text>Free from</Text>
+                <Text
+                  fontSize="sm"
+                  fontWeight="600"
+                  color="gray.dark"
+                  mb="0.5rem"
+                >
+                  Free from types
+                </Text>
                 <Flex flexWrap={'wrap'}>
                   {Object.keys(freeFromDefaults.freeFroms).map(
                     (freeFrom: string) => {
@@ -212,10 +213,25 @@ const SearchMenu = (props) => {
             </DrawerBody>
 
             <DrawerFooter>
-              <Button variant="outline" mr={3} onClick={onClear}>
+              <Button
+                borderRadius="lg"
+                border="solid"
+                borderColor="gray.light"
+                bg="white"
+                color="gray.dark"
+                _hover={{ bg: 'brand.100', color: 'gray.dark' }}
+                mr={3}
+                onClick={onClear}
+              >
                 Clear
               </Button>
-              <Button colorScheme="brand" type="submit">
+              <Button
+                borderRadius="lg"
+                bg="brand.500"
+                color="white"
+                _hover={{ bg: 'brand.100', color: 'black' }}
+                type="submit"
+              >
                 Apply
               </Button>
             </DrawerFooter>
@@ -226,4 +242,4 @@ const SearchMenu = (props) => {
   );
 };
 
-export default SearchMenu;
+export default FilterRecipesButton;

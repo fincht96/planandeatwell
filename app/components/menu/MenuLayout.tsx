@@ -1,5 +1,5 @@
 import Meta from '../meta';
-import Navbar from './MenuNavBar';
+import Navbar from '../Navbar';
 import RecipeBasketButton from './RecipeBasketButton';
 
 export const siteTitle = 'Meal Planner | Plan and Eat Well';

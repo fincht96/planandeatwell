@@ -15,7 +15,7 @@ import { SlPlus } from 'react-icons/sl';
 import CenteredLoadingSpinner from '../../components/CenteredLoadingSpinner';
 import Layout from '../../components/layout';
 import MealPlan from '../../components/meal-plans/MealPlan';
-import SearchMenu from '../../components/meal-plans/SearchMenu';
+import SearchSortFilterSection from '../../components/shared/SearchSortFilterSection';
 import { useAuth } from '../../contexts/auth-context';
 import { CustomNextPage } from '../../types/CustomNextPage';
 import { Order, OrderBy, SortBy } from '../../types/mealPlanOrder.types';
@@ -167,37 +167,36 @@ const MealPlans: CustomNextPage = () => {
     const userFirstName = user?.displayName?.split(' ')[0];
     return (
       <>
-        <Container maxW="1200px" mb={10}>
-          <Box textAlign={'left'}>
+        <Container maxW="1100px" mb={10}>
+          <Box>
             <Text
               noOfLines={2}
-              fontSize="2.5rem"
+              fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
               color="black"
               fontWeight={700}
-              textAlign={isLessThan768 ? 'center' : 'left'}
+              textAlign={{ base: 'center', '2xl': 'left' }}
+              ml={{ '2xl': '1.6rem' }}
             >
               {userFirstName ? `${userFirstName}'s` : 'User'} meal plans
             </Text>
           </Box>
         </Container>
 
-        <Container maxW="1200px" mb={10}>
-          <Box
-            borderRadius="1.5rem"
-            padding="3rem 2rem 2.5rem"
-            background="white"
-            boxShadow="rgb(0 0 0 / 10%) 0px 3.5px 6px"
-          >
+        <Container maxW="1100px" mb={10}>
+          <Box padding="0 2rem 2.5rem">
             <Box>
-              <SearchMenu
-                showMobileView={isLessThan768}
-                mb={'2rem'}
+              <SearchSortFilterSection
+                searchFieldPlaceHolderText="Search meal plans..."
+                selectValues={{
+                  relevance: 'Relevance',
+                  newest: 'Newest',
+                }}
                 sortBy={orderToSortBy(
                   mealPlansQueryParams.order,
                   mealPlansQueryParams.orderBy,
                 )}
                 searchTerm={mealPlansQueryParams.searchTerm}
-                onSearch={({ searchTerm }: { searchTerm: string }) => {
+                onSearchSubmit={({ searchTerm }: { searchTerm: string }) => {
                   setMealPlansQueryParams((current) => {
                     return {
                       ...current,
@@ -215,7 +214,7 @@ const MealPlans: CustomNextPage = () => {
                     },
                   });
                 }}
-                onSortByChange={(sortBy: SortBy) => {
+                handleSortChange={(sortBy: SortBy) => {
                   const orderAndOrderBy = sortByToOrder(sortBy);
                   setMealPlansQueryParams((current) => {
                     return {
@@ -244,7 +243,7 @@ const MealPlans: CustomNextPage = () => {
             </Box>
             <Grid
               templateColumns="repeat(auto-fill, minMax(275px,1fr));"
-              gap={5}
+              gap={6}
             >
               <Box
                 height={{
@@ -341,5 +340,7 @@ const MealPlans: CustomNextPage = () => {
     </Layout>
   );
 };
+
 MealPlans.requireAuth = true;
+
 export default MealPlans;

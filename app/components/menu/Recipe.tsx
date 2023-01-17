@@ -1,9 +1,9 @@
-import { CheckCircleIcon, InfoOutlineIcon, TimeIcon } from '@chakra-ui/icons';
+import { CheckCircleIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { Badge, Box, Flex, Text } from '@chakra-ui/react';
 import Image from 'next/image';
+import { SlBasketLoaded, SlClock, SlPeople } from 'react-icons/sl';
 import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
 import BorderBox from '../BorderBox';
-
 const Recipe = ({
   id,
   name,
@@ -34,10 +34,13 @@ const Recipe = ({
       maxH={'xl'}
       overflow={'hidden'}
       cursor={'pointer'}
+      borderColor="gray.light"
       onClick={() => onClick(id)}
-      border={selected && 'solid black 1px'}
+      bg={selected ? 'brand.100' : ''}
+      position="relative"
+      _hover={{ bg: selected ? 'brand.100' : 'gray.searchBoxGray' }}
     >
-      <Box minH={'20rem'} position={'relative'}>
+      <Box h={'12.5rem'} position={'relative'}>
         <Image
           quality={75}
           src={`${process.env.NEXT_PUBLIC_CDN}${imagePath}`}
@@ -47,14 +50,13 @@ const Recipe = ({
           priority
         />
       </Box>
-      <Box p={'4'} _hover={{ bg: 'brand.50' }}>
+      <Box p={'4'} mb={{ base: '1.5rem', md: '2rem' }}>
         <Box noOfLines={1}>
-          <Text fontSize={'1.8rem'} fontWeight={800} color="gray.dark">
+          <Text fontSize={'1.3rem'} fontWeight={600} color="black">
             {name}
           </Text>
         </Box>
-
-        <Box my={0.5}>
+        <Box mb="0.8rem">
           <Badge
             variant={'solid'}
             colorScheme={getSupermarketBrandColor(supermarketName)}
@@ -63,40 +65,74 @@ const Recipe = ({
           </Badge>
         </Box>
 
-        <Flex my={0.5} alignItems={'center'}>
-          <TimeIcon w={4} h={4} />
-          <Text
-            color={'gray.500'}
-            fontWeight={'semibold'}
-            letterSpacing={'wide'}
-            fontSize={'sm'}
-            ml={'1rem'}
+        <Flex flexDirection="row" justifyContent="flex-start">
+          <Flex
+            my={0.5}
+            flexDirection="column"
+            justifyContent="flex-start"
+            mr="1.5rem"
           >
-            prep {prepTime} min | cook {cookTime} min
-          </Text>
-        </Flex>
-
-        <Flex alignItems={'center'}>
-          <Box>
-            <InfoOutlineIcon w={4} h={4} />
-          </Box>
-
-          <Text
-            color={'gray.500'}
-            fontWeight={'semibold'}
-            letterSpacing={'wide'}
-            fontSize={'sm'}
-            ml={'1rem'}
-          >
-            £{pricePerServing.toFixed(2)} per serving | serves {baseServings}
-            <br /> {ingredientsCount} ingredients
-          </Text>
-        </Flex>
-
-        <Flex justifyContent={'flex-end'}>
-          <CheckCircleIcon visibility={selected ? 'visible' : 'hidden'} />
+            <Flex alignItems="center" mb="0.8rem">
+              <SlClock fontSize="1rem" />
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize="0.8rem"
+                ml={'0.5rem'}
+              >
+                {prepTime + cookTime} mins total
+              </Text>
+            </Flex>
+            <Flex alignItems="center">
+              <InfoOutlineIcon w={4} h={4} />
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize="0.8rem"
+                ml={'0.5rem'}
+              >
+                £{pricePerServing.toFixed(2)} p/serving
+              </Text>
+            </Flex>
+          </Flex>
+          <Flex flexDirection="column" justifyContent="flex-start">
+            <Flex alignItems="center" mb="0.8rem">
+              <SlPeople fontSize="1rem" />
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize="0.8rem"
+                ml={'0.5rem'}
+              >
+                Serves ({baseServings})
+              </Text>
+            </Flex>
+            <Flex alignItems="center">
+              <SlBasketLoaded fontSize="1rem" />
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize="0.8rem"
+                ml={'0.5rem'}
+              >
+                Ingredients ({ingredientsCount})
+              </Text>
+            </Flex>
+          </Flex>
         </Flex>
       </Box>
+      <Flex
+        justifyContent={'flex-end'}
+        position="absolute"
+        bottom="2.5"
+        right="2.5"
+      >
+        <CheckCircleIcon visibility={selected ? 'visible' : 'hidden'} />
+      </Flex>
     </BorderBox>
   );
 };

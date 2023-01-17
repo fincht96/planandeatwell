@@ -13,7 +13,7 @@ const theme = extendTheme({
     }),
   },
   breakpoints: {
-    sm: '320px',
+    sm: '400px',
     md: '768px',
     lg: '1006px',
     xl: '1200px',
@@ -31,6 +31,7 @@ const theme = extendTheme({
     gray: {
       bg: 'F#CFCFC',
       searchBoxGray: 'rgba(228, 228, 228, 0.3)',
+      veryLightGray: '#E7EFEC',
       lighterGray: '#F7FAFC',
       light: '#aaaaaa',
       bone: '#808191',

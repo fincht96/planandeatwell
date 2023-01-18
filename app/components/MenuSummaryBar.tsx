@@ -15,6 +15,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
+import RecipeBasketButton from './menu/RecipeBasketButton';
 
 export default function MenuSummaryBar({
   currentPrice,
@@ -47,44 +48,39 @@ export default function MenuSummaryBar({
         }}
       >
         <Flex
-          bg={useColorModeValue('#D9D9D9', 'gray.800')}
-          color={useColorModeValue('gray.600', 'white')}
-          minH={'60px'}
+          bg={useColorModeValue('gray.veryLightGray', 'gray.800')}
+          color={useColorModeValue('black', 'white')}
+          minH="4rem"
           py={{ base: 2 }}
           px={{ base: 4 }}
-          borderBottom={1}
-          borderStyle={'solid'}
-          borderColor={useColorModeValue('gray.200', 'gray.900')}
           justifyContent={{ base: 'center', md: 'flex-end' }}
           display={{ base: 'none', md: 'flex' }}
+          alignItems="center"
         >
-          <Button
-            colorScheme="brand"
-            fontSize={'1.2rem'}
-            fontWeight={600}
-            padding={'1.5rem 1.5rem'}
-            disabled={!recipeList.length}
-            onClick={onComplete}
-          >
-            Checkout
-          </Button>
+          <RecipeBasketButton
+            currentPrice={currentPrice}
+            ingredientList={ingredientList}
+            recipeList={recipeList}
+            servings={servings}
+            onComplete={onComplete}
+            onAddRecipeServings={onAddRecipeServings}
+            onRemoveRecipeServings={onRemoveRecipeServings}
+          />
         </Flex>
 
         <Flex
-          bg={useColorModeValue('#D9D9D9', 'gray.800')}
+          bg={useColorModeValue('gray.veryLightGray', 'gray.800')}
           color={useColorModeValue('gray.600', 'white')}
-          minH={'60px'}
+          minH="4rem"
           py={{ base: 2 }}
           px={{ base: 4 }}
           borderBottom={1}
-          borderStyle={'solid'}
           borderColor={useColorModeValue('gray.200', 'gray.900')}
           justifyContent={'center'}
-          display={{ base: recipeList.length ? 'flex' : 'none', md: 'none' }}
+          display={{ base: 'flex', md: 'none' }}
         >
           <Button
             colorScheme="brand"
-            fontSize={'1rem'}
             fontWeight={600}
             padding={'1.5rem 1.5rem'}
             disabled={!recipeList.length}
@@ -96,16 +92,15 @@ export default function MenuSummaryBar({
               alignItems={'center'}
               width={'100%'}
             >
-              <Box
-                boxSizing={'border-box'}
-                bg={'brand.600'}
-                p={'0.2rem'}
-                fontWeight={600}
-              >
-                {servings}
-              </Box>
-              <Text>View Basket</Text>
-              <Text>£{currentPrice}</Text>
+              <Text fontSize="0.9rem" color="white" fontWeight="600">
+                Recipes ({recipeList.length})
+              </Text>
+              <Text fontSize="0.9rem" color="white" fontWeight="600">
+                {recipeList.length ? 'View basket' : 'Basket empty'}
+              </Text>
+              <Text fontSize="0.9rem" color="white" fontWeight="600">
+                £{currentPrice}
+              </Text>
             </Flex>
           </Button>
         </Flex>
@@ -120,26 +115,44 @@ export default function MenuSummaryBar({
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader color={'gray.600'}>Your meal plan</DrawerHeader>
+          <DrawerHeader
+            fontSize="2xl"
+            fontWeight="600"
+            color="black"
+            pb="0.25rem"
+          >
+            Your meal plan
+          </DrawerHeader>{' '}
           <DrawerBody>
-            <Box pb={'1rem'}>
+            <Box pb={'0.5rem'}>
               <Divider />
             </Box>
 
-            <Box pb={'1rem'}>
-              <Text fontSize={'1rem'} color="gray.600" fontWeight={600}>
+            <Box pb={'0.5rem'}>
+              <Text
+                fontSize="sm"
+                fontWeight="600"
+                color="gray.dark"
+                pb={'0.25rem'}
+              >
                 Recipes
               </Text>
 
               {recipeList.map((recipe: any) => {
                 return (
                   <Flex justifyContent={'space-between'} key={recipe.recipe.id}>
-                    <Text py={'0.5rem'} fontSize={'1rem'} color="gray.500">
+                    <Text
+                      py="0.25rem"
+                      fontSize="0.78rem"
+                      fontWeight="600"
+                      color="gray.bone"
+                    >
                       {recipe.recipe.name}
                     </Text>
 
                     <Flex alignItems={'center'} gridGap={'0.5rem'}>
                       <Circle
+                        _hover={{ background: 'brand.100' }}
                         size="1.1rem"
                         bg="white"
                         border={'solid 1px'}
@@ -154,11 +167,17 @@ export default function MenuSummaryBar({
                       >
                         <MinusIcon color={'brand.500'} width={'0.5rem'} />
                       </Circle>
-                      <Text fontSize={'1rem'} color="gray.600">
+                      <Text
+                        py="0.25rem"
+                        fontSize="0.78rem"
+                        fontWeight="600"
+                        color="gray.dark"
+                      >
                         {recipe.servings} servings
                       </Text>
 
                       <Circle
+                        _hover={{ background: 'brand.100' }}
                         size="1.1rem"
                         bg="white"
                         border={'solid 1px'}
@@ -179,19 +198,35 @@ export default function MenuSummaryBar({
               })}
             </Box>
 
-            <Box pb={'1rem'}>
-              <Text fontSize={'1rem'} color="gray.600" fontWeight={600}>
+            <Box pb={'0.5rem'}>
+              <Text
+                fontSize="sm"
+                fontWeight="600"
+                color="gray.dark"
+                pb={'0.25rem'}
+              >
                 Ingredients
               </Text>
 
               {ingredientList.map((ingredient: any) => {
                 return (
                   <Flex justifyContent={'space-between'} key={ingredient.id}>
-                    <Text py={'0.5rem'} color="gray.500">
+                    <Text
+                      py="0.25rem"
+                      fontSize="0.78rem"
+                      fontWeight="600"
+                      color="gray.bone"
+                      maxWidth="18rem"
+                    >
                       {ingredient.name} ({ingredient.unitQuantity})
                     </Text>
 
-                    <Text py={'0.5rem'} color="gray.500">
+                    <Text
+                      py={'0.25rem'}
+                      fontSize="0.78rem"
+                      fontWeight="600"
+                      color="gray.bone"
+                    >
                       £{ingredient.price}
                     </Text>
                   </Flex>
@@ -204,18 +239,19 @@ export default function MenuSummaryBar({
             </Box>
 
             <Flex justifyContent={'space-between'} pb={'1rem'}>
-              <Text fontSize={'1rem'} color="gray.600" fontWeight={600}>
+              <Text fontSize="sm" fontWeight="600" color="gray.dark">
                 Total
               </Text>
 
-              <Text fontSize={'1rem'} color="gray.600" fontWeight={600}>
+              <Text fontSize="0.78rem" fontWeight="600" color="gray.dark">
                 £{currentPrice}
               </Text>
             </Flex>
 
             <Button
               colorScheme="brand"
-              fontSize={'1.2rem'}
+              borderRadius="lg"
+              fontSize="sm"
               fontWeight={600}
               padding={'1.5rem 1.5rem'}
               disabled={!recipeList.length}

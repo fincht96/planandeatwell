@@ -17,8 +17,9 @@ const theme = extendTheme({
     md: '768px',
     lg: '1006px',
     xl: '1200px',
-    '1xl': '1350px',
+    '1xl': '1300px',
     '2xl': '1400px',
+    '3xl': '1500px',
   },
   fonts: {
     heading: `'Inter', sans-serif`,

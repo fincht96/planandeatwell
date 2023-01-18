@@ -11,11 +11,9 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
-  Icon,
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { RiShoppingBasketFill } from 'react-icons/ri';
 
 const RecipeBasketButton = ({
   currentPrice,
@@ -39,45 +37,80 @@ const RecipeBasketButton = ({
   return (
     <>
       <Button
-        leftIcon={<Icon as={RiShoppingBasketFill} color={'brand.500'} />}
-        border={'solid 1px'}
-        borderColor={'gray.200'}
-        bg={'white'}
-        fontWeight={400}
-        color={'gray.600'}
-        onClick={() => onOpen()}
+        borderRadius="lg"
+        colorScheme="brand"
+        fontWeight={600}
+        p="1.25rem"
         disabled={!recipeList.length}
+        onClick={() => onOpen()}
+        width={{
+          base: '36%',
+          lg: '30%',
+          xl: '26%',
+          '1xl': '24%',
+          '2xl': '22%',
+          '3xl': '20%',
+        }}
       >
-        <Text as={'span'} fontWeight={600}>
-          £{currentPrice}
-        </Text>
-        &nbsp;({servings} servings)
+        <Flex
+          justifyContent={'space-between'}
+          alignItems={'center'}
+          width={'100%'}
+        >
+          <Text fontSize="0.9rem" color="white" fontWeight="600">
+            Recipes ({recipeList.length})
+          </Text>
+          <Text fontSize="0.9rem" color="white" fontWeight="600">
+            {recipeList.length ? 'View basket' : 'Basket empty'}
+          </Text>
+          <Text fontSize="0.9rem" color="white" fontWeight="600">
+            £{currentPrice}
+          </Text>
+        </Flex>
       </Button>
 
       <Drawer onClose={onClose} isOpen={isOpen} size={'md'}>
         <DrawerOverlay />
-        <DrawerContent>
+        <DrawerContent bg="gray.lighterGray">
           <DrawerCloseButton />
-          <DrawerHeader color={'gray.600'}>Your meal plan</DrawerHeader>
+          <DrawerHeader
+            fontSize="2xl"
+            fontWeight="600"
+            color="black"
+            pb="0.25rem"
+          >
+            Your meal plan
+          </DrawerHeader>
           <DrawerBody>
-            <Box pb={'1rem'}>
+            <Box pb={'0.5rem'}>
               <Divider />
             </Box>
 
-            <Box pb={'1rem'}>
-              <Text fontSize={'1rem'} color="gray.600" fontWeight={600}>
+            <Box pb={'0.5rem'}>
+              <Text
+                fontSize="sm"
+                fontWeight="600"
+                color="gray.dark"
+                pb={'0.25rem'}
+              >
                 Recipes
               </Text>
 
               {recipeList.map((recipe: any) => {
                 return (
                   <Flex justifyContent={'space-between'} key={recipe.recipe.id}>
-                    <Text py={'0.5rem'} fontSize={'1rem'} color="gray.500">
+                    <Text
+                      py="0.25rem"
+                      fontSize="0.78rem"
+                      fontWeight="600"
+                      color="gray.bone"
+                    >
                       {recipe.recipe.name}
                     </Text>
 
                     <Flex alignItems={'center'} gridGap={'0.5rem'}>
                       <Circle
+                        _hover={{ background: 'brand.100' }}
                         size="1.1rem"
                         bg="white"
                         border={'solid 1px'}
@@ -92,11 +125,17 @@ const RecipeBasketButton = ({
                       >
                         <MinusIcon color={'brand.500'} width={'0.5rem'} />
                       </Circle>
-                      <Text fontSize={'1rem'} color="gray.600">
+                      <Text
+                        py="0.25rem"
+                        fontSize="0.78rem"
+                        fontWeight="600"
+                        color="gray.dark"
+                      >
                         {recipe.servings} servings
                       </Text>
 
                       <Circle
+                        _hover={{ background: 'brand.100' }}
                         size="1.1rem"
                         bg="white"
                         border={'solid 1px'}
@@ -117,19 +156,34 @@ const RecipeBasketButton = ({
               })}
             </Box>
 
-            <Box pb={'1rem'}>
-              <Text fontSize={'1rem'} color="gray.600" fontWeight={600}>
+            <Box pb={'0.5rem'}>
+              <Text
+                fontSize="sm"
+                fontWeight="600"
+                color="gray.dark"
+                pb={'0.25rem'}
+              >
                 Ingredients
               </Text>
 
               {ingredientList.map((ingredient: any) => {
                 return (
                   <Flex justifyContent={'space-between'} key={ingredient.id}>
-                    <Text py={'0.5rem'} color="gray.500">
+                    <Text
+                      py="0.25rem"
+                      fontSize="0.78rem"
+                      fontWeight="600"
+                      color="gray.bone"
+                    >
                       {ingredient.name} ({ingredient.unitQuantity})
                     </Text>
 
-                    <Text py={'0.5rem'} color="gray.500">
+                    <Text
+                      py={'0.25rem'}
+                      fontSize="0.78rem"
+                      fontWeight="600"
+                      color="gray.bone"
+                    >
                       £{ingredient.price}
                     </Text>
                   </Flex>
@@ -142,18 +196,19 @@ const RecipeBasketButton = ({
             </Box>
 
             <Flex justifyContent={'space-between'} pb={'1rem'}>
-              <Text fontSize={'1rem'} color="gray.600" fontWeight={600}>
+              <Text fontSize="sm" fontWeight="600" color="gray.dark">
                 Total
               </Text>
 
-              <Text fontSize={'1rem'} color="gray.600" fontWeight={600}>
+              <Text fontSize="0.78rem" fontWeight="600" color="gray.dark">
                 £{currentPrice}
               </Text>
             </Flex>
 
             <Button
               colorScheme="brand"
-              fontSize={'1.2rem'}
+              borderRadius="lg"
+              fontSize="sm"
               fontWeight={600}
               padding={'1.5rem 1.5rem'}
               disabled={!recipeList.length}

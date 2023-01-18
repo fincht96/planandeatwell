@@ -90,6 +90,7 @@ jobs:
             NEXT_PUBLIC_CDN=${{ vars.NEXT_PUBLIC_CDN }} 
             NEXT_PUBLIC_WWW_URL=${{ vars.NEXT_PUBLIC_WWW_URL }}
             NEXT_PUBLIC_APP_BASE_URL=${{ vars.NEXT_PUBLIC_APP_BASE_URL }}
+            NEXT_PUBLIC_API_URL_DOCKER_SERVICE=${{ vars.NEXT_PUBLIC_API_URL_DOCKER_SERVICE }}
            
 
 

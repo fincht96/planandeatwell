@@ -17,6 +17,7 @@ declare global {
       SPACES_REGION: string;
       SPACES_BUCKET: string;
       CDN_ENDPOINT: string;
+      FIREBASE_SERVICE_ACCOUNT: string;
     }
   }
 

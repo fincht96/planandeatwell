@@ -48,9 +48,9 @@ const SelectComponent = (props: any) => {
         }}
         height={selectHeight}
       >
-        {Object.entries(selectValues).map(([key, value]: any, index) => {
+        {Object.entries(selectValues).map(([key, value]: any) => {
           return (
-            <option key={index} value={key}>
+            <option key={key} value={key}>
               {value}
             </option>
           );

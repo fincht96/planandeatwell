@@ -36,7 +36,7 @@ const Recipe = ({
       cursor={'pointer'}
       borderColor="gray.light"
       onClick={() => onClick(id)}
-      bg={selected ? 'brand.100' : ''}
+      bg={selected ? 'brand.100' : 'gray.lightGray'}
       position="relative"
       _hover={{ bg: selected ? 'brand.100' : 'gray.searchBoxGray' }}
     >
@@ -93,7 +93,7 @@ const Recipe = ({
                 fontSize="0.8rem"
                 ml={'0.5rem'}
               >
-                £{pricePerServing.toFixed(2)} p/serving
+                £{pricePerServing.toFixed(2)} per serving
               </Text>
             </Flex>
           </Flex>

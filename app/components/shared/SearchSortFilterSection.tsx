@@ -21,6 +21,7 @@ const SearchSortFilterSection = (props: any) => {
     showRecipesFilter = false,
   } = props;
 
+  // todo: add sensible defaults to below components to avoid explicitly setting props each time
   return (
     <Flex flexDirection={{ base: 'column', xl: 'row' }} mb="2rem">
       <Box display="flex" flexDirection="row">

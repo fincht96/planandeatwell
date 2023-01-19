@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Circle, Container, Flex, Text } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Layout, { siteTitle } from '../../components/layout';
@@ -37,22 +37,17 @@ const Steps: CustomNextPage = () => {
               flexDirection="row"
               alignItems="center"
             >
-              <Box
-                mr="1rem"
-                p={1}
-                borderRadius="9999px"
-                height="2rem"
-                width="100%"
-                maxWidth="2rem"
-                background="brand.500"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
               >
-                <Text fontSize="1.2rem" color="white" fontWeight="600">
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
                   1
                 </Text>
-              </Box>
+              </Circle>
               <Box>
                 <Text
                   color={'gray.dark'}
@@ -71,22 +66,17 @@ const Steps: CustomNextPage = () => {
               flexDirection="row"
               alignItems="center"
             >
-              <Box
-                mr="1rem"
-                p={1}
-                borderRadius="9999px"
-                height="2rem"
-                width="100%"
-                maxWidth="2rem"
-                background="brand.500"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
               >
-                <Text fontSize="1.2rem" color="white" fontWeight="600">
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
                   2
                 </Text>
-              </Box>
+              </Circle>
               <Box>
                 <Text
                   color={'gray.dark'}
@@ -105,22 +95,17 @@ const Steps: CustomNextPage = () => {
               flexDirection="row"
               alignItems="center"
             >
-              <Box
-                mr="1rem"
-                p={1}
-                borderRadius="9999px"
-                height="2rem"
-                width="100%"
-                maxWidth="2rem"
-                background="brand.500"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
               >
-                <Text fontSize="1.2rem" color="white" fontWeight="600">
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
                   3
                 </Text>
-              </Box>
+              </Circle>
               <Box>
                 <Text
                   color={'gray.dark'}
@@ -139,22 +124,17 @@ const Steps: CustomNextPage = () => {
               flexDirection="row"
               alignItems="center"
             >
-              <Box
-                mr="1rem"
-                p={1}
-                borderRadius="9999px"
-                height="2rem"
-                width="100%"
-                maxWidth="2rem"
-                background="brand.500"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
               >
-                <Text fontSize="1.2rem" color="white" fontWeight="600">
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
                   4
                 </Text>
-              </Box>
+              </Circle>
               <Box>
                 <Text
                   color={'gray.dark'}
@@ -173,22 +153,17 @@ const Steps: CustomNextPage = () => {
               flexDirection="row"
               alignItems="center"
             >
-              <Box
-                mr="1rem"
-                p={1}
-                borderRadius="9999px"
-                height="2rem"
-                width="100%"
-                maxWidth="2rem"
-                background="brand.500"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
               >
-                <Text fontSize="1.2rem" color="white" fontWeight="600">
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
                   5
                 </Text>
-              </Box>
+              </Circle>
               <Box>
                 <Text
                   color={'gray.dark'}

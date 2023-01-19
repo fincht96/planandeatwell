@@ -81,7 +81,7 @@ export const RecipeViewDesktop = (
                 </Box>
                 <Box>
                   <Text fontSize={'sm'} fontWeight="600" color={'gray.bone'}>
-                    for {recipe.baseServings} servings - change as needed!sdfsdf
+                    for {recipe.baseServings} servings - change as needed
                   </Text>
                 </Box>
               </Box>

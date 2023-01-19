@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Container,
   Flex,
@@ -11,7 +12,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import Recipe from '../../components/menu/Recipe';
-import SearchMenu from '../../components/menu/SearchMenu';
+import SearchSortFilterSection from '../../components/shared/SearchSortFilterSection';
 import { Order, OrderBy, SortBy } from '../../types/menuOrder.types';
 import {
   orderToSortBy,
@@ -361,142 +362,166 @@ const Menu: CustomNextPage = () => {
           onRemoveRecipeServings={onRemoveRecipeServings}
         />
       )}
-
-      <Container maxW={'1600px'} pt={'1rem'} pb={'5rem'}>
-        <SearchMenu
-          mb={'2rem'}
-          mealsFilters={recipeQueryParams.meals}
-          lifestyleFilters={recipeQueryParams.lifestyles}
-          freeFromFilters={recipeQueryParams.freeFroms}
-          sortBy={orderToSortBy(
-            recipeQueryParams.order,
-            recipeQueryParams.orderBy,
-          )}
-          searchTerm={recipeQueryParams.searchTerm}
-          onSearch={({ searchTerm }: { searchTerm: string }) => {
-            setRecipeQueryParams((current) => {
-              return {
-                ...current,
-                offset: 0,
-                searchTerm,
-              };
-            });
-
-            const { searchTerm: oldSearchTerm, ...unchangedQueryParams } =
-              router.query;
-            router.push({
-              query: {
-                ...unchangedQueryParams,
-                ...(searchTerm.length && { searchTerm }),
-              },
-            });
-          }}
-          onFiltersChange={(filters: {
-            meals: Array<string>;
-            lifestyles: Array<string>;
-            freeFroms: Array<string>;
-          }) => {
-            setRecipeQueryParams((current) => {
-              return {
-                ...current,
-                meals: filters.meals,
-                lifestyles: filters.lifestyles,
-                freeFroms: filters.freeFroms,
-                offset: 0,
-              };
-            });
-
-            const newMeals = filters.meals.toString();
-            const newLifestyles = filters.lifestyles.toString();
-            const newFreeFroms = filters.freeFroms.toString();
-
-            const { meals, lifestyles, freeFroms, ...unchangedQueryParams } =
-              router.query;
-
-            router.push({
-              query: {
-                ...unchangedQueryParams,
-                ...(newMeals.length && { meals: newMeals }),
-                ...(newLifestyles.length && { lifestyles: newLifestyles }),
-                ...(newFreeFroms.length && { freeFroms: newFreeFroms }),
-              },
-            });
-          }}
-          onSortByChange={(sortBy: SortBy) => {
-            const orderAndOrderBy = sortByToOrder(sortBy);
-            setRecipeQueryParams((current) => {
-              return {
-                ...current,
-                ...orderAndOrderBy,
-                offset: 0,
-              };
-            });
-            router.push({
-              query: {
-                ...router.query,
-                ...orderAndOrderBy,
-              },
-            });
-          }}
-        />
-
-        <Text fontSize={'1rem'} color="gray.dark" fontWeight={600} mb={'2rem'}>
-          Results
-          <Text as={'span'} fontWeight={400}>
-            ({totalCountRecipes})
+      <Container maxW="1100px" mb={10}>
+        <Box>
+          <Text
+            noOfLines={2}
+            fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
+            color="black"
+            fontWeight={600}
+            textAlign={{ base: 'center', '2xl': 'left' }}
+            ml={{ '2xl': '0.8rem' }}
+          >
+            Search & select recipes to add to your meal plan!
           </Text>
-        </Text>
+        </Box>
+      </Container>
 
-        <Grid templateColumns="repeat(auto-fill, minMax(275px,1fr));" gap={6}>
-          {recipes.map((recipe) => {
-            const recipeInBasket = recipeBasket
-              .map((recipe) => recipe.recipe.id)
-              .includes(recipe.id);
-            return (
-              <Recipe
-                id={recipe.id}
-                key={recipe.id}
-                name={recipe.name}
-                pricePerServing={recipe.pricePerServing}
-                imagePath={recipe.imagePath}
-                baseServings={recipe.baseServings}
-                cookTime={recipe.cookTime}
-                prepTime={recipe.prepTime}
-                supermarketName={recipe.supermarketName}
-                // ensures that the ingredients count is always up to date, just ensure when fetching recipes, ingredients are included
-                ingredientsCount={recipe.ingredientsList.length}
-                selected={recipeInBasket}
-                onClick={(recipeId) => {
-                  setSelectedRecipe(
-                    recipes.find((recipe) => recipe.id === recipeId),
-                  );
+      <Container maxW="1100px" mb={10} padding="0 2rem 2.5rem">
+        <Box>
+          <SearchSortFilterSection
+            showRecipesFilter={true}
+            selectValues={{
+              relevance: 'Relevance',
+              newest: 'Newest',
+              priceAscending: 'Lowest Price',
+              priceDescending: 'Highest Price',
+            }}
+            searchFieldPlaceHolderText="Search Aldi recipes..."
+            mealsFilters={recipeQueryParams.meals}
+            lifestyleFilters={recipeQueryParams.lifestyles}
+            freeFromFilters={recipeQueryParams.freeFroms}
+            sortBy={orderToSortBy(
+              recipeQueryParams.order,
+              recipeQueryParams.orderBy,
+            )}
+            searchTerm={recipeQueryParams.searchTerm}
+            onSearchSubmit={({ searchTerm }: { searchTerm: string }) => {
+              setRecipeQueryParams((current) => {
+                return {
+                  ...current,
+                  offset: 0,
+                  searchTerm,
+                };
+              });
+
+              const { searchTerm: oldSearchTerm, ...unchangedQueryParams } =
+                router.query;
+              router.push({
+                query: {
+                  ...unchangedQueryParams,
+                  ...(searchTerm.length && { searchTerm }),
+                },
+              });
+            }}
+            onFiltersChange={(filters: {
+              meals: Array<string>;
+              lifestyles: Array<string>;
+              freeFroms: Array<string>;
+            }) => {
+              setRecipeQueryParams((current) => {
+                return {
+                  ...current,
+                  meals: filters.meals,
+                  lifestyles: filters.lifestyles,
+                  freeFroms: filters.freeFroms,
+                  offset: 0,
+                };
+              });
+
+              const newMeals = filters.meals.toString();
+              const newLifestyles = filters.lifestyles.toString();
+              const newFreeFroms = filters.freeFroms.toString();
+
+              const { meals, lifestyles, freeFroms, ...unchangedQueryParams } =
+                router.query;
+
+              router.push({
+                query: {
+                  ...unchangedQueryParams,
+                  ...(newMeals.length && { meals: newMeals }),
+                  ...(newLifestyles.length && { lifestyles: newLifestyles }),
+                  ...(newFreeFroms.length && { freeFroms: newFreeFroms }),
+                },
+              });
+            }}
+            handleSortChange={(sortBy: SortBy) => {
+              const orderAndOrderBy = sortByToOrder(sortBy);
+              setRecipeQueryParams((current) => {
+                return {
+                  ...current,
+                  ...orderAndOrderBy,
+                  offset: 0,
+                };
+              });
+              router.push({
+                query: {
+                  ...router.query,
+                  ...orderAndOrderBy,
+                },
+              });
+            }}
+          />
+
+          <Box>
+            <Text fontSize={'sm'} color="black" fontWeight={600} mb={'2rem'}>
+              Results&nbsp;
+              <Text as={'span'} fontWeight={600} color="black">
+                ({totalCountRecipes})
+              </Text>
+            </Text>
+          </Box>
+
+          <Grid templateColumns="repeat(auto-fill, minMax(270px,1fr));" gap={6}>
+            {recipes.map((recipe) => {
+              const recipeInBasket = recipeBasket
+                .map((recipe) => recipe.recipe.id)
+                .includes(recipe.id);
+              return (
+                <Recipe
+                  id={recipe.id}
+                  key={recipe.id}
+                  name={recipe.name}
+                  pricePerServing={recipe.pricePerServing}
+                  imagePath={recipe.imagePath}
+                  baseServings={recipe.baseServings}
+                  cookTime={recipe.cookTime}
+                  prepTime={recipe.prepTime}
+                  supermarketName={recipe.supermarketName}
+                  ingredientsCount={recipe.ingredientsList.length}
+                  selected={recipeInBasket}
+                  onClick={(recipeId) => {
+                    setSelectedRecipe(
+                      recipes.find((recipe) => recipe.id === recipeId),
+                    );
+                  }}
+                />
+              );
+            })}
+          </Grid>
+
+          {showMore && !!recipes.length && (
+            <Flex justifyContent={'center'}>
+              <Button
+                onClick={() => {
+                  setRecipeQueryParams((current) => {
+                    return {
+                      ...current,
+                      offset: current.offset + current.limit,
+                    };
+                  });
                 }}
-              />
-            );
-          })}
-        </Grid>
-
-        {showMore && !!recipes.length && (
-          <Flex justifyContent={'center'}>
-            <Button
-              onClick={() => {
-                setRecipeQueryParams((current) => {
-                  return {
-                    ...current,
-                    offset: current.offset + current.limit,
-                  };
-                });
-              }}
-              mt={2}
-              colorScheme="brand"
-              fontSize={{ base: '0.9rem', md: '1.1rem' }}
-              fontWeight={600}
-              padding={'1.5rem 1rem'}
-            >
-              Show more
-            </Button>
-          </Flex>
-        )}
+                mt={2}
+                colorScheme="brand"
+                fontSize={{ base: '0.9rem', md: '1.1rem' }}
+                fontWeight={600}
+                padding={'1.5rem 1rem'}
+              >
+                Show more
+              </Button>
+            </Flex>
+          )}
+        </Box>
       </Container>
       <MenuSummaryBar {...mealPlanBasketProps()} />
     </MenuLayout>

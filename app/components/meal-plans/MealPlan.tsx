@@ -30,6 +30,7 @@ const MealPlan = ({
       overflow={'hidden'}
       display={'flex'}
       p={'2rem'}
+      borderColor="gray.light"
     >
       <Box position="relative" width="100%">
         <Box mb="1.5rem">

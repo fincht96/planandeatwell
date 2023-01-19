@@ -1,12 +1,12 @@
-import { Box, Grid, Text } from '@chakra-ui/react';
+import { Box, Container, Grid, Text } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import BorderBox from '../components/BorderBox';
 import Layout, { siteTitle } from '../components/layout';
-import StepLayout from '../components/StepLayout';
 import aldiImg from '../public/images/aldi.png';
 import asdaImg from '../public/images/asda.png';
 import sainsburysImg from '../public/images/sainsburys.png';
@@ -26,9 +26,8 @@ const SupermarketButton = ({
   onClick: any;
 }) => {
   return (
-    <Box
-      bg={'#ffffff'}
-      border={'solid 1px #CCCCCC'}
+    <BorderBox
+      borderColor="gray.light"
       w={'100%'}
       h={'100%'}
       display="flex"
@@ -38,12 +37,12 @@ const SupermarketButton = ({
       cursor={disabled ? 'default' : 'pointer'}
       onClick={disabled ? null : onClick}
       opacity={disabled ? 0.4 : 1.0}
-      _hover={{ bg: disabled ? 'none' : '#fafafa' }}
+      _hover={{ bg: disabled ? 'none' : 'brand.100' }}
     >
-      <Box maxW={'7rem'}>
+      <Box maxW={'6rem'}>
         <Image quality={100} src={imageProp} alt={supermarket} />
       </Box>
-    </Box>
+    </BorderBox>
   );
 };
 
@@ -100,20 +99,14 @@ const Steps: NextPage = () => {
         <title>{siteTitle}</title>
       </Head>
 
-      <StepLayout>
-        <Box m={'3rem 2rem'}>
+      <Container maxH="1000px" maxW="800px" padding="0 2rem 2.5rem">
+        <Box>
           <Text
-            fontSize={{ base: '0.8rem', md: '1rem' }}
-            color="gray.normal"
-            fontWeight={400}
-          >
-            Step 2 of 3
-          </Text>
-          <Text
-            fontSize={{ base: '1.25rem', md: '1.5rem' }}
-            color="gray.dark"
+            mb="2rem"
+            fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
+            color="black"
             fontWeight={600}
-            mb={'2rem'}
+            textAlign={{ base: 'center', lg: 'left' }}
           >
             Choose your supermarket
           </Text>
@@ -142,7 +135,7 @@ const Steps: NextPage = () => {
             })}
           </Grid>
         </Box>
-      </StepLayout>
+      </Container>
     </Layout>
   );
 };

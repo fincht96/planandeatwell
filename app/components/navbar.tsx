@@ -48,8 +48,10 @@ const LinkItems: Array<LinkItemProps> = [
 
 export default function SidebarWithHeader({
   children,
+  recipeBasketButton,
 }: {
   children: ReactNode;
+  recipeBasketButton?: any;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -72,7 +74,7 @@ export default function SidebarWithHeader({
           <SidebarContent onClose={onClose} />
         </DrawerContent>
       </Drawer>
-      <MobileNav onOpen={onOpen} />
+      <MobileNav onOpen={onOpen} recipeBasketButton={recipeBasketButton} />
       <Box ml={{ base: 0, md: 60 }} py="4">
         {children}
       </Box>
@@ -104,7 +106,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         mx="8"
         justifyContent="space-between"
       >
-        <Image src="/images/logo.png" height={45} width={176} alt={'logo'} />
+        <Box
+          cursor={'pointer'}
+          onClick={() => router.push('/create-plan/steps')}
+        >
+          <Image src="/images/logo.png" height={45} width={176} alt={'logo'} />
+        </Box>
         <CloseButton
           display={{ base: 'flex', md: 'none' }}
           onClick={onClose}
@@ -178,10 +185,11 @@ const NavItem = ({
 };
 
 interface MobileProps extends FlexProps {
+  recipeBasketButton: React.ReactElement;
   onOpen: () => void;
 }
 
-const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+const MobileNav = ({ onOpen, recipeBasketButton, ...rest }: MobileProps) => {
   const { signOut, user } = useAuth();
   return (
     <Flex
@@ -202,6 +210,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       />
 
       <HStack spacing={{ base: '0', md: '6' }}>
+        <Box display={{ base: 'none', md: 'flex' }}>{recipeBasketButton}</Box>
         <Flex alignItems={'center'} p="0.3rem">
           <Menu>
             <MenuButton

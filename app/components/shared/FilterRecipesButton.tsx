@@ -124,6 +124,7 @@ const FilterRecipesButton = (props: any) => {
           onClose();
         }}
         finalFocusRef={btnRef}
+        size={'xs'}
       >
         <form onSubmit={handleSubmit(onFilterMenuSubmit)} autoComplete="off">
           <DrawerOverlay />

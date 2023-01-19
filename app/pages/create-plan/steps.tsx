@@ -1,8 +1,7 @@
-import { Box, Button, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Circle, Container, Flex, Text } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Layout, { siteTitle } from '../../components/layout';
-import StepLayout from '../../components/StepLayout';
 import { CustomNextPage } from '../../types/CustomNextPage';
 
 const Steps: CustomNextPage = () => {
@@ -18,66 +17,185 @@ const Steps: CustomNextPage = () => {
         <title>{siteTitle}</title>
       </Head>
 
-      <StepLayout>
-        <Box p={'3rem 1rem'}>
+      <Container maxH="1000px" maxW="800px" padding="0 2rem 2.5rem">
+        <Box>
           <Text
-            fontSize={{ base: '1.25rem', md: '1.5rem' }}
-            color="gray.dark"
+            mb="2rem"
+            fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
+            color="black"
             fontWeight={600}
-            mb={'1rem'}
+            textAlign={{ base: 'center', lg: 'left' }}
           >
             Your meal plan is just a few steps away...
           </Text>
 
           <Flex justifyContent={'center'} flexDirection={'column'}>
-            <Box mb={'2rem'} maxW={'30rem'}>
-              <Text>
-                1. choose recipes for your meal plan based on supermarket, price
-                per serving, dietry requirements and more
-              </Text>
+            <Box
+              mb={'1.5rem'}
+              maxW={'50rem'}
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+            >
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
+              >
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
+                  1
+                </Text>
+              </Circle>
+              <Box>
+                <Text
+                  color={'gray.dark'}
+                  fontWeight={'600'}
+                  letterSpacing={'wide'}
+                  fontSize="1rem"
+                >
+                  Select supermarket
+                </Text>
+              </Box>
             </Box>
-            <Box mb={'2rem'} maxW={'30rem'}>
-              <Text>
-                2. we then make a meal plan based of the recipes you chosen. we
-                should you the ingredients you need. You can sort ingredients.
-                We also tell you exactly how much it cost
-              </Text>
+            <Box
+              mb={'1.5rem'}
+              maxW={'50rem'}
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+            >
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
+              >
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
+                  2
+                </Text>
+              </Circle>
+              <Box>
+                <Text
+                  color={'gray.dark'}
+                  fontWeight={'600'}
+                  letterSpacing={'wide'}
+                  fontSize="1rem"
+                >
+                  Choose recipes made with supermarket ingredients
+                </Text>
+              </Box>
             </Box>
-            <Box mb={'2rem'} maxW={'30rem'}>
-              <Text>
-                3. Head to the shops with our the list of ingredients. then
-                follow our recipes instructions to make the recipe at home.
-              </Text>
+            <Box
+              mb={'1.5rem'}
+              maxW={'50rem'}
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+            >
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
+              >
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
+                  3
+                </Text>
+              </Circle>
+              <Box>
+                <Text
+                  color={'gray.dark'}
+                  fontWeight={'600'}
+                  letterSpacing={'wide'}
+                  fontSize="1rem"
+                >
+                  Create a meal plan
+                </Text>
+              </Box>
             </Box>
-            <Box mb={'2rem'} maxW={'30rem'}>
-              <Text>
-                4. refer back to your created meal plan whenever you need. You
-                can create multiple meal plan depending on your goals.
-              </Text>
+            <Box
+              mb={'1.5rem'}
+              maxW={'50rem'}
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+            >
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
+              >
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
+                  4
+                </Text>
+              </Circle>
+              <Box>
+                <Text
+                  color={'gray.dark'}
+                  fontWeight={'600'}
+                  letterSpacing={'wide'}
+                  fontSize="1rem"
+                >
+                  Shop using meal plan ingredients
+                </Text>
+              </Box>
             </Box>
-            <Box mb={'2rem'} maxW={'30rem'}>
-              <Text>
-                tip: share your meal plan with friends to help them save money
-                and time
-              </Text>
+            <Box
+              mb={'2rem'}
+              maxW={'50rem'}
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+            >
+              <Circle
+                size="2rem"
+                bg="brand.500"
+                border={'solid 1px'}
+                borderColor={'brand.500'}
+                mr={4}
+              >
+                <Text fontSize="1.1rem" color="white" fontWeight="600">
+                  5
+                </Text>
+              </Circle>
+              <Box>
+                <Text
+                  color={'gray.dark'}
+                  fontWeight={'600'}
+                  letterSpacing={'wide'}
+                  fontSize="1rem"
+                >
+                  Do your cooking using instructions provided in meal plan
+                </Text>
+              </Box>
             </Box>
           </Flex>
 
-          <Flex justifyContent={'center'}>
+          <Flex justifyContent={'center'} mt="1rem">
             <Button
-              mt={4}
+              height="3.5rem"
+              borderRadius="lg"
               colorScheme="brand"
-              w="15rem"
-              fontSize={{ base: '1.2rem', md: '1.5rem' }}
+              w="10rem"
+              _hover={{
+                bg: 'brand.100',
+                color: 'black',
+              }}
+              fontSize="1.2rem"
               fontWeight={600}
-              padding={'1.5rem 1rem'}
               onClick={() => onNavigate('/supermarket')}
             >
-              Get started
+              Start
             </Button>
           </Flex>
         </Box>
-      </StepLayout>
+      </Container>
     </Layout>
   );
 };

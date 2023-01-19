@@ -1,16 +1,15 @@
-import { Box, Button, FormLabel, Input } from '@chakra-ui/react';
+import { Button, FormLabel, Input } from '@chakra-ui/react';
 import React from 'react';
 
 const FilterCheckBox = React.forwardRef<any>((props: any, ref: any) => {
   const { label, id, isChecked, ...rest } = props;
 
   return (
-    <Box>
+    <>
       <Input type="checkbox" id={id} {...rest} hidden ref={ref} />
       <Button
-        fontSize={'0.9rem'}
-        border={'solid 1px'}
-        borderColor={'brand.500'}
+        borderRadius="lg"
+        fontSize="sm"
         cursor={'pointer'}
         sx={
           isChecked
@@ -23,8 +22,11 @@ const FilterCheckBox = React.forwardRef<any>((props: any, ref: any) => {
                 },
               }
             : {
-                color: 'brand.500',
-                background: 'white',
+                color: 'gray.bone',
+                background: 'gray.veryLightGray',
+                ':hover': {
+                  background: 'brand.100',
+                },
               }
         }
         as={FormLabel}
@@ -32,7 +34,7 @@ const FilterCheckBox = React.forwardRef<any>((props: any, ref: any) => {
       >
         {label}
       </Button>
-    </Box>
+    </>
   );
 });
 

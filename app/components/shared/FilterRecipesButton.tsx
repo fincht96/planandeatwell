@@ -131,7 +131,7 @@ const FilterRecipesButton = (props: any) => {
           <DrawerContent bg="gray.lighterGray">
             <DrawerCloseButton />
             <DrawerHeader>
-              <Text fontSize="2xl" fontWeight="600" color="black">
+              <Text fontSize="2xl" fontWeight="600">
                 Filters
               </Text>
             </DrawerHeader>
@@ -217,8 +217,8 @@ const FilterRecipesButton = (props: any) => {
               <Button
                 borderRadius="lg"
                 border="solid"
-                borderColor="gray.veryLightGray"
-                bg="gray.veryLightGray"
+                borderColor="gray.light"
+                bg="white"
                 color="gray.dark"
                 _hover={{ bg: 'brand.100', color: 'gray.dark' }}
                 mr={3}

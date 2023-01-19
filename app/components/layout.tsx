@@ -1,5 +1,5 @@
 import Meta from './meta';
-import Navbar from './navbar';
+import Navbar from './Navbar';
 
 export const siteTitle = 'Meal Planner | Plan and Eat Well';
 

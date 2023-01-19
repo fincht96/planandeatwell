@@ -1,4 +1,4 @@
-export default {
+const knex = {
   development: {
     client: 'pg',
     connection: process.env.DATABASE_URL,
@@ -14,8 +14,8 @@ export default {
     client: 'pg',
     connection: process.env.DATABASE_URL,
     pool: {
-      min: 0,
-      max: 4,
+      min: 2,
+      max: 20,
     },
     migrations: {
       directory: __dirname + '/migrations',
@@ -25,3 +25,7 @@ export default {
     },
   },
 };
+
+export default process.env.NODE_ENV === 'production'
+  ? knex['production']
+  : knex['development'];

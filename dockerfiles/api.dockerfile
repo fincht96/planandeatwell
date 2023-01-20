@@ -1,6 +1,7 @@
 FROM node:16-alpine AS build
 WORKDIR /app
 COPY ./api .
+RUN npm ci
 RUN npm run build
 
 FROM node:16-alpine

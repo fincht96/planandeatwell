@@ -11,6 +11,7 @@ export default class AppConfig {
   spacesRegion: string;
   spacesBucket: string;
   cdnEndpoint: string;
+  firebaseServiceAccount: string;
 
   constructor() {
     this.environment = process.env.NODE_ENV;
@@ -25,5 +26,6 @@ export default class AppConfig {
     this.spacesRegion = process.env.SPACES_REGION;
     this.spacesBucket = process.env.SPACES_BUCKET;
     this.cdnEndpoint = process.env.CDN_ENDPOINT;
+    this.firebaseServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
   }
 }

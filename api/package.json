@@ -10,7 +10,8 @@
     "start": "node build/index.js",
     "lint": "eslint . --ext .ts",
     "lint-and-fix": "eslint . --ext .ts --fix",
-    "format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+    "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "migrate:latest": "knex --knexfile ./src/knexfile.ts migrate:latest"
   },
   "keywords": [],
   "author": "",

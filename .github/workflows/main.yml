@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - prod
-  pull_request:
-    branches:
-      - prod
-
 jobs:
   db-migrations: 
     runs-on: ubuntu-latest
@@ -72,14 +68,6 @@ jobs:
     needs: [api-deploy]
     runs-on: ubuntu-latest
     steps:
-      - name: Print the vars
-        run: |
-            echo "NEXT_PUBLIC_API_URL ${{vars.NEXT_PUBLIC_API_URL}}" \
-            echo "NEXT_PUBLIC_GA_TRACKING_ID ${{vars.NEXT_PUBLIC_GA_TRACKING_ID}}" \
-            echo "NEXT_PUBLIC_ENV ${{vars.NEXT_PUBLIC_ENV}}" \
-            echo "NEXT_PUBLIC_CDN ${{vars.NEXT_PUBLIC_CDN}}" \
-            echo "NEXT_PUBLIC_APP_BASE_URL ${{vars.NEXT_PUBLIC_APP_BASE_URL}}"
-
       - name: Cloning repo
         uses: actions/checkout@v2
         with:

@@ -1,13 +1,23 @@
 import {
   Box,
   Button,
+  Card,
+  CardBody,
   Container,
   Divider,
   Flex,
   Grid,
+  GridItem,
+  Heading,
   Icon,
-  Link,
+  Image,
   Select,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
   useDisclosure,
   useToast,
@@ -17,11 +27,18 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { FiLink2 } from 'react-icons/fi';
-import { MdModeEdit } from 'react-icons/md';
-import { TiDeleteOutline } from 'react-icons/ti';
-import Editable from '../../components/Editable';
+import { ImCopy } from 'react-icons/im';
+import {
+  SlActionRedo,
+  SlBasketLoaded,
+  SlClock,
+  SlInfo,
+  SlPeople,
+  SlTrash,
+} from 'react-icons/sl';
+import CustomEditable from '../../components/Editable';
 import Layout from '../../components/layout';
+import RecipeModal from '../../components/menu/RecipeModal';
 import ConfirmCancelModal from '../../components/shared/ConfirmCancelModal';
 import { useAuth } from '../../contexts/auth-context';
 import { CustomNextPage } from '../../types/CustomNextPage';
@@ -50,54 +67,46 @@ const ContentBox = ({
   rows,
   summary,
   ingredientsViewSelectComponent,
+  supermarket,
 }: {
   title: any;
   rows: Array<any>;
   summary: any;
   ingredientsViewSelectComponent?: any;
+  supermarket: any;
 }) => {
   return (
-    <Box
-      p={'1rem 1.5rem'}
-      border={'solid #CCCCCC 1px'}
-      background={'#ffffff'}
-      width={'100%'}
-      maxH={'min-content'}
-    >
-      <Flex justifyContent={'space-between'}>
-        <Box>
-          <Text
-            fontSize={{ base: '1rem', md: '1.2rem' }}
-            color="gray.dark"
-            fontWeight={600}
-            mb={'1rem'}
-          >
-            {title}
-          </Text>
-        </Box>
-        <Box>{ingredientsViewSelectComponent}</Box>
+    <>
+      <Flex direction="row" align="center">
+        <Box>{title}</Box>
+        <Box>{supermarket}</Box>
       </Flex>
-      <Box>
-        {rows.map((row) => {
-          return (
-            <Box mb={'1rem'} key={row.id}>
-              <Box>{row.content}</Box>
-              <Box>{row.subContent}</Box>
-            </Box>
-          );
-        })}
+      <Box borderRadius="xl" width={'100%'} maxH={'min-content'}>
+        <Box mb="1.5rem">{ingredientsViewSelectComponent}</Box>
+        <Box>
+          {rows.map((row) => {
+            return (
+              <Box key={row.id}>
+                <Box>{row.content}</Box>
+                <Box>{row.subContent}</Box>
+              </Box>
+            );
+          })}
+        </Box>
+        <Box my={'1rem'}>
+          <Divider />
+        </Box>
+        <Box>{summary}</Box>
       </Box>
-      <Box my={'1rem'}>
-        <Divider />
-      </Box>
-      <Box>{summary}</Box>
-    </Box>
+    </>
   );
 };
 
 type PermittedIngredientsViewStates = 'ALL' | 'RECIPE' | 'CATEGORY';
 
 const MealPlan: CustomNextPage = () => {
+  const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
+
   const [mealPlan, setMealPlan] =
     useState<MealPlanWithSupermarketDetailsType | null>(null);
   const { authToken, user, authClaims } = useAuth();
@@ -105,6 +114,20 @@ const MealPlan: CustomNextPage = () => {
   const router = useRouter();
   const mealPlanUuid =
     typeof router.query.id === 'string' ? router.query.id : '';
+
+  const {
+    isOpen: isRecipeOpen,
+    onClose: onRecipeClose,
+    onOpen: onRecipeOpen,
+  } = useDisclosure({
+    defaultIsOpen: false,
+  });
+
+  useEffect(() => {
+    if (selectedRecipe) {
+      onRecipeOpen();
+    }
+  }, [onRecipeOpen, selectedRecipe]);
 
   const [ingredientView, setIngredientView] =
     useState<PermittedIngredientsViewStates>('ALL');
@@ -239,26 +262,19 @@ const MealPlan: CustomNextPage = () => {
       return decoratedIngredients?.map((ingredient: IngredientDecorated) => ({
         id: ingredient.id,
         content: (
-          <Flex justifyContent={'space-between'} gap={'1rem'}>
-            <Box display="flex" flexDirection="row">
-              <Text
-                color={'gray.dark'}
-                fontSize={{ base: '0.9rem', md: '1rem' }}
-                mr={1}
-              >
+          <Flex justifyContent={'space-between'} mb="0.5rem">
+            <Box display="flex" flexDirection={{ base: 'column', md: 'row' }}>
+              <Text color={'gray.bone'} fontSize="sm" mr={1} fontWeight="600">
                 {roundUpIngredientUnitQuantity(ingredient)}x {ingredient.name}
               </Text>
-              <Text
-                color={'gray.dark'}
-                fontSize={{ base: '0.9rem', md: '1rem' }}
-              >
+              <Text color="gray.dark" fontSize="sm" fontWeight="600">
                 {getFormattedQuantityAndUnitText(
                   toTwoSignificantFigures(ingredient.scalarQuantity),
                   ingredient.unit,
                 )}
               </Text>
             </Box>
-            <Text color={'gray.dark'} fontSize={{ base: '0.9rem', md: '1rem' }}>
+            <Text color={'gray.bone'} fontSize="sm" mr={1} fontWeight="600">
               £{getIngredientPrice(ingredient)}
             </Text>
           </Flex>
@@ -280,31 +296,35 @@ const MealPlan: CustomNextPage = () => {
         return {
           id: recipeWithServings.recipe.id,
           content: (
-            <Flex justifyContent={'space-between'} gap={'1rem'}>
-              <Text
-                color={'gray.dark'}
-                fontSize={{ base: '0.9rem', md: '1rem' }}
-                as="b"
-              >
-                {recipeWithServings.recipe.name}
+            <Flex justifyContent={'space-between'}>
+              <Text color="black" fontSize="sm" as="b" mb="0.3rem">
+                {recipeWithServings.recipe.name} - (
+                {recipeWithServings.servings}) servings
               </Text>
             </Flex>
           ),
           subContent: (
-            <Flex flexDirection={'column'} gap={'1rem'}>
+            <Flex flexDirection={'column'} mb="0.3rem">
               {decoratedIngredients.map((ingredient: IngredientDecorated) => {
                 return (
-                  <Flex key={ingredient.id}>
+                  <Flex
+                    key={ingredient.id}
+                    mb="0.3rem"
+                    direction={{ base: 'column', md: 'row' }}
+                  >
                     <Text
-                      color={'gray.dark'}
-                      fontSize={{ base: '0.9rem', md: '1rem' }}
+                      color={'gray.bone'}
+                      fontSize="sm"
+                      fontWeight="600"
                       mr={1}
                     >
+                      {ingredient.name}
+                    </Text>
+                    <Text color={'gray.dark'} fontSize="sm" fontWeight="600">
                       {getFormattedQuantityAndUnitText(
                         toTwoSignificantFigures(ingredient.scalarQuantity),
                         ingredient.unit,
-                      )}{' '}
-                      - {ingredient.name}
+                      )}
                     </Text>
                   </Flex>
                 );
@@ -327,33 +347,38 @@ const MealPlan: CustomNextPage = () => {
           return {
             id: categoryName,
             content: (
-              <Flex justifyContent={'space-between'} gap={'1rem'}>
-                <Text
-                  color={'gray.dark'}
-                  fontSize={{ base: '0.9rem', md: '1rem' }}
-                  as="b"
-                >
+              <Flex justifyContent={'space-between'}>
+                <Text color="black" fontSize="sm" as="b" mb="0.3rem">
                   {categoryName}
                 </Text>
               </Flex>
             ),
             subContent: (
-              <Flex flexDirection={'column'} gap={'1rem'}>
+              <Flex flexDirection={'column'} mb="0.3rem">
                 {groupedIngredients.map((ingredient: IngredientDecorated) => {
                   return (
-                    <Flex key={ingredient.id} justifyContent={'space-between'}>
-                      <Box display="flex" flexDirection="row">
+                    <Flex
+                      key={ingredient.id}
+                      justifyContent={'space-between'}
+                      mb="0.3rem"
+                    >
+                      <Box
+                        display="flex"
+                        flexDirection={{ base: 'column', md: 'row' }}
+                      >
                         <Text
-                          color={'gray.dark'}
-                          fontSize={{ base: '0.9rem', md: '1rem' }}
+                          color={'gray.bone'}
+                          fontSize="sm"
                           mr={1}
+                          fontWeight="600"
                         >
                           {roundUpIngredientUnitQuantity(ingredient)}x{' '}
                           {ingredient.name}
                         </Text>
                         <Text
                           color={'gray.dark'}
-                          fontSize={{ base: '0.9rem', md: '1rem' }}
+                          fontSize="sm"
+                          fontWeight="600"
                         >
                           {getFormattedQuantityAndUnitText(
                             toTwoSignificantFigures(ingredient.scalarQuantity),
@@ -361,10 +386,7 @@ const MealPlan: CustomNextPage = () => {
                           )}
                         </Text>
                       </Box>
-                      <Text
-                        color={'gray.dark'}
-                        fontSize={{ base: '0.9rem', md: '1rem' }}
-                      >
+                      <Text color={'gray.bone'} fontSize="sm" fontWeight="600">
                         £{getIngredientPrice(ingredient)}
                       </Text>
                     </Flex>
@@ -402,123 +424,412 @@ const MealPlan: CustomNextPage = () => {
       <Head>
         <title>Meal Plan | Plan and Eat Well</title>
       </Head>
-      <Container my={'2rem'} maxW={'1100px'}>
+      {selectedRecipe && (
+        <RecipeModal
+          isOpen={isRecipeOpen}
+          onClose={() => {
+            setSelectedRecipe(null);
+            onRecipeClose();
+          }}
+          recipe={selectedRecipe}
+          currentServings={selectedRecipe.selectedServings}
+        />
+      )}
+      <Container maxW="1100px" mb={10}>
         <Box>
-          <Text>Ingredients from: {mealPlan?.supermarketName}</Text>
-        </Box>
-        <Flex
-          justifyContent={'space-between'}
-          alignItems={'center'}
-          gap={'5rem'}
-          my={'1rem'}
-        >
-          <Box flex={1}>
-            <Editable
-              enableEditing={editMode}
-              previewValue={mealPlanName}
-              handleSubmit={(e, closeEditing) => {
-                handleSubmit((d) => onSubmit(d, closeEditing))(e);
-              }}
-              {...register('mealPlanName', {
-                required: 'A name is required',
-                maxLength: {
-                  value: 199,
-                  message: 'Must be less than 200 characters',
-                },
-              })}
-              resetForm={() => {
-                reset({ mealPlanName });
-              }}
-              error={{
-                isError: !!errors.mealPlanName,
-                message: errors.mealPlanName?.message,
-              }}
-              name={'mealPlanName'}
-            />
-          </Box>
-        </Flex>
-        <Flex gap={'1rem'} mb={'2rem'}>
-          <Button
-            bg={'#ffffff'}
-            border={'solid 1px'}
-            borderColor={'#cccccc'}
-            color={'#4d4d4d'}
-            fontSize={{ base: '0.9rem', md: '1rem' }}
-            fontWeight={400}
-            minW={'min-content'}
-            onClick={onCopyLink}
+          <Text
+            noOfLines={2}
+            fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
+            color="black"
+            fontWeight={600}
+            textAlign={{ base: 'center', '2xl': 'left' }}
           >
-            <Flex
-              justifyContent={'space-between'}
-              gap={'0.5rem'}
-              alignItems={'center'}
-            >
-              <Icon
-                as={FiLink2}
-                width={{ base: '1.5rem' }}
-                height={{ base: '1.5rem' }}
-                color={'#4d4d4d'}
+            {mealPlanName}
+          </Text>
+        </Box>
+      </Container>
+      <Container maxW={{ base: '500px', lg: '700px', xl: '1100px' }}>
+        <Tabs isFitted defaultIndex={0}>
+          <TabList>
+            <Tab color="black">
+              <Text fontSize={'1rem'} fontWeight={600} color="black">
+                Meals
+              </Text>
+            </Tab>
+            <Tab color="black">
+              <Text fontSize={'1rem'} fontWeight={600} color="black">
+                Ingredients
+              </Text>
+            </Tab>
+            {editMode && (
+              <Tab color="black">
+                <Text fontSize={'1rem'} fontWeight={600} color="black">
+                  Edit plan
+                </Text>
+              </Tab>
+            )}
+          </TabList>
+          <TabPanels>
+            <TabPanel p={0}>
+              <Flex direction="row">
+                <Text
+                  fontSize={'sm'}
+                  color="black"
+                  fontWeight={600}
+                  my="1.5rem"
+                  mr="1rem"
+                >
+                  Total servings&nbsp;
+                  <Text as={'span'} fontWeight={600} color="black">
+                    ({totalServings})
+                  </Text>
+                </Text>
+                <Text
+                  fontSize={'sm'}
+                  color="black"
+                  fontWeight={600}
+                  my="1.5rem"
+                >
+                  Recipes&nbsp;
+                  <Text as={'span'} fontWeight={600} color="black">
+                    ({recipes.length})
+                  </Text>
+                </Text>
+              </Flex>
+              {recipes.map((recipeWithServings: any) => {
+                return (
+                  <>
+                    <Card
+                      cursor={'pointer'}
+                      key={recipeWithServings.id}
+                      direction={{ base: 'column', sm: 'row' }}
+                      overflow="hidden"
+                      variant="outline"
+                      borderRadius="xl"
+                      borderColor="gray.light"
+                      mb="1.5rem"
+                      _hover={{
+                        bg: 'gray.searchBoxGray',
+                      }}
+                      onClick={() => {
+                        setSelectedRecipe({
+                          ...recipeWithServings.recipe,
+                          selectedServings: recipeWithServings.servings,
+                        });
+                      }}
+                    >
+                      <Box width={{ base: '100%', sm: '400px' }} height="200px">
+                        <Image
+                          objectFit="cover"
+                          height="100%"
+                          width="100%"
+                          src={`${process.env.NEXT_PUBLIC_CDN}${recipeWithServings.recipe.imagePath}`}
+                          alt={recipeWithServings.name}
+                        />
+                      </Box>
+                      <Stack>
+                        <CardBody>
+                          <Heading fontSize="xl">
+                            {recipeWithServings.recipe.name}
+                          </Heading>
+                          <Flex flexDirection="row" alignItems="center" mt={3}>
+                            <Flex
+                              flexDirection="column"
+                              justifyContent="flex-start"
+                              mr="1.5rem"
+                            >
+                              <Flex alignItems="center" mb="0.8rem">
+                                <SlClock fontSize="1rem" />
+                                <Text
+                                  color={'gray.dark'}
+                                  fontWeight={'600'}
+                                  letterSpacing={'wide'}
+                                  fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                                  ml={'0.5rem'}
+                                >
+                                  {recipeWithServings.recipe.prepTime +
+                                    recipeWithServings.recipe.cookTime}
+                                  mins total
+                                </Text>
+                              </Flex>
+                              <Flex alignItems="center">
+                                <SlInfo fontSize="1rem" />
+                                <Text
+                                  color={'gray.dark'}
+                                  fontWeight={'600'}
+                                  letterSpacing={'wide'}
+                                  fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                                  ml={'0.5rem'}
+                                >
+                                  £
+                                  {recipeWithServings.recipe.pricePerServing.toFixed(
+                                    2,
+                                  )}{' '}
+                                  per serving
+                                </Text>
+                              </Flex>
+                            </Flex>
+                            <Flex
+                              flexDirection="column"
+                              justifyContent="flex-start"
+                            >
+                              <Flex alignItems="center" mb="0.8rem">
+                                <SlPeople fontSize="1rem" />
+                                <Text
+                                  color={'gray.dark'}
+                                  fontWeight={'600'}
+                                  letterSpacing={'wide'}
+                                  fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                                  ml={'0.5rem'}
+                                >
+                                  Serves ({recipeWithServings.servings})
+                                </Text>
+                              </Flex>
+                              <Flex alignItems="center">
+                                <SlBasketLoaded fontSize="1rem" />
+                                <Text
+                                  color={'gray.dark'}
+                                  fontWeight={'600'}
+                                  letterSpacing={'wide'}
+                                  fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                                  ml={'0.5rem'}
+                                >
+                                  Ingredients (
+                                  {recipeWithServings.recipe.ingredientsCount})
+                                </Text>
+                              </Flex>
+                            </Flex>
+                          </Flex>
+                        </CardBody>
+                      </Stack>
+                    </Card>
+                  </>
+                );
+              })}
+            </TabPanel>
+            <TabPanel p={0}>
+              <ContentBox
+                ingredientsViewSelectComponent={
+                  <Select
+                    height="3rem"
+                    bg="gray.searchBoxGray"
+                    onChange={handleSelectChange}
+                    borderRadius="md"
+                    fontSize="sm"
+                    fontWeight="600"
+                    color="gray.bone"
+                    width={{ base: '28%', xl: '12%' }}
+                  >
+                    <option value="ALL">All</option>
+                    <option value="RECIPE">Recipes</option>
+                    <option value="CATEGORY">Categories</option>
+                  </Select>
+                }
+                title={
+                  <Text
+                    fontSize={'sm'}
+                    color="black"
+                    fontWeight={600}
+                    my="1.5rem"
+                    mr="1rem"
+                  >
+                    Ingredients&nbsp;
+                    <Text as={'span'} fontWeight={600} color="black">
+                      ({ingredients?.length})
+                    </Text>
+                  </Text>
+                }
+                supermarket={
+                  <Text fontSize={'sm'} color="black" fontWeight={600}>
+                    ({mealPlan?.supermarketName})
+                  </Text>
+                }
+                rows={rowData ? rowData : []}
+                summary={
+                  ingredientView !== 'RECIPE' && (
+                    <Flex
+                      justifyContent={'space-between'}
+                      alignItems={'center'}
+                    >
+                      <Text fontWeight="600" color="black" fontSize="sm">
+                        Total price
+                      </Text>
+                      <Text fontWeight={'600'} color="black" fontSize="sm">
+                        £{totalPrice.toFixed(2)}
+                      </Text>
+                    </Flex>
+                  )
+                }
               />
-              <Text>Copy Link</Text>
-            </Flex>
-          </Button>
-          {editMode && (
-            <>
-              <Button
-                bg={'#ffffff'}
-                border={'solid 1px'}
-                borderColor={'brand.500'}
-                color={'brand.500'}
-                fontSize={'1rem'}
-                fontWeight={400}
-                minW={'min-content'}
-                onClick={() => {
-                  onNavigate('/create-plan/menu', {
-                    supermarketId: mealPlan?.supermarketId.toString(),
-                    meal_plan_uuid: mealPlanUuid,
-                  });
+            </TabPanel>
+            <TabPanel p={0}>
+              <Grid
+                templateColumns={{
+                  base: 'repeat(1, 1fr);',
+                  md: 'repeat(2, 1fr);',
                 }}
+                gap={4}
+                my="1.5rem"
               >
-                <Flex
-                  justifyContent={'space-between'}
-                  alignItems={'center'}
-                  gap={'0.5rem'}
+                <GridItem
+                  borderRadius="xl"
+                  height="115px"
+                  display="flex"
+                  justifyContent="center"
+                  bg="gray.searchBoxGray"
                 >
-                  <Icon
-                    as={MdModeEdit}
-                    width={{ base: '1.2rem' }}
-                    height={{ base: '1.2rem' }}
-                    color={'brand.500'}
-                  />
-                  <Text>Edit meal plan</Text>
-                </Flex>
-              </Button>
-              <Button
-                colorScheme="red"
-                color={'white'}
-                fontSize={'1rem'}
-                fontWeight={400}
-                minW={'min-content'}
-                onClick={() => {
-                  onOpen();
-                }}
-              >
-                <Flex
-                  justifyContent={'space-between'}
-                  gap={'0.5rem'}
-                  alignItems={'center'}
+                  <Flex
+                    direction="column"
+                    justifyContent="center"
+                    align="center"
+                  >
+                    <Text fontSize="md" fontWeight="600" mb={2}>
+                      Edit plan name
+                    </Text>
+                    <CustomEditable
+                      enableEditing={editMode}
+                      previewValue={mealPlanName}
+                      handleSubmit={(e, closeEditing) => {
+                        handleSubmit((d) => onSubmit(d, closeEditing))(e);
+                      }}
+                      {...register('mealPlanName', {
+                        required: 'A name is required',
+                        maxLength: {
+                          value: 199,
+                          message: 'Must be less than 200 characters',
+                        },
+                      })}
+                      resetForm={() => {
+                        reset({ mealPlanName });
+                      }}
+                      error={{
+                        isError: !!errors.mealPlanName,
+                        message: errors.mealPlanName?.message,
+                      }}
+                      name={'mealPlanName'}
+                    />
+                  </Flex>
+                </GridItem>
+                <GridItem
+                  borderRadius="xl"
+                  height="115px"
+                  display="flex"
+                  justifyContent="center"
+                  bg="gray.searchBoxGray"
                 >
-                  <Icon
-                    as={TiDeleteOutline}
-                    width={{ base: '1.5rem' }}
-                    height={{ base: '1.5rem' }}
-                    color={'white'}
-                  />
-                  <Text>Delete meal plan</Text>
-                </Flex>
-              </Button>
-            </>
-          )}
+                  <Flex
+                    direction="column"
+                    justifyContent="center"
+                    align="center"
+                  >
+                    <Text fontSize="md" fontWeight="600" mb={2}>
+                      Edit recipes in plan
+                    </Text>
+                    <Button
+                      height="3rem"
+                      width="12rem"
+                      colorScheme="brand"
+                      fontSize="sm"
+                      fontWeight="600"
+                      onClick={() => {
+                        onNavigate('/create-plan/menu', {
+                          supermarketId: mealPlan?.supermarketId.toString(),
+                          meal_plan_uuid: mealPlanUuid,
+                        });
+                      }}
+                    >
+                      <Flex
+                        justifyContent={'space-between'}
+                        alignItems={'center'}
+                        gap={'0.5rem'}
+                      >
+                        <Icon
+                          as={SlActionRedo}
+                          fontSize="1.1rem"
+                          color="white"
+                        />
+
+                        <Text>Edit recipes</Text>
+                      </Flex>
+                    </Button>
+                  </Flex>
+                </GridItem>
+                <GridItem
+                  borderRadius="xl"
+                  height="115px"
+                  display="flex"
+                  justifyContent="center"
+                  bg="gray.searchBoxGray"
+                >
+                  <Flex
+                    direction="column"
+                    justifyContent="center"
+                    align="center"
+                  >
+                    <Text fontSize="md" fontWeight="600" mb={2}>
+                      Delete plan
+                    </Text>
+                    <Button
+                      height="3rem"
+                      width="12rem"
+                      colorScheme="red"
+                      color={'white'}
+                      fontSize="sm"
+                      fontWeight="600"
+                      onClick={() => {
+                        onOpen();
+                      }}
+                    >
+                      <Flex
+                        justifyContent={'space-between'}
+                        gap={'0.5rem'}
+                        alignItems={'center'}
+                      >
+                        <Icon as={SlTrash} fontSize="1.1rem" color="white" />
+                        <Text>Delete</Text>
+                      </Flex>
+                    </Button>
+                  </Flex>
+                </GridItem>
+                <GridItem
+                  borderRadius="xl"
+                  height="115px"
+                  display="flex"
+                  justifyContent="center"
+                  bg="gray.searchBoxGray"
+                >
+                  <Flex
+                    direction="column"
+                    justifyContent="center"
+                    align="center"
+                  >
+                    <Text fontSize="md" fontWeight="600" mb={2}>
+                      Share plan
+                    </Text>
+                    <Button
+                      fontSize="sm"
+                      colorScheme="brand"
+                      fontWeight="600"
+                      onClick={onCopyLink}
+                      height="3rem"
+                      width="12rem"
+                    >
+                      <Flex
+                        justifyContent={'space-between'}
+                        gap={'0.5rem'}
+                        alignItems={'center'}
+                      >
+                        <Icon as={ImCopy} fontSize="1.1rem" color="white" />
+                        <Text>Copy Link</Text>
+                      </Flex>
+                    </Button>
+                  </Flex>
+                </GridItem>
+              </Grid>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+        <Flex gap={'1rem'} mb={'2rem'}>
           <ConfirmCancelModal
             isOpen={isOpen}
             onClose={onClose}
@@ -555,102 +866,7 @@ const MealPlan: CustomNextPage = () => {
             lg: '1fr 0.5fr',
           }}
           gap={6}
-        >
-          <ContentBox
-            ingredientsViewSelectComponent={
-              <Select size="sm" onChange={handleSelectChange}>
-                <option value="ALL">All</option>
-                <option value="RECIPE">Recipes</option>
-                <option value="CATEGORY">Categories</option>
-              </Select>
-            }
-            title={
-              <Text as={'span'}>
-                Ingredients{' '}
-                <Text as={'span'} fontWeight={200}>
-                  ({ingredients?.length})
-                </Text>
-              </Text>
-            }
-            rows={rowData ? rowData : []}
-            summary={
-              ingredientView !== 'RECIPE' && (
-                <Flex justifyContent={'space-between'} alignItems={'center'}>
-                  <Text
-                    fontWeight={'600'}
-                    color={'#4d4d4d'}
-                    fontSize={{ base: '0.9rem', md: '1rem' }}
-                  >
-                    Total price
-                  </Text>
-                  <Text
-                    fontWeight={'600'}
-                    color={'#4d4d4d'}
-                    fontSize={{ base: '0.9rem', md: '1rem' }}
-                  >
-                    £{totalPrice.toFixed(2)}
-                  </Text>
-                </Flex>
-              )
-            }
-          />
-
-          <Box gridRow={{ base: 1, lg: 'auto' }}>
-            <ContentBox
-              title={
-                <Text as={'span'}>
-                  Recipes{' '}
-                  <Text as={'span'} fontWeight={200}>
-                    ({recipes.length})
-                  </Text>
-                </Text>
-              }
-              rows={recipes.map((recipeWithServings: any) => ({
-                id: recipeWithServings.recipe.id,
-                content: (
-                  <Flex justifyContent={'space-between'} gap={'1rem'}>
-                    <Text
-                      color={'gray.dark'}
-                      as={Link}
-                      sx={{ textDecoration: 'underline' }}
-                      _hover={{ color: 'brand.500' }}
-                      href={`${process.env.NEXT_PUBLIC_WWW_URL}/recipes/${recipeWithServings.recipe.id}?servings=${recipeWithServings.servings}`}
-                      isExternal
-                      fontSize={{ base: '0.9rem', md: '1rem' }}
-                    >
-                      {recipeWithServings.recipe.name}
-                    </Text>
-
-                    <Text
-                      color={'gray.dark'}
-                      fontSize={{ base: '0.9rem', md: '1rem' }}
-                    >
-                      {recipeWithServings.servings} servings
-                    </Text>
-                  </Flex>
-                ),
-              }))}
-              summary={
-                <Flex justifyContent={'space-between'} alignItems={'center'}>
-                  <Text
-                    fontWeight={'600'}
-                    color={'#4d4d4d'}
-                    fontSize={{ base: '0.9rem', md: '1rem' }}
-                  >
-                    Servings
-                  </Text>
-                  <Text
-                    fontWeight={'600'}
-                    color={'#4d4d4d'}
-                    fontSize={{ base: '0.9rem', md: '1rem' }}
-                  >
-                    {totalServings}
-                  </Text>
-                </Flex>
-              }
-            />
-          </Box>
-        </Grid>
+        ></Grid>
       </Container>
     </Layout>
   );

@@ -215,7 +215,7 @@ const RecipeBasketButton = ({
               width={'100%'}
               onClick={onComplete}
             >
-              Checkout
+              Create plan
             </Button>
           </DrawerBody>
         </DrawerContent>

@@ -41,13 +41,16 @@ export const RecipeViewDesktop = (
     currentServings,
     ingredients,
   }: {
-    onAddRecipeServings: (recipe: any, numServings: number) => void;
-    onRemoveRecipeServings: (recipe: any, numServings: number) => void;
+    onAddRecipeServings?: (recipe: any, numServings: number) => void;
+    onRemoveRecipeServings?: (recipe: any, numServings: number) => void;
     pricePerServing: number;
     currentServings: number;
     ingredients: Array<any>;
   },
 ) => {
+  const showDynamicServingFeatures =
+    !!onAddRecipeServings && !!onRemoveRecipeServings;
+
   return (
     <>
       <Grid templateColumns="repeat(2, 1fr);" gap={2} p="1.25rem">
@@ -168,35 +171,45 @@ export const RecipeViewDesktop = (
             p="1rem"
             textAlign={'center'}
           >
-            <Flex justifyContent={'space-between'}>
-              <Button
-                borderRadius="lg"
-                bg={'brand.500'}
-                color={'white'}
-                _hover={{ background: 'brand.400' }}
-                _active={{ background: 'brand.400' }}
-                onClick={() =>
-                  onRemoveRecipeServings(recipe, recipe.baseServings)
-                }
-              >
-                <MinusIcon fontSize="1rem" />
-              </Button>
-
+            <Flex
+              justifyContent={
+                showDynamicServingFeatures ? 'space-between' : 'center'
+              }
+            >
+              {showDynamicServingFeatures && (
+                <Button
+                  borderRadius="lg"
+                  bg={'brand.500'}
+                  color={'white'}
+                  _hover={{ background: 'brand.400' }}
+                  _active={{ background: 'brand.400' }}
+                  onClick={() =>
+                    onRemoveRecipeServings(recipe, recipe.baseServings)
+                  }
+                >
+                  <MinusIcon fontSize="1rem" />
+                </Button>
+              )}
               <Box>
                 <Text fontSize={'1.2rem'} fontWeight={600} color="gray.dark">
-                  {currentServings} servings added
+                  {currentServings} servings{' '}
+                  {showDynamicServingFeatures && 'added'}
                 </Text>
               </Box>
-              <Button
-                borderRadius="lg"
-                bg={'brand.500'}
-                color={'white'}
-                _hover={{ background: 'brand.400' }}
-                _active={{ background: 'brand.400' }}
-                onClick={() => onAddRecipeServings(recipe, recipe.baseServings)}
-              >
-                <AddIcon fontSize="1rem" />
-              </Button>
+              {showDynamicServingFeatures && (
+                <Button
+                  borderRadius="lg"
+                  bg={'brand.500'}
+                  color={'white'}
+                  _hover={{ background: 'brand.400' }}
+                  _active={{ background: 'brand.400' }}
+                  onClick={() =>
+                    onAddRecipeServings(recipe, recipe.baseServings)
+                  }
+                >
+                  <AddIcon fontSize="1rem" />
+                </Button>
+              )}
             </Flex>
             <Box>
               <Text fontSize={'sm'} fontWeight={'300'} color={'gray.dark'}>
@@ -282,13 +295,16 @@ export const RecipeViewMobile = (
     currentServings,
     ingredients,
   }: {
-    onAddRecipeServings: (recipe: any, numServings: number) => void;
-    onRemoveRecipeServings: (recipe: any, numServings: number) => void;
+    onAddRecipeServings?: (recipe: any, numServings: number) => void;
+    onRemoveRecipeServings?: (recipe: any, numServings: number) => void;
     pricePerServing: number;
     currentServings: number;
     ingredients: Array<any>;
   },
 ) => {
+  const showDynamicServingFeatures =
+    !!onAddRecipeServings && !!onRemoveRecipeServings;
+
   return (
     <>
       <Grid templateColumns="repeat(1, 1fr);" gap={2}>
@@ -397,41 +413,49 @@ export const RecipeViewMobile = (
                     p="1rem"
                     textAlign={'center'}
                   >
-                    <Flex justifyContent={'space-between'}>
-                      <Button
-                        borderRadius="lg"
-                        bg={'brand.500'}
-                        color={'white'}
-                        _hover={{ background: 'brand.400' }}
-                        _active={{ background: 'brand.400' }}
-                        onClick={() =>
-                          onRemoveRecipeServings(recipe, recipe.baseServings)
-                        }
-                      >
-                        <MinusIcon fontSize="1rem" />
-                      </Button>
-
+                    <Flex
+                      justifyContent={
+                        showDynamicServingFeatures ? 'space-between' : 'center'
+                      }
+                    >
+                      {showDynamicServingFeatures && (
+                        <Button
+                          borderRadius="lg"
+                          bg={'brand.500'}
+                          color={'white'}
+                          _hover={{ background: 'brand.400' }}
+                          _active={{ background: 'brand.400' }}
+                          onClick={() =>
+                            onRemoveRecipeServings(recipe, recipe.baseServings)
+                          }
+                        >
+                          <MinusIcon fontSize="1rem" />
+                        </Button>
+                      )}
                       <Box>
                         <Text
                           fontSize={'1.2rem'}
                           fontWeight={600}
                           color="gray.dark"
                         >
-                          {currentServings} servings added
+                          {currentServings} servings{' '}
+                          {showDynamicServingFeatures && 'added'}
                         </Text>
                       </Box>
-                      <Button
-                        borderRadius="lg"
-                        bg={'brand.500'}
-                        color={'white'}
-                        _hover={{ background: 'brand.400' }}
-                        _active={{ background: 'brand.400' }}
-                        onClick={() =>
-                          onAddRecipeServings(recipe, recipe.baseServings)
-                        }
-                      >
-                        <AddIcon fontSize="1rem" />
-                      </Button>
+                      {showDynamicServingFeatures && (
+                        <Button
+                          borderRadius="lg"
+                          bg={'brand.500'}
+                          color={'white'}
+                          _hover={{ background: 'brand.400' }}
+                          _active={{ background: 'brand.400' }}
+                          onClick={() =>
+                            onAddRecipeServings(recipe, recipe.baseServings)
+                          }
+                        >
+                          <AddIcon fontSize="1rem" />
+                        </Button>
+                      )}
                     </Flex>
                     <Box>
                       <Text

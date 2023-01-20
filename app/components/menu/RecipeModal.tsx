@@ -50,8 +50,8 @@ export default function RecipeModal({
   onClose: () => void;
   recipe: RecipeType;
   currentServings: number;
-  onAddRecipeServings: (recipe: any, numServings: number) => void;
-  onRemoveRecipeServings: (recipe: any, numServings: number) => void;
+  onAddRecipeServings?: (recipe: any, numServings: number) => void;
+  onRemoveRecipeServings?: (recipe: any, numServings: number) => void;
 }) {
   const {
     onClose: onPopoverClose,

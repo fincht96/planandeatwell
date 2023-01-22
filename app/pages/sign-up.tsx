@@ -8,6 +8,7 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Heading,
   HStack,
@@ -20,6 +21,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { useMutation } from '@tanstack/react-query';
+import { passwordStrength } from 'check-password-strength';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
@@ -28,6 +30,15 @@ import { useForm } from 'react-hook-form';
 import Layout from '../components/layout';
 import { CustomNextPage } from '../types/CustomNextPage';
 import { createUser } from '../utils/requests/user';
+
+const isPasswordStrongEnough = (password: string) => {
+  const passwordOutput = passwordStrength(password);
+  if (passwordOutput.length > 7 && passwordOutput.contains.length > 2) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 const SignUp: CustomNextPage = () => {
   const router = useRouter();
@@ -117,7 +128,7 @@ const SignUp: CustomNextPage = () => {
         justify={'center'}
         bg={useColorModeValue('gray.50', 'gray.800')}
       >
-        <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+        <Stack spacing={8} mx={'auto'} maxW={'lg'} py={5} px={6}>
           <Stack align={'center'}>
             <Heading fontSize={'4xl'} textAlign={'center'}>
               Sign up
@@ -132,120 +143,120 @@ const SignUp: CustomNextPage = () => {
             boxShadow={'lg'}
             p={8}
           >
-            <Stack spacing={4}>
-              <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-                <HStack>
-                  <Box>
-                    <FormControl
-                      id="firstName"
-                      isRequired
-                      isInvalid={!!errors.firstName}
-                    >
-                      <FormLabel>First Name</FormLabel>
-                      <Input
-                        type="text"
-                        {...register('firstName', {
-                          required: 'First name is required',
-                        })}
-                      />
-
-                      <FormErrorMessage>
-                        {errors.firstName && `${errors?.firstName.message}`}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </Box>
-                  <Box>
-                    <FormControl
-                      id="lastName"
-                      isRequired
-                      isInvalid={!!errors.lastName}
-                    >
-                      <FormLabel>Last Name</FormLabel>
-                      <Input
-                        type="text"
-                        {...register('lastName', {
-                          required: 'Last name is required',
-                        })}
-                      />
-                      <FormErrorMessage>
-                        {errors.lastName && `${errors?.lastName.message}`}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </Box>
-                </HStack>
-                <FormControl id="email" isRequired isInvalid={!!errors.email}>
-                  <FormLabel>Email address</FormLabel>
+            <Stack
+              as={'form'}
+              onSubmit={handleSubmit(onSubmit)}
+              autoComplete="off"
+              spacing={'1rem'}
+            >
+              <HStack>
+                <FormControl
+                  id="firstName"
+                  isRequired
+                  isInvalid={!!errors.firstName}
+                >
+                  <FormLabel>First Name</FormLabel>
                   <Input
-                    type="email"
-                    {...register('email', {
-                      required: 'Email is required',
+                    type="text"
+                    {...register('firstName', {
+                      required: 'First name is required',
                     })}
-                    autoComplete="off"
                   />
+
                   <FormErrorMessage>
-                    {errors.email && `${errors?.email.message}`}
+                    {errors.firstName && `${errors?.firstName.message}`}
                   </FormErrorMessage>
                 </FormControl>
                 <FormControl
-                  id="password"
+                  id="lastName"
                   isRequired
-                  isInvalid={!!errors.password}
+                  isInvalid={!!errors.lastName}
                 >
-                  <FormLabel>Password</FormLabel>
-                  <InputGroup>
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      {...register('password', {
-                        required: 'Password is required',
-                      })}
-                      autoComplete="off"
-                    />
-                    <InputRightElement h={'full'}>
-                      <Button
-                        variant={'ghost'}
-                        onClick={() =>
-                          setShowPassword((showPassword) => !showPassword)
-                        }
-                      >
-                        {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
-
+                  <FormLabel>Last Name</FormLabel>
+                  <Input
+                    type="text"
+                    {...register('lastName', {
+                      required: 'Last name is required',
+                    })}
+                  />
                   <FormErrorMessage>
-                    {errors.password && `${errors?.password.message}`}
+                    {errors.lastName && `${errors?.lastName.message}`}
                   </FormErrorMessage>
                 </FormControl>
-                <Stack spacing={10} pt={2}>
-                  <Button
-                    size="lg"
-                    bg={'brand.500'}
-                    color={'white'}
-                    _hover={{
-                      bg: 'brand.600',
-                    }}
-                    type="submit"
-                    isLoading={signUpMutation.isLoading}
-                  >
-                    Sign up
-                  </Button>
-                </Stack>
-                <Stack pt={6}>
-                  <Text align={'center'}>
-                    Already a user?{' '}
-                    <NextLink href={'/sign-in'}>
-                      <Text
-                        display={'inline'}
-                        color={'brand.400'}
-                        cursor={'pointer'}
-                        as="span"
-                      >
-                        Sign in
-                      </Text>
-                    </NextLink>
-                  </Text>
-                </Stack>
-              </form>
+              </HStack>
+              <FormControl id="email" isRequired isInvalid={!!errors.email}>
+                <FormLabel>Email address</FormLabel>
+                <Input
+                  type="email"
+                  {...register('email', {
+                    required: 'Email is required',
+                  })}
+                />
+                <FormErrorMessage>
+                  {errors.email && `${errors?.email.message}`}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl
+                id="password"
+                isRequired
+                isInvalid={!!errors.password}
+              >
+                <FormLabel>Password</FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    {...register('password', {
+                      required: 'Password is required',
+                      validate: isPasswordStrongEnough,
+                    })}
+                    autoComplete="new-password"
+                  />
+                  <InputRightElement h={'full'}>
+                    <Button
+                      variant={'ghost'}
+                      onClick={() =>
+                        setShowPassword((showPassword) => !showPassword)
+                      }
+                    >
+                      {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+
+                <FormHelperText color={errors.password ? 'red' : 'gray.500'}>
+                  Ensure password is at least 8 characters long, contains a
+                  lowercase, uppercase, symbol and/or a number
+                </FormHelperText>
+              </FormControl>
+              <Stack spacing={10} pt={2}>
+                <Button
+                  size="lg"
+                  bg={'brand.500'}
+                  color={'white'}
+                  _hover={{
+                    bg: 'brand.600',
+                  }}
+                  type="submit"
+                  isLoading={signUpMutation.isLoading}
+                >
+                  Sign up
+                </Button>
+              </Stack>
+              <Stack pt={6}>
+                <Text align={'center'}>
+                  Already a user?{' '}
+                  <NextLink href={'/sign-in'}>
+                    <Text
+                      display={'inline'}
+                      color={'brand.400'}
+                      cursor={'pointer'}
+                      as="span"
+                    >
+                      Sign in
+                    </Text>
+                  </NextLink>
+                </Text>
+              </Stack>
             </Stack>
           </Box>
         </Stack>

@@ -219,7 +219,7 @@ Instagram: https://www.instagram.com/planandeatwell
   attachments: [
     {
       filename: 'logo.png',
-      path: process.cwd() + '/src/app/static/logo.png',
+      path: './static/logo.png',
       cid: 'logo_footer@planandeatwell.uk', //same cid value as in the html
     },
   ],

@@ -367,7 +367,7 @@ from
         group by 
           meal_plans.id
       ) as recipe_metrics on recipe_metrics.meal_plan_id = ingredient_metrics.meal_plan_id
-  ) as meal_plan_metric_data ON CONFLICT (id) DO 
+  ) as meal_plan_metric_data ON CONFLICT (meal_plan_id) DO 
 UPDATE 
 SET 
   recipes_count = EXCLUDED.recipes_count, 

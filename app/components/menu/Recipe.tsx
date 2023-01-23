@@ -36,7 +36,7 @@ const Recipe = ({
       cursor={'pointer'}
       borderColor="gray.light"
       onClick={() => onClick(id)}
-      bg={selected ? 'brand.100' : 'gray.lightGray'}
+      bg={selected ? 'brand.100' : 'gray.lighterGray'}
       position="relative"
       _hover={{ bg: selected ? 'brand.100' : 'gray.searchBoxGray' }}
     >

@@ -363,18 +363,16 @@ const Menu: CustomNextPage = () => {
         />
       )}
       <Container maxW="1100px" mb={10}>
-        <Box>
-          <Text
-            noOfLines={2}
-            fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
-            color="black"
-            fontWeight={600}
-            textAlign={{ base: 'center', '2xl': 'left' }}
-            ml={{ '2xl': '0.8rem' }}
-          >
-            Search & select recipes to add to your meal plan!
-          </Text>
-        </Box>
+        <Text
+          noOfLines={2}
+          fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
+          color="black"
+          fontWeight={600}
+          textAlign={{ base: 'center', '2xl': 'left' }}
+          ml={{ '2xl': '0.8rem' }}
+        >
+          Search & select recipes to add to your meal plan!
+        </Text>
       </Container>
 
       <Container maxW="1100px" mb={10} padding="0 2rem 2.5rem">

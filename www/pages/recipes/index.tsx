@@ -1,7 +1,15 @@
 import Head from 'next/head';
 import Layout, { siteTitle } from '../../components/layout';
 import type { NextPage } from 'next';
-import { Box, Container, Text, Grid, Button, Flex } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Text,
+  Grid,
+  Button,
+  Flex,
+  Center,
+} from '@chakra-ui/react';
 import RecipeCard from '../../components/recipes/RecipeCard';
 import { getRecipes } from '../../utils/api-requests/recipes';
 import { useEffect, useState } from 'react';
@@ -15,6 +23,7 @@ import {
 } from '../../utils/queryParamConversions';
 import SearchMenu from '../../components/recipes/SearchMenu';
 import { RecipeType } from '../../types/recipe.types';
+import SearchSortFilterSection from '../../components/shared/SearchSortFilterSection';
 
 const Recipes: NextPage = (props: any) => {
   const [fullPath, setFullPath] = useState<string>('');
@@ -130,15 +139,26 @@ const Recipes: NextPage = (props: any) => {
         </Head>
         <Box pt={'100px'}>
           <Container maxW="1200px" mb={10}>
-            <Box textAlign={'center'}>
-              <Text fontSize={'2.3rem'} color="gray.dark" fontWeight={500}>
-                Recipes
-              </Text>
-            </Box>
+            <Text
+              noOfLines={2}
+              fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
+              color="black"
+              fontWeight={600}
+              textAlign="center"
+            >
+              Recipes
+            </Text>
           </Container>
           <Container maxW="1200px" mb={10}>
-            <SearchMenu
-              mb={'2rem'}
+            <SearchSortFilterSection
+              showRecipesFilter={true}
+              selectValues={{
+                relevance: 'Relevance',
+                newest: 'Newest',
+                priceAscending: 'Lowest Price',
+                priceDescending: 'Highest Price',
+              }}
+              searchFieldPlaceHolderText="Search recipes..."
               mealsFilters={recipeQueryParams.meals}
               lifestyleFilters={recipeQueryParams.lifestyles}
               freeFromFilters={recipeQueryParams.freeFroms}
@@ -147,7 +167,7 @@ const Recipes: NextPage = (props: any) => {
                 recipeQueryParams.orderBy,
               )}
               searchTerm={recipeQueryParams.searchTerm}
-              onSearch={({ searchTerm }: { searchTerm: string }) => {
+              onSearchSubmit={({ searchTerm }: { searchTerm: string }) => {
                 setRecipeQueryParams((current) => {
                   return {
                     ...current,
@@ -202,7 +222,7 @@ const Recipes: NextPage = (props: any) => {
                   },
                 });
               }}
-              onSortByChange={(sortBy: SortBy) => {
+              handleSortChange={(sortBy: SortBy) => {
                 const orderAndOrderBy = sortByToOrder(sortBy);
                 setRecipeQueryParams((current) => {
                   return {
@@ -220,22 +240,16 @@ const Recipes: NextPage = (props: any) => {
                 });
               }}
             />
-
-            <Text
-              fontSize={'1rem'}
-              color="gray.dark"
-              fontWeight={600}
-              mb={'2rem'}
-            >
-              Results
-              <Text as={'span'} fontWeight={400}>
+            <Text fontSize={'sm'} color="black" fontWeight={600} mb={'2rem'}>
+              Results&nbsp;
+              <Text as={'span'} fontWeight={600} color="black">
                 ({recipes.length})
               </Text>
             </Text>
           </Container>
           <Container maxW="1200px" mb={10}>
             <Grid
-              templateColumns="repeat(auto-fill, minMax(220px,1fr));"
+              templateColumns="repeat(auto-fill, minMax(270px, 1fr));"
               gap={6}
             >
               {recipes.map((recipe: RecipeType) => {
@@ -249,9 +263,9 @@ const Recipes: NextPage = (props: any) => {
               })}
             </Grid>
           </Container>
-          <Container maxW="1200px" mb={10}>
+          <Container maxW="1200px">
             {showMore && !!recipes.length && (
-              <Flex justifyContent={'center'}>
+              <Flex justifyContent="center" alignItems="center" pb="3rem">
                 <Button
                   onClick={() => {
                     setRecipeQueryParams((current) => {
@@ -261,11 +275,12 @@ const Recipes: NextPage = (props: any) => {
                       };
                     });
                   }}
-                  mt={2}
+                  height="3rem"
                   colorScheme="brand"
-                  fontSize={{ base: '0.9rem', md: '1.1rem' }}
+                  fontSize="sm"
                   fontWeight={600}
-                  padding={'1.5rem 1rem'}
+                  padding={'1.5rem 1.5rem'}
+                  borderRadius="lg"
                 >
                   Show more
                 </Button>

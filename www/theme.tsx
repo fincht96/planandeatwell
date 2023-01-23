@@ -1,23 +1,37 @@
 import { extendTheme } from '@chakra-ui/react';
 
 const theme = extendTheme({
+  styles: {
+    global: (props: any) => ({
+      body: {
+        bg: '#F7FAFC',
+      },
+    }),
+  },
   breakpoints: {
-    sm: '320px',
+    sm: '400px',
     md: '768px',
     lg: '1006px',
     xl: '1200px',
+    '1xl': '1300px',
+    '2xl': '1400px',
+    '3xl': '1500px',
   },
   fonts: {
-    heading: `Roboto, sans-serif`,
-    body: `Roboto, sans-serif`,
+    heading: `'Inter', sans-serif`,
+    body: `'Inter', sans-serif`,
   },
   colors: {
     transparent: 'transparent',
     black: '#000',
     white: '#fff',
     gray: {
-      bg: '#FCFCFC',
+      bg: 'F#CFCFC',
+      searchBoxGray: 'rgba(228, 228, 228, 0.3)',
+      veryLightGray: '#E7EFEC',
+      lighterGray: '#F7FAFC',
       light: '#aaaaaa',
+      bone: '#808191',
       normal: '#777777',
       dark: '#444444',
     },

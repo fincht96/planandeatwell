@@ -1,27 +1,34 @@
+import { CloseIcon, CopyIcon } from '@chakra-ui/icons';
 import {
+  Box,
+  Button,
+  Flex,
+  IconButton,
   Modal,
   ModalBody,
   ModalContent,
   ModalOverlay,
   Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverCloseButton,
-  PopoverHeader,
   PopoverArrow,
   PopoverBody,
-  Button,
-  Box,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
   Text,
-  IconButton,
   useDisclosure,
   useMediaQuery,
 } from '@chakra-ui/react';
-import { CloseIcon, LinkIcon, CopyIcon } from '@chakra-ui/icons';
-import BorderBox from '../BorderBox';
+import copy from 'copy-to-clipboard';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import copy from 'copy-to-clipboard';
+import {
+  SlCheck,
+  SlShare,
+  SlSizeActual,
+  SlSizeFullscreen,
+} from 'react-icons/sl';
+import BorderBox from '../BorderBox';
 import { RecipeViewDesktop, RecipeViewMobile } from './RecipeViews';
 import { RecipeType } from '../../types/recipe.types';
 
@@ -41,7 +48,11 @@ export default function RecipeModal({
     isOpen: isPopoverOpen,
     onOpen: onPopoverOpen,
   } = useDisclosure();
+
   const [shareRecipeLinkCopied, setShareRecipeLinkCopied] =
+    useState<boolean>(false);
+
+  const [showFullModalScreen, setShowFullModalScreen] =
     useState<boolean>(false);
 
   const [isLessThan900] = useMediaQuery('(max-width: 900px)');
@@ -61,12 +72,22 @@ export default function RecipeModal({
         onClose={onClose}
         isCentered
         scrollBehavior="inside"
-        size={!!isLessThan900 ? 'full' : ''}
+        size={showFullModalScreen || isLessThan900 ? 'full' : ''}
       >
         <ModalOverlay />
-        <ModalContent p={'2rem 0'} maxW="65rem" height="100%" padding={0}>
-          <ModalBody padding={0} borderWidth={'1px'} borderRadius={'lg'}>
-            <BorderBox
+        <ModalContent
+          maxW={showFullModalScreen ? 'none' : '65rem'}
+          width="100%"
+          height="100%"
+          bg="gray.lighterGray"
+          marginTop={{
+            base: 'none',
+            xl: showFullModalScreen ? 'none' : '4.5rem',
+          }}
+          borderRadius="none"
+        >
+          <ModalBody padding={0}>
+            <Box
               mb={2}
               width={'100%'}
               height={300}
@@ -82,37 +103,93 @@ export default function RecipeModal({
                 position="relative"
               >
                 <Box mr={2}>
+                  {!isLessThan900 && (
+                    <Button
+                      borderRadius="lg"
+                      color="black"
+                      fontSize="sm"
+                      leftIcon={
+                        showFullModalScreen ? (
+                          <SlSizeActual fontSize="1rem" />
+                        ) : (
+                          <SlSizeFullscreen fontSize="1rem" />
+                        )
+                      }
+                      aria-label="share-recipe-button"
+                      background="gray.lighterGray"
+                      onClick={() => {
+                        setShowFullModalScreen(!showFullModalScreen);
+                      }}
+                    >
+                      {showFullModalScreen ? 'Small screen' : 'Full screen'}
+                    </Button>
+                  )}
                   <Popover
                     isOpen={isPopoverOpen}
                     closeOnBlur={false}
-                    placement="bottom"
+                    placement="bottom-end"
                     onClose={onPopoverClose}
                   >
                     <PopoverTrigger>
                       <Button
+                        ml={2}
+                        borderRadius="lg"
+                        color="black"
+                        fontSize="sm"
+                        leftIcon={<SlShare fontSize="1rem" />}
                         aria-label="share-recipe-button"
-                        background={'white'}
+                        background="gray.lighterGray"
                         onClick={() => {
                           setShareRecipeLinkCopied(false);
                           onPopoverOpen();
                         }}
                       >
-                        <LinkIcon />
                         Share
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent>
+                    <PopoverContent
+                      bg="gray.lighterGray"
+                      width="280px"
+                      borderRadius="xl"
+                      p={1}
+                    >
                       <PopoverArrow />
-                      <PopoverHeader>
+                      <PopoverHeader border="none" pb={0}>
                         {shareRecipeLinkCopied ? (
-                          <Text textAlign={'center'}>Link copied!</Text>
+                          <Flex justifyContent="center" alignItems="center">
+                            <SlCheck fontSize="0.9rem" />
+                            <Text
+                              ml={1}
+                              textAlign={'center'}
+                              fontSize="sm"
+                              fontWeight="600"
+                              color="black"
+                            >
+                              Link copied!
+                            </Text>
+                          </Flex>
                         ) : (
-                          <Text textAlign={'center'}>Share this recipe</Text>
+                          <Text
+                            textAlign={'center'}
+                            fontSize="sm"
+                            fontWeight="600"
+                            color="black"
+                          >
+                            Share recipe
+                          </Text>
                         )}
                       </PopoverHeader>
                       <PopoverCloseButton />
                       <PopoverBody>
                         <BorderBox
+                          borderRadius="lg"
+                          _hover={{
+                            bg: 'brand.400',
+                            borderColor: 'brand.400',
+                          }}
+                          bg="brand.500"
+                          borderColor="brand.500"
+                          height="2.5rem"
                           cursor={'pointer'}
                           display="flex"
                           flexDirection="row"
@@ -124,14 +201,21 @@ export default function RecipeModal({
                           }}
                         >
                           <Box>
-                            <CopyIcon />
+                            <CopyIcon color="white" fontSize="1.1rem" />
                           </Box>
-                          <Box ml={1}>
-                            {shareRecipeLinkCopied ? (
-                              <Text background={'gray.100'}>Copy link</Text>
-                            ) : (
-                              <Text>Copy link</Text>
-                            )}
+                          <Box
+                            ml={1}
+                            bg={shareRecipeLinkCopied ? 'brand.200' : 'none'}
+                          >
+                            <Text
+                              fontSize="sm"
+                              fontWeight="600"
+                              color="white"
+                              width="200px"
+                              noOfLines={1}
+                            >
+                              {fullPath}/{recipe.id}
+                            </Text>
                           </Box>
                         </BorderBox>
                       </PopoverBody>
@@ -140,6 +224,8 @@ export default function RecipeModal({
                 </Box>
                 <Box mr={2}>
                   <IconButton
+                    borderRadius="lg"
+                    fontSize="0.7rem"
                     background={'white'}
                     icon={<CloseIcon />}
                     onClick={onClose}
@@ -156,7 +242,7 @@ export default function RecipeModal({
                   priority
                 />
               </Box>
-            </BorderBox>
+            </Box>
             {!!isLessThan900
               ? RecipeViewMobile(recipe, {
                   pricePerServing: recipe.pricePerServing,

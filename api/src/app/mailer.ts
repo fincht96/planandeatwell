@@ -12,8 +12,8 @@ export default class Mailer {
   async init() {
     let options = {
       host: this.appConfig.mailHost,
-      secure: true,
-      port: 465,
+      secure: false,
+      port: 587,
       auth: {
         user: this.appConfig.mailUser,
         pass: this.appConfig.mailPass,

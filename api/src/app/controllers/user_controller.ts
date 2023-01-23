@@ -13,7 +13,7 @@ const createAccountSchema = Joi.object({
   firstName: Joi.string().max(200).required(),
   lastName: Joi.string().max(200).required(),
   email: Joi.string().min(3).max(200).required(),
-  password: Joi.string().max(400).required(),
+  password: Joi.string().min(8).max(400).required(),
 }).and('firstName', 'lastName', 'email', 'password');
 
 export default class UserController {

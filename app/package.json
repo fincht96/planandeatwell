@@ -18,6 +18,7 @@
     "@tanstack/react-query": "^4.13.0",
     "camelize": "^1.0.1",
     "camelize-ts": "^2.1.1",
+    "check-password-strength": "^2.0.7",
     "eslint-plugin-react-hooks": "^4.6.0",
     "firebase": "^9.15.0",
     "fraction.js": "^4.2.0",

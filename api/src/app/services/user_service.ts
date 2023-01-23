@@ -51,7 +51,7 @@ export default class UserService {
     const result = await this.db('users').insert(
       {
         roles: ['user'],
-        email,
+        email: email.toLowerCase(),
         first_name: firstName,
         last_name: lastName,
       },
@@ -61,7 +61,19 @@ export default class UserService {
     const firebase_uid = result[0].uid;
     const planandeatwell_id = result[0].id;
 
-    // create firebase account
+    // lookup user
+    const user = await this.firebaseAdmin
+      .auth()
+      .getUserByEmail(email)
+      .then((userRecord) => userRecord)
+      .catch(() => null);
+
+    // if user exists on firebase, delete existing firebase user
+    if (user) {
+      await this.firebaseAdmin.auth().deleteUser(user.uid);
+    }
+
+    // create a firebase account
     await this.firebaseAdmin.auth().createUser({
       uid: firebase_uid,
       email,

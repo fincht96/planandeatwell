@@ -13,7 +13,7 @@ export default class Mailer {
     let options = {
       host: this.appConfig.mailHost,
       secure: false,
-      port: 587,
+      port: this.appConfig.mailPort,
       auth: {
         user: this.appConfig.mailUser,
         pass: this.appConfig.mailPass,

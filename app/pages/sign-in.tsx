@@ -1,9 +1,6 @@
 import {
-  Alert,
-  AlertIcon,
   Box,
   Button,
-  CloseButton,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -14,7 +11,7 @@ import {
   Stack,
   Text,
   useColorModeValue,
-  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import Head from 'next/head';
 import NextLink from 'next/link';
@@ -31,44 +28,45 @@ const SignIn: CustomNextPage = () => {
   const router = useRouter();
   const { signIn, unsubscribe, subscribe } = useAuth();
   const [loading, setLoading] = useState(false);
-
-  const {
-    isOpen: isNewAccountAlertVisible,
-    onClose: onCloseNewAccountAlert,
-    onOpen: onShowNewAccount,
-  } = useDisclosure({
-    defaultIsOpen: false,
-  });
-
-  const {
-    isOpen: userRequestedPasswordReset,
-    onClose: onCloseRequestedPasswordReset,
-    onOpen: onShowRequestedPasswordReset,
-  } = useDisclosure({
-    defaultIsOpen: false,
-  });
-
-  const {
-    isOpen: signInErrorAlertVisible,
-    onClose: onCloseSignInErrorAlert,
-    onOpen: onOpenSignInErrorAlert,
-  } = useDisclosure({
-    defaultIsOpen: false,
-  });
+  const toast = useToast();
+  const isLargerThan800 = window.innerWidth > 800;
+  const passwordResetToastId = 'password-reset';
+  const newAccountToastId = 'new-account';
+  const signInErrorToastId = 'sign-in';
 
   useEffect(() => {
-    !!router.query.userRequestPasswordReset
-      ? onShowRequestedPasswordReset()
-      : onCloseRequestedPasswordReset();
+    if (
+      !!router.query.userRequestPasswordReset &&
+      !toast.isActive(passwordResetToastId)
+    ) {
+      toast({
+        id: passwordResetToastId,
+        title: 'Success',
+        description: `You will shortly receive an email with instructions on how to reset
+              your password in a few minutes! 😅`,
+        position: isLargerThan800 ? 'top' : 'bottom',
+        status: 'success',
+        isClosable: true,
+        duration: 6000,
+      });
 
-    !!router.query.newAccount ? onShowNewAccount() : onCloseNewAccountAlert();
-  }, [
-    onCloseNewAccountAlert,
-    onCloseRequestedPasswordReset,
-    onShowNewAccount,
-    onShowRequestedPasswordReset,
-    router.query,
-  ]);
+      router.replace('/sign-in', undefined, { shallow: true });
+    }
+  }, [isLargerThan800, router, router.query.userRequestPasswordReset, toast]);
+
+  useEffect(() => {
+    if (!!router.query.newAccount && !toast.isActive(newAccountToastId)) {
+      toast({
+        id: newAccountToastId,
+        title: 'Awesome',
+        description: `Awesome, your account has been created! 🚀`,
+        position: isLargerThan800 ? 'top' : 'bottom',
+        status: 'success',
+        isClosable: true,
+      });
+      router.replace('/sign-in', undefined, { shallow: true });
+    }
+  }, [isLargerThan800, router, router.query.newAccount, toast]);
 
   useEffect(() => {
     const authSubscriber = {
@@ -78,7 +76,16 @@ const SignIn: CustomNextPage = () => {
         }
         if (event.name === 'onError') {
           setLoading(false);
-          onOpenSignInErrorAlert();
+          if (!toast.isActive(signInErrorToastId)) {
+            toast({
+              id: signInErrorToastId,
+              title: 'Oops',
+              description: 'Something went wrong signing you in 😕',
+              position: isLargerThan800 ? 'top' : 'bottom',
+              status: 'error',
+              isClosable: true,
+            });
+          }
         }
       },
     };
@@ -92,7 +99,7 @@ const SignIn: CustomNextPage = () => {
         unsubscribe(authSubscriber);
       }
     };
-  }, [onOpenSignInErrorAlert, subscribe, unsubscribe]);
+  }, [isLargerThan800, subscribe, toast, unsubscribe]);
 
   const {
     register,
@@ -113,52 +120,6 @@ const SignIn: CustomNextPage = () => {
       <Head>
         <title>Sign In | Plan and Eat Well</title>
       </Head>
-
-      {userRequestedPasswordReset && (
-        <Alert
-          status="success"
-          as={Flex}
-          justifyContent={'space-between'}
-          alignItems={'center'}
-        >
-          <Flex>
-            <AlertIcon />
-            Success, you will receive an email with instructions on how to reset
-            your password in a few minutes! 😅
-          </Flex>
-          <CloseButton onClick={onCloseRequestedPasswordReset} />
-        </Alert>
-      )}
-
-      {isNewAccountAlertVisible && (
-        <Alert
-          status="success"
-          as={Flex}
-          justifyContent={'space-between'}
-          alignItems={'center'}
-        >
-          <Flex>
-            <AlertIcon />
-            Awesome, your account has been created! 🚀
-          </Flex>
-          <CloseButton onClick={onCloseNewAccountAlert} />
-        </Alert>
-      )}
-
-      {signInErrorAlertVisible && (
-        <Alert
-          status="error"
-          as={Flex}
-          justifyContent={'space-between'}
-          alignItems={'center'}
-        >
-          <Flex>
-            <AlertIcon />
-            Oops, something went wrong signing you in! 😕
-          </Flex>
-          <CloseButton onClick={onCloseSignInErrorAlert} />
-        </Alert>
-      )}
 
       <Flex
         minH={'100vh'}

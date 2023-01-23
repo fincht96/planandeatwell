@@ -523,7 +523,7 @@ const MealPlan: CustomNextPage = () => {
                           objectFit="cover"
                           height="100%"
                           width="100%"
-                          src={`${process.env.NEXT_PUBLIC_CDN}${recipeWithServings.recipe.imagePath}`}
+                          src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}/${recipeWithServings.recipe.imagePath}`}
                           alt={recipeWithServings.name}
                         />
                       </Box>

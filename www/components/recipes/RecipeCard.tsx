@@ -26,7 +26,7 @@ const RecipeCard = ({
     >
       <Box position={'relative'}>
         <Image
-          src={`${process.env.NEXT_PUBLIC_CDN}${recipe.imagePath}`}
+          src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}/${recipe.imagePath}`}
           alt={recipe.name}
           width="100%"
           height="100%"

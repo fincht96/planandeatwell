@@ -28,7 +28,7 @@ const Recipe = ({
       <Box>
         <Link href={`/recipes/${id}`} isExternal>
           <Image
-            src={`${process.env.NEXT_PUBLIC_CDN}${imagePath}`}
+            src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}/${imagePath}`}
             alt={name}
             width="100%"
             height="100%"

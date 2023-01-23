@@ -10,7 +10,7 @@ export async function seed(knex: Knex): Promise<void> {
     {
       name: 'Greek Fajitas',
       base_servings: 4,
-      image_path: '/recipe_images/aldi/greek-fajitas.jpg',
+      image_path: 'recipe_images/aldi/greek-fajitas.jpg',
       meal_type: ['dinner', 'lunch'],
       lifestyle_type: ['vegetarian'],
       free_from_type: ['dairy_free'],
@@ -21,7 +21,7 @@ export async function seed(knex: Knex): Promise<void> {
     {
       name: 'Vegan Pesto Pasta',
       base_servings: 4,
-      image_path: '/recipe_images/aldi/vegan-pesto-pasta.jpg',
+      image_path: 'recipe_images/aldi/vegan-pesto-pasta.jpg',
       meal_type: ['dinner', 'lunch'],
       lifestyle_type: ['vegan'],
       prep_time: 5,
@@ -31,7 +31,7 @@ export async function seed(knex: Knex): Promise<void> {
     {
       name: 'Fish Pie',
       base_servings: 4,
-      image_path: '/recipe_images/aldi/fish-pie.jpg',
+      image_path: 'recipe_images/aldi/fish-pie.jpg',
       meal_type: ['dinner', 'lunch'],
       lifestyle_type: ['pescatarian'],
       free_from_type: ['gluten_free'],

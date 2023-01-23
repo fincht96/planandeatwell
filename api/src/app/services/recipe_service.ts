@@ -397,7 +397,7 @@ from
     group by 
       recipe_id, 
       base_servings
-  ) as all_recipe_metrics ON CONFLICT (id) DO 
+  ) as all_recipe_metrics ON CONFLICT (recipe_id) DO 
 UPDATE 
 SET 
   price_per_serving = EXCLUDED.price_per_serving, 

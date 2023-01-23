@@ -68,7 +68,7 @@ const Recipe: NextPage = ({ recipe }: any) => {
           <Container maxW="1200px" mb={4}>
             <BorderBox my={2} width={'100%'} height={300} position={'relative'}>
               <Image
-                src={`${process.env.NEXT_PUBLIC_CDN}${recipe.imagePath}`}
+                src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}/${recipe.imagePath}`}
                 alt={recipe.name}
                 layout={'fill'}
                 objectFit="cover"

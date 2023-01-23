@@ -43,7 +43,7 @@ const Recipe = ({
       <Box h={'12.5rem'} position={'relative'}>
         <Image
           quality={75}
-          src={`${process.env.NEXT_PUBLIC_CDN}${imagePath}`}
+          src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}/${imagePath}`}
           layout={'fill'}
           alt={name}
           objectFit={'cover'}

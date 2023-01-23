@@ -247,7 +247,7 @@ export default function Recipes() {
     queryFn: () =>
       getSignedUploadUrl(
         idToken,
-        `${aldiRecipeImagePath}/${filename}`,
+        `${process.env.NODE_ENV}/${aldiRecipeImagePath}/${filename}`,
         contentType,
         'public-read',
       ),
@@ -285,7 +285,8 @@ export default function Recipes() {
       insertRecipeMutation.mutate({
         recipe: {
           ...recipe,
-          imagePath: `/${aldiRecipeImagePath}/${filename}`,
+          // imagePath stored in recipe in db is environment agnostic
+          imagePath: `${aldiRecipeImagePath}/${filename}`,
         },
       });
     },

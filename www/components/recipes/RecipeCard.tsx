@@ -1,5 +1,5 @@
 import { Box, Text, Badge, useDisclosure, Flex } from '@chakra-ui/react';
-import { TimeIcon, InfoOutlineIcon } from '@chakra-ui/icons';
+import { InfoOutlineIcon } from '@chakra-ui/icons';
 import { SlBasketLoaded, SlClock, SlPeople } from 'react-icons/sl';
 import Image from 'next/image';
 import BorderBox from '../BorderBox';
@@ -18,16 +18,14 @@ const RecipeCard = ({
 
   return (
     <BorderBox
-      maxW={'sm'}
       maxH={'xl'}
       overflow={'hidden'}
+      cursor={'pointer'}
+      borderColor="gray.light"
       onClick={onOpen}
-      _hover={{ background: 'brand.100' }}
-      cursor="pointer"
-      // borderColor="gray.light"
-      border="none"
       bg="gray.lighterGray"
-      margin="auto"
+      position="relative"
+      _hover="brand.100"
     >
       <RecipeModal
         onClose={onClose}
@@ -35,32 +33,22 @@ const RecipeCard = ({
         recipe={recipe}
         fullPath={fullPath}
       />
-      <Box position={'relative'}>
+      <Box h={'12.5rem'} position={'relative'}>
         <Image
+          quality={75}
           src={`${process.env.NEXT_PUBLIC_CDN}${recipe.imagePath}`}
+          layout={'fill'}
           alt={recipe.name}
-          width="100%"
-          height="70%"
-          layout="responsive"
+          objectFit={'cover'}
           priority
         />
       </Box>
-      <Box
-        p={'4'}
-        borderBottomLeftRadius="lg"
-        borderBottomRightRadius="lg"
-        borderWidth="1px"
-        borderTop="none"
-        bg="white"
-        borderColor="#dad1d1"
-        // borderColor="gray.light"
-      >
+      <Box p={'4'} mb={{ base: '1.5rem', md: '2rem' }}>
         <Box noOfLines={1}>
           <Text fontSize={'1.3rem'} fontWeight={600} color="black">
             {recipe.name}
           </Text>
         </Box>
-
         <Box mb="0.8rem">
           <Badge
             variant={'solid'}
@@ -69,6 +57,7 @@ const RecipeCard = ({
             {recipe.supermarketName}
           </Badge>
         </Box>
+
         <Flex flexDirection="row" justifyContent="flex-start">
           <Flex
             my={0.5}

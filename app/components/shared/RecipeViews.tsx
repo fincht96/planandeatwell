@@ -32,27 +32,25 @@ const Interweave = dynamic<any>(
 );
 
 // greater than 900px
-export const RecipeViewDesktop = (
-  recipe: RecipeType,
-  {
+export const RecipeViewDesktop = ({
+  recipe,
     onAddRecipeServings,
     onRemoveRecipeServings,
     pricePerServing,
     currentServings,
     ingredients,
   }: {
+  recipe: RecipeType;
     onAddRecipeServings?: (recipe: any, numServings: number) => void;
     onRemoveRecipeServings?: (recipe: any, numServings: number) => void;
     pricePerServing: number;
     currentServings: number;
     ingredients: Array<any>;
-  },
-) => {
+}) => {
   const showDynamicServingFeatures =
     !!onAddRecipeServings && !!onRemoveRecipeServings;
 
   return (
-    <>
       <Grid templateColumns="repeat(2, 1fr);" gap={2} p="1.25rem">
         <GridItem w="100%" h="100">
           <Box display={'flex'} flexDirection={'column'}>
@@ -559,6 +557,5 @@ export const RecipeViewMobile = (
           </Box>
         </GridItem>
       </Grid>
-    </>
   );
 };

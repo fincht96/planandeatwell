@@ -274,21 +274,25 @@ export default function RecipeModal({
                 />
               </Box>
             </Box>
-            {!!isLessThan900
-              ? RecipeViewMobile(recipe, {
-                  onAddRecipeServings,
-                  onRemoveRecipeServings,
-                  pricePerServing,
-                  currentServings,
-                  ingredients: decoratedIngredients,
-                })
-              : RecipeViewDesktop(recipe, {
-                  onAddRecipeServings,
-                  onRemoveRecipeServings,
-                  pricePerServing,
-                  currentServings,
-                  ingredients: decoratedIngredients,
-                })}
+            {!!isLessThan900 ? (
+              <RecipeViewMobile
+                recipe={recipe}
+                onAddRecipeServings={onAddRecipeServings}
+                onRemoveRecipeServings={onRemoveRecipeServings}
+                pricePerServing={pricePerServing}
+                currentServings={currentServings}
+                ingredients={decoratedIngredients}
+              />
+            ) : (
+              <RecipeViewDesktop
+                recipe={recipe}
+                onAddRecipeServings={onAddRecipeServings}
+                onRemoveRecipeServings={onRemoveRecipeServings}
+                pricePerServing={pricePerServing}
+                currentServings={currentServings}
+                ingredients={decoratedIngredients}
+              />
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

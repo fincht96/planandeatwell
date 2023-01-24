@@ -35,9 +35,7 @@ const RecipeCard = ({
       />
       <Box h={'12.5rem'} position={'relative'}>
         <Image
-          quality={75}
           src={`${process.env.NEXT_PUBLIC_CDN}${recipe.imagePath}`}
-          layout={'fill'}
           alt={recipe.name}
           objectFit={'cover'}
           priority

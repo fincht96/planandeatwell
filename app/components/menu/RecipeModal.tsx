@@ -266,7 +266,7 @@ export default function RecipeModal({
               </Box>
               <Box>
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_CDN}${recipe.imagePath}`}
+                  src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}/${recipe.imagePath}`}
                   alt={recipe.name}
                   layout={'fill'}
                   objectFit="cover"

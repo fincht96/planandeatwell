@@ -1,10 +1,7 @@
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
-  Alert,
-  AlertIcon,
   Box,
   Button,
-  CloseButton,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -18,7 +15,7 @@ import {
   Stack,
   Text,
   useColorModeValue,
-  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { useMutation } from '@tanstack/react-query';
 import { passwordStrength } from 'check-password-strength';
@@ -43,14 +40,9 @@ const isPasswordStrongEnough = (password: string) => {
 const SignUp: CustomNextPage = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-
-  const {
-    isOpen: signUpErrorAlertVisible,
-    onClose: onCloseSignUpErrorAlert,
-    onOpen: onOpenSignUpErrorAlert,
-  } = useDisclosure({
-    defaultIsOpen: false,
-  });
+  const toast = useToast();
+  const signInErrorToastId = 'sign-in';
+  const isLargerThan800 = window.innerWidth > 800;
 
   const signUpMutation = useMutation({
     mutationFn: ({
@@ -75,10 +67,18 @@ const SignUp: CustomNextPage = () => {
         '/sign-in', // "as" argument
       );
     },
-
     onError: (e) => {
       console.error(e);
-      onOpenSignUpErrorAlert();
+      if (!toast.isActive(signInErrorToastId)) {
+        toast({
+          id: signInErrorToastId,
+          title: 'Dang it!',
+          description: 'Something went wrong signing you up! 😕',
+          position: isLargerThan800 ? 'top' : 'bottom',
+          status: 'error',
+          isClosable: true,
+        });
+      }
     },
   });
 
@@ -107,21 +107,6 @@ const SignUp: CustomNextPage = () => {
       <Head>
         <title>Sign Up | Plan and Eat Well</title>
       </Head>
-
-      {signUpErrorAlertVisible && (
-        <Alert
-          status="error"
-          as={Flex}
-          justifyContent={'space-between'}
-          alignItems={'center'}
-        >
-          <Flex>
-            <AlertIcon />
-            Dang it! Something went wrong signing you up! 😕
-          </Flex>
-          <CloseButton onClick={onCloseSignUpErrorAlert} />
-        </Alert>
-      )}
 
       <Flex
         minH={'100vh'}

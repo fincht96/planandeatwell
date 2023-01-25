@@ -8,6 +8,7 @@ import {
   Container,
   Button,
   Flex,
+  Link,
 } from '@chakra-ui/react';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -69,7 +70,13 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
               </Text>
             </Stack>
             <Stack direction={'row'}>
-              <Button colorScheme="brand" fontSize="md" fontWeight="600">
+              <Button
+                colorScheme="brand"
+                fontSize="md"
+                fontWeight="600"
+                as={Link}
+                href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-up`}
+              >
                 Join for free now
               </Button>
             </Stack>
@@ -162,7 +169,13 @@ const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
               </Text>
             </Stack>
             <Stack direction={'row'} justifyContent="center">
-              <Button colorScheme="brand" fontSize="md" fontWeight="600">
+              <Button
+                colorScheme="brand"
+                fontSize="md"
+                fontWeight="600"
+                as={Link}
+                href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-up`}
+              >
                 Join for free now
               </Button>
             </Stack>

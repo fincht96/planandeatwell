@@ -1,4 +1,6 @@
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
+  Avatar,
   Box,
   BoxProps,
   CloseButton,
@@ -16,19 +18,12 @@ import {
   Text,
   useColorModeValue,
   useDisclosure,
-  VStack,
 } from '@chakra-ui/react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ReactNode, ReactText } from 'react';
 import { IconType } from 'react-icons';
-import {
-  SlMenu,
-  SlNotebook,
-  SlPlus,
-  SlSettings,
-  SlUserFollowing,
-} from 'react-icons/sl';
+import { SlMenu, SlNotebook, SlPlus } from 'react-icons/sl';
 import { useAuth } from '../contexts/auth-context';
 import ChakraNextLink from './NextChakraLink';
 interface LinkItemProps {
@@ -215,32 +210,16 @@ const MobileNav = ({ onOpen, recipeBasketButton, ...rest }: MobileProps) => {
           <Menu>
             <MenuButton
               borderRadius="lg"
-              p="1.25rem"
+              p="0.5rem"
               transition="all 0.3s"
               _focus={{ boxShadow: 'none' }}
-              _hover={{ background: 'brand.100' }}
+              _hover={{ background: 'gray.100' }}
             >
               <HStack>
-                <Box>
-                  <SlUserFollowing fontSize="1.3rem" />
-                </Box>
-                <VStack alignItems="flex-start" spacing="1px" ml="2">
-                  <Text
-                    fontSize="sm"
-                    fontWeight="700"
-                    overflow={'hidden'}
-                    textOverflow={'ellipsis'}
-                    maxW={{
-                      base: '5rem',
-                      sm: '8rem',
-                      md: '10rem',
-                      lg: '15rem',
-                    }}
-                    whiteSpace={'nowrap'}
-                  >
-                    {user?.displayName ?? 'User'}
-                  </Text>
-                </VStack>
+                <HStack alignItems="center" spacing="1rem">
+                  <Avatar name={user?.displayName ?? 'User'} />
+                  <ChevronDownIcon />
+                </HStack>
               </HStack>
             </MenuButton>
             <MenuList

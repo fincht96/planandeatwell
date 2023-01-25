@@ -1,6 +1,5 @@
 import { Box, Container, Grid, Text } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -11,6 +10,7 @@ import aldiImg from '../../public/images/aldi.png';
 import asdaImg from '../../public/images/asda.png';
 import sainsburysImg from '../../public/images/sainsburys.png';
 import tescoImg from '../../public/images/tesco.png';
+import { CustomNextPage } from '../../types/CustomNextPage';
 import { SupermarketType } from '../../types/supermarket.types';
 import { getSupermarkets } from '../../utils/requests/supermarkets';
 
@@ -46,7 +46,7 @@ const SupermarketButton = ({
   );
 };
 
-const Steps: NextPage = () => {
+const Supermarket: CustomNextPage = () => {
   const router = useRouter();
   const [supermarkets, setSupermarkets] = useState<Array<any>>([]);
 
@@ -140,4 +140,6 @@ const Steps: NextPage = () => {
   );
 };
 
-export default Steps;
+Supermarket.requireAuth = true;
+
+export default Supermarket;

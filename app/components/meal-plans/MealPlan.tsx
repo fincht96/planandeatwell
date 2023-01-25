@@ -1,4 +1,5 @@
-import { Badge, Box, Button, Flex, Text } from '@chakra-ui/react';
+import { ArrowForwardIcon } from '@chakra-ui/icons';
+import { Badge, Box, Flex, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import BorderBox from '../BorderBox';
 
@@ -23,16 +24,18 @@ const MealPlan = ({
 
   return (
     <BorderBox
-      height={{
-        '2xl': '19.5rem',
-        base: '20rem',
-      }}
       overflow={'hidden'}
       display={'flex'}
-      p={'2rem'}
+      p={'1.5rem'}
       borderColor="gray.light"
+      cursor={'pointer'}
+      bg={'gray.lightGray'}
+      _hover={{ bg: 'gray.searchBoxGray' }}
+      onClick={() => {
+        router.push(`/meal-plans/${uuid}`);
+      }}
     >
-      <Box position="relative" width="100%">
+      <Box width={'100%'}>
         <Box mb="1.5rem">
           <Text
             fontSize={'xl'}
@@ -48,74 +51,47 @@ const MealPlan = ({
           </Badge>
         </Box>
 
-        <Flex flexDirection="column">
-          <Text color={'gray.bone'} fontSize={'sm'} fontWeight="600">
-            Total price
-            <Text color="black" fontWeight={'600'} fontSize={'3xl'} mb="0.5rem">
+        <Flex flexDirection="column" mb={'1rem'}>
+          <Flex direction={'column'} mb={'1rem'}>
+            <Text color={'gray.bone'} fontSize={'sm'} fontWeight="500">
+              Total price
+            </Text>
+            <Text color="black" fontWeight={'600'} fontSize={'2rem'}>
               £{totalPrice}
             </Text>
-          </Text>
-          <Box display="flex" flexDirection="row" justifyContent="flex-start">
-            <Text
-              color={'gray.bone'}
-              fontSize={'sm'}
-              fontWeight="600"
-              mr={{ base: '1rem', sm: '0.5rem', md: '1rem' }}
-            >
-              Recipes
+          </Flex>
+          <Flex justifyContent={'space-between'}>
+            <Flex direction={'column'}>
+              <Text color={'gray.bone'} fontSize={'sm'} fontWeight="500">
+                Recipes
+              </Text>
               <Text color="black" fontWeight="600">
                 {recipesCount}
               </Text>
-            </Text>
-            <Text
-              color={'gray.bone'}
-              fontSize={'sm'}
-              fontWeight="600"
-              mr={{ base: '1rem', sm: '0.5rem', md: '1rem' }}
-            >
-              Servings
+            </Flex>
+            <Flex direction={'column'}>
+              <Text color={'gray.bone'} fontSize={'sm'} fontWeight="500">
+                Servings
+              </Text>
               <Text color="black" fontWeight="600">
                 {totalServings}
               </Text>
-            </Text>
-            <Text
-              color={'gray.bone'}
-              fontSize={'sm'}
-              fontWeight="600"
-              mr={{ base: '1rem', sm: '0.5rem', md: '1rem' }}
-            >
-              Ingredients
+            </Flex>
+
+            <Flex direction={'column'}>
+              <Text color={'gray.bone'} fontSize={'sm'} fontWeight="500">
+                Ingredients
+              </Text>
               <Text color="black" fontWeight="600">
                 {ingredientsCount}
               </Text>
-            </Text>
-          </Box>
+            </Flex>
+          </Flex>
         </Flex>
 
-        <Box
-          display="flex"
-          alignItems="center"
-          flexDirection={'row'}
-          position="absolute"
-          bottom="0"
-        >
-          <Button
-            bg="brand.500"
-            color="white"
-            borderRadius="xl"
-            _hover={{
-              bg: 'brand.100',
-              color: 'black',
-            }}
-            onClick={() => {
-              router.push(`/meal-plans/${uuid}`);
-            }}
-          >
-            <Text fontSize="sm" fontWeight="600">
-              View meal plan
-            </Text>
-          </Button>
-        </Box>
+        <Flex justifyContent={'end'}>
+          <ArrowForwardIcon fontSize={'1.5rem'} fontWeight={'600'} />
+        </Flex>
       </Box>
     </BorderBox>
   );

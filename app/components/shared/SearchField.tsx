@@ -99,7 +99,7 @@ const SearchField = (props: any) => {
               }}
               _hover={{ bg: 'brand.100', color: 'black' }}
             >
-              <Icon as={SlClose} fontSize="1rem" color="black" />
+              <Icon as={SlClose} fontSize="1rem" color="gray.400" />
             </InputRightAddon>
           </InputGroup>
           <FormErrorMessage color={'red'}>

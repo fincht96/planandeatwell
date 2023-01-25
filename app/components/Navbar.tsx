@@ -1,4 +1,6 @@
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
+  Avatar,
   Box,
   BoxProps,
   CloseButton,
@@ -16,19 +18,12 @@ import {
   Text,
   useColorModeValue,
   useDisclosure,
-  VStack,
 } from '@chakra-ui/react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ReactNode, ReactText } from 'react';
 import { IconType } from 'react-icons';
-import {
-  SlMenu,
-  SlNotebook,
-  SlPlus,
-  SlSettings,
-  SlUserFollowing,
-} from 'react-icons/sl';
+import { SlMenu, SlNotebook, SlPlus } from 'react-icons/sl';
 import { useAuth } from '../contexts/auth-context';
 import ChakraNextLink from './NextChakraLink';
 interface LinkItemProps {
@@ -43,7 +38,6 @@ const LinkItems: Array<LinkItemProps> = [
     href: '/create-plan',
   },
   { name: 'My meal plans', icon: SlNotebook, href: '/meal-plans' },
-  { name: 'Settings', icon: SlSettings, href: '#' },
 ];
 
 export default function SidebarWithHeader({
@@ -75,7 +69,7 @@ export default function SidebarWithHeader({
         </DrawerContent>
       </Drawer>
       <MobileNav onOpen={onOpen} recipeBasketButton={recipeBasketButton} />
-      <Box ml={{ base: 0, md: 60 }} py="4">
+      <Box ml={{ base: 0, md: '16rem' }} py="4">
         {children}
       </Box>
     </Box>
@@ -108,7 +102,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       >
         <Box
           cursor={'pointer'}
-          onClick={() => router.push('/create-plan/steps')}
+          onClick={() => router.push('/create-plan/supermarket')}
         >
           <Image src="/images/logo.png" height={45} width={176} alt={'logo'} />
         </Box>
@@ -116,6 +110,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           display={{ base: 'flex', md: 'none' }}
           onClick={onClose}
           size="1rem"
+          p={'1rem'}
         />
       </Flex>
       {LinkItems.map((link) => {
@@ -215,32 +210,16 @@ const MobileNav = ({ onOpen, recipeBasketButton, ...rest }: MobileProps) => {
           <Menu>
             <MenuButton
               borderRadius="lg"
-              p="1.25rem"
+              p="0.5rem"
               transition="all 0.3s"
               _focus={{ boxShadow: 'none' }}
-              _hover={{ background: 'brand.100' }}
+              _hover={{ background: 'gray.100' }}
             >
               <HStack>
-                <Box>
-                  <SlUserFollowing fontSize="1.3rem" />
-                </Box>
-                <VStack alignItems="flex-start" spacing="1px" ml="2">
-                  <Text
-                    fontSize="sm"
-                    fontWeight="700"
-                    overflow={'hidden'}
-                    textOverflow={'ellipsis'}
-                    maxW={{
-                      base: '5rem',
-                      sm: '8rem',
-                      md: '10rem',
-                      lg: '15rem',
-                    }}
-                    whiteSpace={'nowrap'}
-                  >
-                    {user?.displayName ?? 'User'}
-                  </Text>
-                </VStack>
+                <HStack alignItems="center" spacing="1rem">
+                  <Avatar name={user?.displayName ?? 'User'} />
+                  <ChevronDownIcon />
+                </HStack>
               </HStack>
             </MenuButton>
             <MenuList

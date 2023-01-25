@@ -38,7 +38,7 @@ const SearchSortFilterSection = (props: any) => {
           searchFieldHeight="3.5rem"
           searchFieldParentWidth={{ base: '100%' }}
           searchFieldFontWeight="600"
-          searchFieldFontSize="sm"
+          searchFieldFontSize="md"
           searchFieldWidth={{ base: '50rem', xl: '21.7rem' }}
           searchFieldParentMargin="0 1.5rem 0 0"
         />
@@ -49,7 +49,7 @@ const SearchSortFilterSection = (props: any) => {
           handleSortChange={handleSortChange}
           sortBy={sortBy}
           selectParentWith={{ base: '50%', xl: '100%' }}
-          selectFontSize="sm"
+          selectFontSize="md"
           selectHeight="3.5rem"
           selectBorderColor="gray.lighterGray"
           selectBgColor="rgba(228, 228, 228, 0.3)"
@@ -68,7 +68,7 @@ const SearchSortFilterSection = (props: any) => {
             btnBgColor="rgba(228, 228, 228, 0.3)"
             btnTextColor="gray.bone"
             btnFontWeight="600"
-            btnFontSize="sm"
+            btnFontSize="md"
             btnBorderColor="gray.lighterGray"
             btnParentWidth={{ base: '50%', xl: '100%' }}
             btnWidth="100%"

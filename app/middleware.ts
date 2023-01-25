@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   if (url.pathname === '/create-plan') {
-    url.pathname = '/create-plan/steps';
+    url.pathname = '/create-plan/supermarket';
     return NextResponse.redirect(url);
   }
 }

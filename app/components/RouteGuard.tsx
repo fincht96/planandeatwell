@@ -65,7 +65,9 @@ export function RouteGuard({
     if (initialized) {
       /* if authenticated user attempts to access inaccessible route, redirect to protected route */
       if (user && userInaccessibleRoutes.includes(routeName)) {
-        router.push(redirectPath.length ? redirectPath : '/create-plan/steps');
+        router.push(
+          redirectPath.length ? redirectPath : '/create-plan/supermarket',
+        );
       }
     }
   }, [

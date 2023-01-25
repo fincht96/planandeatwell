@@ -86,7 +86,7 @@ const ContentBox = ({
         <Box>
           {rows.map((row) => {
             return (
-              <Box key={row.id}>
+              <Box key={row.id} mb={'1rem'}>
                 <Box>{row.content}</Box>
                 <Box>{row.subContent}</Box>
               </Box>
@@ -262,9 +262,9 @@ const MealPlan: CustomNextPage = () => {
       return decoratedIngredients?.map((ingredient: IngredientDecorated) => ({
         id: ingredient.id,
         content: (
-          <Flex justifyContent={'space-between'} mb="0.5rem">
-            <Box display="flex" flexDirection={{ base: 'column', md: 'row' }}>
-              <Text color={'gray.bone'} fontSize="sm" mr={1} fontWeight="600">
+          <Flex justifyContent={'space-between'}>
+            <Box display="flex" flexDirection={'column'} alignItems={'start'}>
+              <Text fontSize="1rem" fontWeight="500" color="gray.700">
                 {roundUpIngredientUnitQuantity(ingredient)}x {ingredient.name}
               </Text>
               <Text color="gray.dark" fontSize="sm" fontWeight="600">
@@ -298,26 +298,28 @@ const MealPlan: CustomNextPage = () => {
           content: (
             <Flex justifyContent={'space-between'}>
               <Text color="black" fontSize="sm" as="b" mb="0.3rem">
-                {recipeWithServings.recipe.name} - (
-                {recipeWithServings.servings}) servings
+                {recipeWithServings.recipe.name} - {recipeWithServings.servings}{' '}
+                servings
               </Text>
             </Flex>
           ),
           subContent: (
-            <Flex flexDirection={'column'} mb="0.3rem">
+            <Flex
+              flexDirection={'column'}
+              mb="2rem"
+              pb={'1rem'}
+              borderBottom={'solid 1px'}
+              borderColor={'gray.300'}
+            >
               {decoratedIngredients.map((ingredient: IngredientDecorated) => {
                 return (
                   <Flex
                     key={ingredient.id}
-                    mb="0.3rem"
-                    direction={{ base: 'column', md: 'row' }}
+                    mb="1rem"
+                    direction={'column'}
+                    alignItems={'start'}
                   >
-                    <Text
-                      color={'gray.bone'}
-                      fontSize="sm"
-                      fontWeight="600"
-                      mr={1}
-                    >
+                    <Text fontSize="1rem" fontWeight="500" color="gray.700">
                       {ingredient.name}
                     </Text>
                     <Text color={'gray.dark'} fontSize="sm" fontWeight="600">
@@ -354,24 +356,17 @@ const MealPlan: CustomNextPage = () => {
               </Flex>
             ),
             subContent: (
-              <Flex flexDirection={'column'} mb="0.3rem">
+              <Flex flexDirection={'column'} mb="2rem">
                 {groupedIngredients.map((ingredient: IngredientDecorated) => {
                   return (
                     <Flex
                       key={ingredient.id}
                       justifyContent={'space-between'}
-                      mb="0.3rem"
+                      mb="1rem"
+                      gap={'1rem'}
                     >
-                      <Box
-                        display="flex"
-                        flexDirection={{ base: 'column', md: 'row' }}
-                      >
-                        <Text
-                          color={'gray.bone'}
-                          fontSize="sm"
-                          mr={1}
-                          fontWeight="600"
-                        >
+                      <Box display="flex" flexDirection={'column'}>
+                        <Text fontSize="1rem" fontWeight="500" color="gray.700">
                           {roundUpIngredientUnitQuantity(ingredient)}x{' '}
                           {ingredient.name}
                         </Text>
@@ -435,20 +430,19 @@ const MealPlan: CustomNextPage = () => {
           currentServings={selectedRecipe.selectedServings}
         />
       )}
-      <Container maxW="1100px" mb={10}>
+      <Container maxW="900px" mb={10}>
         <Box>
           <Text
             noOfLines={2}
             fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
             color="black"
             fontWeight={600}
-            textAlign={{ base: 'center', '2xl': 'left' }}
           >
             {mealPlanName}
           </Text>
         </Box>
       </Container>
-      <Container maxW={{ base: '500px', lg: '700px', xl: '1100px' }}>
+      <Container maxW={'900px'} px={'1rem'}>
         <Tabs isFitted defaultIndex={0}>
           <TabList>
             <Tab color="black">
@@ -615,10 +609,10 @@ const MealPlan: CustomNextPage = () => {
                     bg="gray.searchBoxGray"
                     onChange={handleSelectChange}
                     borderRadius="md"
-                    fontSize="sm"
+                    fontSize="md"
                     fontWeight="600"
                     color="gray.bone"
-                    width={{ base: '28%', xl: '12%' }}
+                    maxW={'15rem'}
                   >
                     <option value="ALL">All</option>
                     <option value="RECIPE">Recipes</option>

@@ -81,7 +81,6 @@ export default function WithSubnavigation() {
           gap={'1rem'}
         >
           <MenuButton onClick={onToggle} />
-
           <Button
             bg={'#ffffff'}
             border={'solid 1px'}
@@ -89,16 +88,11 @@ export default function WithSubnavigation() {
             color={'brand.500'}
             fontSize={'1rem'}
             fontWeight={400}
-            // onClick={() => {
-            //   router.push('/steps');
-            // }}
             alignContent={'center'}
-            // display={'flex'}
             as={Link}
             href={'/'}
             isExternal
             _hover={{
-              // color: 'red',
               textDecoration: 'none',
               background: 'gray.100',
             }}

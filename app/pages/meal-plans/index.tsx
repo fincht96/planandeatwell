@@ -141,7 +141,7 @@ const MealPlans: CustomNextPage = () => {
             <Button
               height={{ base: '100%', lg: '80%' }}
               width={{ base: '100%', lg: '80%' }}
-              onClick={() => onNavigate('/create-plan/steps')}
+              onClick={() => onNavigate('/create-plan/supermarket')}
             >
               <Box
                 display="flex"
@@ -168,22 +168,26 @@ const MealPlans: CustomNextPage = () => {
     return (
       <>
         <Container maxW="1100px" mb={10}>
-          <Box>
+          <Flex justifyContent={'space-between'} alignItems={'center'} mb={10}>
             <Text
               noOfLines={2}
               fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
               color="black"
               fontWeight={700}
-              textAlign={{ base: 'center', '2xl': 'left' }}
-              ml={{ '2xl': '1.6rem' }}
+              textAlign={'left'}
             >
               {userFirstName ? `${userFirstName}'s` : 'User'} meal plans
             </Text>
-          </Box>
-        </Container>
-
-        <Container maxW="1100px" mb={10}>
-          <Box padding="0 2rem 2.5rem">
+            <Box
+              cursor={'pointer'}
+              p={'0.5rem'}
+              onClick={() => onNavigate('/create-plan/supermarket')}
+              color="black"
+            >
+              <SlPlus fontSize="2rem" />
+            </Box>
+          </Flex>
+          <Box>
             <Box>
               <SearchSortFilterSection
                 searchFieldPlaceHolderText="Search meal plans..."
@@ -245,32 +249,6 @@ const MealPlans: CustomNextPage = () => {
               templateColumns="repeat(auto-fill, minMax(275px,1fr));"
               gap={6}
             >
-              <Box
-                height={{
-                  '2xl': '19.5rem',
-                  base: '20rem',
-                }}
-              >
-                <Button
-                  height={'100%'}
-                  width={'100%'}
-                  onClick={() => onNavigate('/create-plan/steps')}
-                >
-                  <Box
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Box display="flex" justifyContent="center">
-                      <SlPlus fontSize="1.3rem" color="black" />
-                    </Box>
-                    <Box mt="1rem">
-                      <Text>Create new meal plan</Text>
-                    </Box>
-                  </Box>
-                </Button>
-              </Box>
               {mealPlans.map((mealPlan: any) => {
                 return (
                   <MealPlan

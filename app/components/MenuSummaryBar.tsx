@@ -1,4 +1,4 @@
-import { AddIcon, MinusIcon } from '@chakra-ui/icons';
+import { AddIcon, CloseIcon, MinusIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
@@ -6,11 +6,9 @@ import {
   Divider,
   Drawer,
   DrawerBody,
-  DrawerCloseButton,
   DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
+  IconButton,
   Text,
   useColorModeValue,
   useDisclosure,
@@ -112,18 +110,25 @@ export default function MenuSummaryBar({
         size={'full'}
         placement={'bottom'}
       >
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader
-            fontSize="2xl"
-            fontWeight="600"
-            color="black"
-            pb="0.25rem"
-          >
-            Your meal plan
-          </DrawerHeader>{' '}
-          <DrawerBody>
+        <DrawerContent bg="gray.lighterGray">
+          <DrawerBody pb={'2rem'}>
+            <Flex
+              alignItems={'center'}
+              justifyContent={'space-between'}
+              py={'2rem'}
+            >
+              <Text fontSize="2xl" fontWeight="600" color="black">
+                Your meal plan
+              </Text>
+              <IconButton
+                borderRadius="lg"
+                fontSize="0.7rem"
+                bg="gray.lighterGray"
+                icon={<CloseIcon />}
+                onClick={onClose}
+                aria-label="close-modal-button"
+              />
+            </Flex>
             <Box pb={'0.5rem'}>
               <Divider />
             </Box>
@@ -140,13 +145,12 @@ export default function MenuSummaryBar({
 
               {recipeList.map((recipe: any) => {
                 return (
-                  <Flex justifyContent={'space-between'} key={recipe.recipe.id}>
-                    <Text
-                      py="0.25rem"
-                      fontSize="0.78rem"
-                      fontWeight="600"
-                      color="gray.bone"
-                    >
+                  <Flex
+                    justifyContent={'space-between'}
+                    key={recipe.recipe.id}
+                    mb={'1rem'}
+                  >
+                    <Text fontSize="1rem" fontWeight="500" color="gray.700">
                       {recipe.recipe.name}
                     </Text>
 
@@ -168,10 +172,11 @@ export default function MenuSummaryBar({
                         <MinusIcon color={'brand.500'} width={'0.5rem'} />
                       </Circle>
                       <Text
-                        py="0.25rem"
-                        fontSize="0.78rem"
-                        fontWeight="600"
-                        color="gray.dark"
+                        color={'gray.dark'}
+                        fontWeight={'600'}
+                        letterSpacing={'wide'}
+                        fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                        ml={'0.5rem'}
                       >
                         {recipe.servings} servings
                       </Text>
@@ -210,22 +215,21 @@ export default function MenuSummaryBar({
 
               {ingredientList.map((ingredient: any) => {
                 return (
-                  <Flex justifyContent={'space-between'} key={ingredient.id}>
-                    <Text
-                      py="0.25rem"
-                      fontSize="0.78rem"
-                      fontWeight="600"
-                      color="gray.bone"
-                      maxWidth="18rem"
-                    >
-                      {ingredient.name} ({ingredient.unitQuantity})
+                  <Flex
+                    justifyContent={'space-between'}
+                    key={ingredient.id}
+                    mb={'1rem'}
+                  >
+                    <Text fontSize="1rem" fontWeight="500" color="gray.700">
+                      {ingredient.unitQuantity}x {ingredient.name}
                     </Text>
 
                     <Text
-                      py={'0.25rem'}
-                      fontSize="0.78rem"
-                      fontWeight="600"
-                      color="gray.bone"
+                      color={'gray.dark'}
+                      fontWeight={'600'}
+                      letterSpacing={'wide'}
+                      fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                      ml={'0.5rem'}
                     >
                       £{ingredient.price}
                     </Text>
@@ -239,11 +243,21 @@ export default function MenuSummaryBar({
             </Box>
 
             <Flex justifyContent={'space-between'} pb={'1rem'}>
-              <Text fontSize="sm" fontWeight="600" color="gray.dark">
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize={'1rem'}
+              >
                 Total
               </Text>
 
-              <Text fontSize="0.78rem" fontWeight="600" color="gray.dark">
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize={'1rem'}
+              >
                 £{currentPrice}
               </Text>
             </Flex>

@@ -162,11 +162,11 @@ const MobileNav = ({ toggleShowNav }: any) => {
   const signInAndGetStarted = [
     {
       label: 'Sign in',
-      href: `${process.env.NEXT_PUBLIC_APP_BASE_URL}sign-in`,
+      href: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-in`,
     },
     {
       label: 'Get started',
-      href: `${process.env.NEXT_PUBLIC_APP_BASE_URL}sign-up`,
+      href: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-up`,
     },
   ];
 

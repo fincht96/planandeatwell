@@ -111,6 +111,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           display={{ base: 'flex', md: 'none' }}
           onClick={onClose}
           size="1rem"
+          p={'1rem'}
         />
       </Flex>
       {LinkItems.map((link) => {

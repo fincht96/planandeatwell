@@ -11,7 +11,7 @@ const Video = () => {
       <span id="video" style={{ position: 'absolute', top: '-120px' }} />
       <Stack spacing={3} mb={3}>
         <Text
-          fontSize="md"
+          fontSize={{ base: 'sm', md: 'md' }}
           color="brand.500"
           fontWeight={700}
           textAlign="center"
@@ -19,7 +19,7 @@ const Video = () => {
           Watch a video
         </Text>
         <Text
-          fontSize={{ base: '1.9rem', md: '2.25rem' }}
+          fontSize={{ base: '1.4rem', sm: '1.9rem', md: '2.25rem' }}
           color="black"
           fontWeight={800}
           textAlign="center"

@@ -15,10 +15,7 @@ const RecipeCard = ({
   fullPath: string;
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  console.log(
-    'da',
-    `${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}${recipe.imagePath}`,
-  );
+
   return (
     <BorderBox
       maxH={'xl'}
@@ -39,7 +36,7 @@ const RecipeCard = ({
       <Box h={'12.5rem'} position={'relative'}>
         <Image
           quality={75}
-          src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}${recipe.imagePath}`}
+          src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}/${recipe.imagePath}`}
           layout={'fill'}
           alt={recipe.name}
           objectFit={'cover'}

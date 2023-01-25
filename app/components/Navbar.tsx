@@ -69,7 +69,7 @@ export default function SidebarWithHeader({
         </DrawerContent>
       </Drawer>
       <MobileNav onOpen={onOpen} recipeBasketButton={recipeBasketButton} />
-      <Box ml={{ base: 0, md: 60 }} py="4">
+      <Box ml={{ base: 0, md: '16rem' }} py="4">
         {children}
       </Box>
     </Box>

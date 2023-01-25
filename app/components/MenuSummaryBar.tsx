@@ -13,6 +13,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
+import { roundTo2dp } from '../utils/roundTo2dp';
 import RecipeBasketButton from './menu/RecipeBasketButton';
 
 export default function MenuSummaryBar({
@@ -112,22 +113,29 @@ export default function MenuSummaryBar({
       >
         <DrawerContent bg="gray.lighterGray">
           <DrawerBody pb={'2rem'}>
-            <Flex
-              alignItems={'center'}
-              justifyContent={'space-between'}
-              py={'2rem'}
-            >
-              <Text fontSize="2xl" fontWeight="600" color="black">
-                Your meal plan
+            <Flex py={'2rem'} direction={'column'}>
+              <Flex alignItems={'center'} justifyContent={'space-between'}>
+                <Text fontSize="2xl" fontWeight="600" color="black">
+                  Your meal plan
+                </Text>
+                <IconButton
+                  borderRadius="lg"
+                  fontSize="0.7rem"
+                  bg="gray.lighterGray"
+                  icon={<CloseIcon />}
+                  onClick={onClose}
+                  aria-label="close-modal-button"
+                />
+              </Flex>
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize={'0.9rem'}
+              >
+                ({servings} servings @ £{roundTo2dp(currentPrice / servings)}{' '}
+                /serving)
               </Text>
-              <IconButton
-                borderRadius="lg"
-                fontSize="0.7rem"
-                bg="gray.lighterGray"
-                icon={<CloseIcon />}
-                onClick={onClose}
-                aria-label="close-modal-button"
-              />
             </Flex>
             <Box pb={'0.5rem'}>
               <Divider />
@@ -176,7 +184,6 @@ export default function MenuSummaryBar({
                         fontWeight={'600'}
                         letterSpacing={'wide'}
                         fontSize={{ base: '0.8rem', lg: '0.9rem' }}
-                        ml={'0.5rem'}
                       >
                         {recipe.servings} servings
                       </Text>

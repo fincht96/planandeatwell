@@ -52,7 +52,7 @@ export const RecipeViewDesktop = ({
 
   return (
     <Grid templateColumns="repeat(2, 1fr);" gap={2} p="1.25rem">
-      <GridItem w="100%" h="100">
+      <GridItem w="100%" h="100" pb={'2rem'}>
         <Box display={'flex'} flexDirection={'column'}>
           <Box px="1rem">
             <Text fontSize={'3rem'} fontWeight={600} color="black">
@@ -109,7 +109,9 @@ export const RecipeViewDesktop = ({
                         {instruction.step}
                       </Box>
                     </Circle>
-                    <Interweave content={instruction.instruction} />
+                    <Text bg={'gray.lighterGray'}>
+                      <Interweave content={instruction.instruction} />
+                    </Text>
                   </Box>
                 );
               })}
@@ -357,7 +359,9 @@ export const RecipeViewMobile = ({
                                 {instruction.step}
                               </Box>
                             </Circle>
-                            <Interweave content={instruction.instruction} />
+                            <Text bg={'gray.lighterGray'}>
+                              <Interweave content={instruction.instruction} />
+                            </Text>
                           </Box>
                         );
                       },

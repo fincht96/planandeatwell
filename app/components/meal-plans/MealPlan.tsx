@@ -1,6 +1,7 @@
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { Badge, Box, Flex, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
+import { roundTo2dp } from '../../utils/roundTo2dp';
 import BorderBox from '../BorderBox';
 
 const MealPlan = ({
@@ -36,7 +37,7 @@ const MealPlan = ({
       }}
     >
       <Box width={'100%'}>
-        <Box mb="1.5rem">
+        <Box mb="2rem">
           <Text
             fontSize={'xl'}
             fontWeight={600}
@@ -46,35 +47,39 @@ const MealPlan = ({
           >
             {name}
           </Text>
+
+          <Text
+            color={'gray.dark'}
+            fontWeight={'600'}
+            letterSpacing={'wide'}
+            fontSize={'0.9rem'}
+          >
+            ({totalServings} servings @ £
+            {roundTo2dp(totalPrice / totalServings)}
+            /serving)
+          </Text>
+
           <Badge variant={'solid'} colorScheme="orange">
             {supermarketName}
           </Badge>
         </Box>
 
         <Flex flexDirection="column" mb={'1rem'}>
-          <Flex direction={'column'} mb={'1rem'}>
-            <Text color={'gray.bone'} fontSize={'sm'} fontWeight="500">
-              Total price
-            </Text>
-            <Text color="black" fontWeight={'600'} fontSize={'2rem'}>
-              £{totalPrice}
-            </Text>
-          </Flex>
           <Flex justifyContent={'space-between'}>
-            <Flex direction={'column'}>
+            <Flex direction={'column'} mb={'1rem'}>
               <Text color={'gray.bone'} fontSize={'sm'} fontWeight="500">
-                Recipes
+                Total price
               </Text>
-              <Text color="black" fontWeight="600">
-                {recipesCount}
+              <Text color="black" fontWeight={'600'} fontSize={'1.5rem'}>
+                £{totalPrice}
               </Text>
             </Flex>
             <Flex direction={'column'}>
               <Text color={'gray.bone'} fontSize={'sm'} fontWeight="500">
-                Servings
+                Recipes
               </Text>
-              <Text color="black" fontWeight="600">
-                {totalServings}
+              <Text color="black" fontWeight="600" fontSize={'1.5rem'}>
+                {recipesCount}
               </Text>
             </Flex>
 
@@ -82,7 +87,7 @@ const MealPlan = ({
               <Text color={'gray.bone'} fontSize={'sm'} fontWeight="500">
                 Ingredients
               </Text>
-              <Text color="black" fontWeight="600">
+              <Text color="black" fontWeight="600" fontSize={'1.5rem'}>
                 {ingredientsCount}
               </Text>
             </Flex>

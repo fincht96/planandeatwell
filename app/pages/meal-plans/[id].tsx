@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Card,
@@ -61,25 +62,23 @@ import {
   getMealPlan,
   updateMealPlan,
 } from '../../utils/requests/meal-plans';
+import { roundTo2dp } from '../../utils/roundTo2dp';
 
 const ContentBox = ({
   title,
   rows,
   summary,
   ingredientsViewSelectComponent,
-  supermarket,
 }: {
   title: any;
   rows: Array<any>;
   summary: any;
   ingredientsViewSelectComponent?: any;
-  supermarket: any;
 }) => {
   return (
     <>
       <Flex direction="row" align="center">
         <Box>{title}</Box>
-        <Box>{supermarket}</Box>
       </Flex>
       <Box borderRadius="xl" width={'100%'} maxH={'min-content'}>
         <Box mb="1.5rem">{ingredientsViewSelectComponent}</Box>
@@ -440,6 +439,21 @@ const MealPlan: CustomNextPage = () => {
           >
             {mealPlanName}
           </Text>
+
+          <Text
+            color={'gray.dark'}
+            fontWeight={'600'}
+            letterSpacing={'wide'}
+            fontSize={{ base: '1rem', sm: '1rem', md: '1.2rem' }}
+            mb={'1rem'}
+          >
+            ({totalServings} servings @ £
+            {roundTo2dp(totalPrice / totalServings)} /serving)
+          </Text>
+
+          <Badge variant={'solid'} colorScheme="orange" fontSize="1em">
+            {mealPlan?.supermarketName}
+          </Badge>
         </Box>
       </Container>
       <Container maxW={'900px'} px={'1rem'}>
@@ -466,18 +480,6 @@ const MealPlan: CustomNextPage = () => {
           <TabPanels>
             <TabPanel p={0}>
               <Flex direction="row">
-                <Text
-                  fontSize={'sm'}
-                  color="black"
-                  fontWeight={600}
-                  my="1.5rem"
-                  mr="1rem"
-                >
-                  Total servings&nbsp;
-                  <Text as={'span'} fontWeight={600} color="black">
-                    ({totalServings})
-                  </Text>
-                </Text>
                 <Text
                   fontSize={'sm'}
                   color="black"
@@ -631,11 +633,6 @@ const MealPlan: CustomNextPage = () => {
                     <Text as={'span'} fontWeight={600} color="black">
                       ({ingredients?.length})
                     </Text>
-                  </Text>
-                }
-                supermarket={
-                  <Text fontSize={'sm'} color="black" fontWeight={600}>
-                    ({mealPlan?.supermarketName})
                   </Text>
                 }
                 rows={rowData ? rowData : []}

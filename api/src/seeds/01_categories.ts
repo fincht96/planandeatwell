@@ -29,5 +29,6 @@ export async function seed(knex: Knex): Promise<void> {
     { id: 20, name: 'Ice cream and desserts' },
     { id: 21, name: 'Milk, dairy and eggs' },
     { id: 22, name: 'Pizza, pasta and pasta sauces' },
+    { id: 23, name: 'Herbs and spices' },
   ]);
 }

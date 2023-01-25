@@ -34,8 +34,6 @@ export default function MenuSummaryBar({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  console.log('called');
-
   return (
     <>
       <Box

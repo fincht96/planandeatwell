@@ -39,7 +39,7 @@ const SearchSortFilterSection = (props: any) => {
           searchFieldParentWidth={{ base: '100%' }}
           searchFieldFontWeight="600"
           searchFieldFontSize="sm"
-          searchFieldWidth={{ base: '50rem', xl: '21.7rem' }}
+          searchFieldWidth={{ base: '100rem', xl: '21.7rem' }}
           searchFieldParentMargin="0 1.5rem 0 0"
         />
       </Box>

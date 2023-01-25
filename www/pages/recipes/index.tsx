@@ -141,9 +141,9 @@ const Recipes: NextPage = (props: any) => {
           <Container maxW="1200px" mb={10}>
             <Text
               noOfLines={2}
-              fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
+              fontSize={{ base: '1.4rem', sm: '1.9rem', md: '2.25rem' }}
               color="black"
-              fontWeight={600}
+              fontWeight={800}
               textAlign="center"
             >
               Recipes

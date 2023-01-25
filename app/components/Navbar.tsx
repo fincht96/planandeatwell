@@ -108,7 +108,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       >
         <Box
           cursor={'pointer'}
-          onClick={() => router.push('/create-plan/steps')}
+          onClick={() => router.push('/create-plan/supermarket')}
         >
           <Image src="/images/logo.png" height={45} width={176} alt={'logo'} />
         </Box>

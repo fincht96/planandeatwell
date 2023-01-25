@@ -15,7 +15,6 @@ const SearchSortFilterSection = (props: any) => {
     onSearchSubmit,
     minLength = 2,
     maxLength = 200,
-    value,
     sortBy,
     searchTerm,
     showRecipesFilter = false,
@@ -30,7 +29,6 @@ const SearchSortFilterSection = (props: any) => {
           onSearchSubmit={onSearchSubmit}
           minLength={minLength}
           maxLength={maxLength}
-          value={value}
           searchTerm={searchTerm}
           searchFieldBgColor="gray.searchBoxGray"
           searchFieldBorder="none"

@@ -28,7 +28,7 @@ const SearchField = (props: any) => {
     onSearchSubmit,
     minLength = 2,
     maxLength = 200,
-    value,
+    searchTerm,
   } = props;
 
   const {
@@ -40,8 +40,8 @@ const SearchField = (props: any) => {
   } = useForm();
 
   useEffect(() => {
-    setValue('searchTerm', value);
-  }, [value, setValue]);
+    setValue('searchTerm', searchTerm);
+  }, [searchTerm, setValue]);
 
   return (
     <Box

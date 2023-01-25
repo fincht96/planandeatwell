@@ -117,7 +117,7 @@ export const RecipeViewDesktop = ({
               })}
             </Box>
           </Box>
-          <Box px="1rem" mt={2}>
+          <Box px="1rem" mt={2} pb={'5rem'}>
             <Box>
               <Text
                 fontSize={'1.5rem'}

@@ -38,7 +38,6 @@ const LinkItems: Array<LinkItemProps> = [
     href: '/create-plan',
   },
   { name: 'My meal plans', icon: SlNotebook, href: '/meal-plans' },
-  { name: 'Settings', icon: SlSettings, href: '#' },
 ];
 
 export default function SidebarWithHeader({

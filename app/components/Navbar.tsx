@@ -120,6 +120,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
             icon={link.icon}
             href={link.href}
             selected={router.pathname.includes(link.href)}
+            py={'0.5rem'}
           >
             {link.name}
           </NavItem>

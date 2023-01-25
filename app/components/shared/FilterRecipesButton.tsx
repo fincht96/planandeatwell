@@ -216,7 +216,7 @@ const FilterRecipesButton = (props: any) => {
             <DrawerFooter>
               <Button
                 borderRadius="lg"
-                border="solid"
+                border="solid 2px"
                 borderColor="gray.light"
                 bg="white"
                 color="gray.dark"

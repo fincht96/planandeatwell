@@ -227,6 +227,10 @@ const MobileNav = ({ onOpen, recipeBasketButton, ...rest }: MobileProps) => {
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
               <MenuItem
+                bg={'gray.lighterGray'}
+                _hover={{
+                  bg: 'gray.200',
+                }}
                 onClick={() => {
                   if (signOut) {
                     signOut();

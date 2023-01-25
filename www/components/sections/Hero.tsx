@@ -1,6 +1,14 @@
 import styles from '../../styles/Hero.module.css';
 import Image from 'next/image';
-import { Text, SimpleGrid, Box, Stack, Container } from '@chakra-ui/react';
+import {
+  Text,
+  SimpleGrid,
+  Box,
+  Stack,
+  Container,
+  Button,
+  Flex,
+} from '@chakra-ui/react';
 
 import { useEffect, useState, useMemo } from 'react';
 import NavDown from '../NavDown';
@@ -15,35 +23,56 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
           flexDirection="column"
           justifyContent={'space-between'}
         >
-          <Stack spacing={5} py={'130px'}>
-            <Stack direction={'column'} spacing={2}>
-              <Text fontSize="50px" color="gray.dark" fontWeight={500}>
+          <Stack spacing={5} my="auto">
+            <Stack direction={'column'} spacing={1}>
+              <Text
+                fontSize={{ base: '1rem', md: '2.5rem', xl: '3rem' }}
+                color="black"
+                fontWeight={800}
+              >
                 Not sure what to cook?
               </Text>
 
               <Stack direction={'row'}>
-                <Text fontSize="50px" color="gray.dark" fontWeight={500}>
+                <Text
+                  fontSize={{ base: '1rem', md: '2.5rem', xl: '3rem' }}
+                  color="black"
+                  fontWeight={800}
+                >
                   We save you&nbsp;
                 </Text>
 
-                <span className={styles.container}>
+                <Box
+                  display="inline-block"
+                  borderBottom="solid black 2px"
+                  width="170px"
+                  marginBottom="0px"
+                >
+                  {' '}
                   <Text
-                    fontSize="50px"
-                    color="gray.dark"
-                    fontWeight={300}
+                    fontSize={{ base: '1rem', md: '2.5rem', xl: '3rem' }}
+                    color="brand.500"
+                    fontWeight={500}
                     className={show ? styles.typedOut : ''}
                     visibility={show ? 'visible' : 'hidden'}
+                    textAlign="center"
                   >
                     {keyword}
                   </Text>
-                </span>
+                </Box>
               </Stack>
             </Stack>
-
-            <Text fontSize="20px" color="gray.normal" fontWeight={400}>
-              A free tool for creating budgeted meal plans from your local
-              supermarket with meals starting from less than £0.99/pp
-            </Text>
+            <Stack>
+              <Text fontSize="1.2rem" color="gray.dark" fontWeight={400}>
+                Create budgeted meal plans from your local supermarket with
+                meals starting from less than £0.99/per person.
+              </Text>
+            </Stack>
+            <Stack direction={'row'}>
+              <Button colorScheme="brand" fontSize="md" fontWeight="600">
+                Join for free now
+              </Button>
+            </Stack>
           </Stack>
         </Box>
         <Box>
@@ -58,7 +87,7 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
       </SimpleGrid>
 
       <Box display="flex" justifyContent={'center'}>
-        <NavDown link={'#what-is-it'} color={'gray.light'} />
+        <NavDown link={'#video'} color="black" />
       </Box>
     </Stack>
   );
@@ -66,49 +95,83 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
 
 const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
   return (
-    <Stack spacing={8}>
-      <SimpleGrid columns={1} spacing={10}>
-        <Box
-          w="100%"
-          display={'flex'}
-          flexDirection="column"
-          justifyContent={'space-between'}
-        >
-          <Stack spacing={50}>
-            <Stack direction={'column'} spacing={2} alignItems={'center'}>
-              <Text fontSize="6vw" color="gray.dark" fontWeight={500}>
-                Not sure what to cook?
-              </Text>
+    <Stack spacing={{ base: 3, sm: 10 }}>
+      <SimpleGrid columns={1} spacing={0}>
+        <Flex justifyContent="center" mt={{ base: '5rem', md: '1rem' }}>
+          <Image
+            priority
+            src="/images/cooking-pan.png"
+            height={250}
+            width={250}
+            alt={'cooking pan'}
+          />
+        </Flex>
+        <Box w="100%" display={'flex'} flexDirection="column">
+          <Stack spacing={8}>
+            <Stack direction={'column'} alignItems={'center'}>
+              <Stack direction={'row'}>
+                <Text
+                  fontSize={{ base: '1.5rem', sm: '2.1rem' }}
+                  color="black"
+                  fontWeight={800}
+                  textAlign="center"
+                >
+                  Not sure what to cook?
+                </Text>
+              </Stack>
 
               <Stack direction={'row'}>
-                <Text fontSize="6vw" color="gray.dark" fontWeight={500} sx={{}}>
+                <Text
+                  fontSize={{ base: '1.5rem', sm: '2.1rem' }}
+                  color="black"
+                  fontWeight={800}
+                >
                   We save you&nbsp;
                 </Text>
 
-                <span className={styles.container}>
+                <Box
+                  display="inline-block"
+                  borderBottom="solid black 2px"
+                  width="100px"
+                  marginBottom="0px"
+                >
                   <Text
-                    fontSize="6vw"
-                    color="gray.dark"
-                    fontWeight={300}
+                    fontSize={{ base: '1.5rem', sm: '1.8rem' }}
+                    color="brand.500"
+                    fontWeight={500}
                     className={show ? styles.typedOut : ''}
                     visibility={show ? 'visible' : 'hidden'}
+                    textAlign="center"
                   >
                     {keyword}
                   </Text>
-                </span>
+                </Box>
               </Stack>
             </Stack>
 
-            <Text fontSize={{ md: '3vw' }} color="gray.normal" fontWeight={400}>
-              A free tool for creating budgeted meal plans from your local
-              supermarket with meals starting from less than £0.99/pp
-            </Text>
+            <Stack direction={'row'} justifyContent="center">
+              <Text
+                fontSize="1rem"
+                color="gray.dark"
+                fontWeight={400}
+                textAlign="center"
+                maxW={{ base: '19rem', sm: '28rem' }}
+              >
+                Create budgeted meal plans from your local supermarket with
+                meals starting from less than £0.99/per person.
+              </Text>
+            </Stack>
+            <Stack direction={'row'} justifyContent="center">
+              <Button colorScheme="brand" fontSize="md" fontWeight="600">
+                Join for free now
+              </Button>
+            </Stack>
           </Stack>
         </Box>
       </SimpleGrid>
 
       <Box display="flex" justifyContent={'center'}>
-        <NavDown link={'#what-is-it'} color={'gray.light'} />
+        <NavDown link={'#video'} color="black" />
       </Box>
     </Stack>
   );
@@ -140,14 +203,8 @@ const Hero = () => {
   }, [words, words.length]);
 
   return (
-    <Box
-      backgroundColor={'#FCFCFC'}
-      pt={'100px'}
-      borderBottom={1}
-      borderStyle={'solid'}
-      borderColor={'gray.200'}
-    >
-      <Container maxW="1200px" mb={10}>
+    <Box backgroundColor="gray.lighterGray" pt={{ base: '0px', md: '120px' }}>
+      <Container maxW="1200px" mb={10} p={[0, 5]}>
         <Box display={{ base: 'none', lg: 'block' }}>
           <DesktopHero keyword={keyword} show={show} />
         </Box>

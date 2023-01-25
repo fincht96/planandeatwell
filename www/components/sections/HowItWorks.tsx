@@ -1,299 +1,142 @@
-import { Text, Container, Grid, GridItem, Box } from "@chakra-ui/react";
-import Image from "next/image";
-import { useMediaQuery } from "@chakra-ui/react";
+import {
+  Text,
+  Stack,
+  Container,
+  SimpleGrid,
+  StackDivider,
+  Flex,
+  Image,
+  Icon,
+  useColorModeValue,
+} from '@chakra-ui/react';
+import { ReactElement } from 'react';
+import { IoStorefrontOutline } from 'react-icons/io5';
+import { BsPencilSquare } from 'react-icons/bs';
+import { AiOutlineShoppingCart } from 'react-icons/ai';
+import { RiShareLine } from 'react-icons/ri';
+import { AiOutlineSelect } from 'react-icons/ai';
 
-const MobileGrid = () => {
+interface FeatureProps {
+  text: string;
+  iconBg: string;
+  icon?: ReactElement;
+}
+
+const Feature = ({ text, icon, iconBg }: FeatureProps) => {
   return (
-    <Grid templateColumns={"repeat(1, 1fr)"} rowGap={20}>
-      <GridItem
-        w="100%"
-        display={"flex"}
-        justifyContent={"center"}
-        flexDirection={"column"}
+    <Stack direction={'row'} align={'center'}>
+      <Flex
+        w={8}
+        h={8}
+        align={'center'}
+        justify={'center'}
+        rounded={'full'}
+        bg={iconBg}
       >
-        <Box mb={5}>
-          <Text
-            fontSize="18px"
-            color="gray.dark"
-            fontWeight={500}
-            sx={{ mb: 2, textAlign: "left" }}
-          >
-            1. Choose your supermarket
-          </Text>
-
-          <Text fontSize="16px" color="gray.normal" fontWeight={400}>
-            Choose the supermarket that best suits your needs.
-          </Text>
-        </Box>
-
-        <Box display={"flex"} justifyContent={"center"}>
-          <Image
-            priority
-            src="/images/shopping-trolley.png"
-            height={200}
-            width={200}
-            alt={"shopping-trolley"}
-          />
-        </Box>
-      </GridItem>
-
-      <GridItem
-        w="100%"
-        display={"flex"}
-        justifyContent={"center"}
-        flexDirection={"column"}
-      >
-        <Box mb={5}>
-          <Text
-            fontSize="18px"
-            color="gray.dark"
-            fontWeight={500}
-            sx={{ mb: 2 }}
-          >
-            2. Choose the number of people
-          </Text>
-
-          <Text fontSize="16px" color="gray.normal" fontWeight={400}>
-            Get the right quantity of ingredients for one or more people.
-          </Text>
-        </Box>
-
-        <Box display={"flex"} justifyContent={"center"}>
-          <Image
-            priority
-            src="/images/people.png"
-            height={200}
-            width={200}
-            alt={"people"}
-          />
-        </Box>
-      </GridItem>
-
-      <GridItem
-        w="100%"
-        display={"flex"}
-        justifyContent={"center"}
-        flexDirection={"column"}
-      >
-        <Box mb={5}>
-          <Text
-            fontSize="18px"
-            color="gray.dark"
-            fontWeight={500}
-            sx={{ mb: 2 }}
-          >
-            3. Choose your meal preferences
-          </Text>
-
-          <Text fontSize="16px" color="gray.normal" fontWeight={400}>
-            Choose the meal you want to create recipes for and specify any
-            dietary preferences. You can also specify any ingredients you
-            already have.
-          </Text>
-        </Box>
-
-        <Box display={"flex"} justifyContent={"center"}>
-          <Image
-            priority
-            src="/images/rice-bowl.png"
-            height={200}
-            width={200}
-            alt={"rice-bowl"}
-          />
-        </Box>
-      </GridItem>
-
-      <GridItem
-        w="100%"
-        display={"flex"}
-        justifyContent={"center"}
-        flexDirection={"column"}
-      >
-        <Box mb={5}>
-          <Text
-            fontSize="18px"
-            color="gray.dark"
-            fontWeight={500}
-            sx={{ mb: 2 }}
-          >
-            4. Choose your budget
-          </Text>
-
-          <Text fontSize="16px" color="gray.normal" fontWeight={400}>
-            You never need to overspend, know exactly how much it will cost
-            before you go.
-          </Text>
-        </Box>
-
-        <Box display={"flex"} justifyContent={"center"}>
-          <Image
-            priority
-            src="/images/card.png"
-            height={200}
-            width={200}
-            alt={"bank-card"}
-          />
-        </Box>
-      </GridItem>
-    </Grid>
-  );
-};
-
-const DesktopGrid = () => {
-  return (
-    <Grid templateColumns={"repeat(2, 1fr)"} rowGap={20}>
-      <GridItem w="100%" display={"flex"} justifyContent={"center"}>
-        <Image
-          priority
-          src="/images/shopping-trolley.png"
-          height={250}
-          width={250}
-          alt={"shopping-trolley"}
-        />
-      </GridItem>
-
-      <GridItem
-        w="100%"
-        display={"flex"}
-        justifyContent={"center"}
-        flexDirection={"column"}
-      >
-        <>
-          <Text
-            fontSize="18px"
-            color="gray.dark"
-            fontWeight={500}
-            sx={{ mb: 5 }}
-          >
-            1. Choose your supermarket
-          </Text>
-
-          <Text fontSize="16px" color="gray.normal" fontWeight={400}>
-            Choose the supermarket that best suits your needs.
-          </Text>
-        </>
-      </GridItem>
-
-      <GridItem
-        w="100%"
-        display={"flex"}
-        justifyContent={"center"}
-        flexDirection={"column"}
-      >
-        <>
-          <Text
-            fontSize="18px"
-            color="gray.dark"
-            fontWeight={500}
-            sx={{ mb: 5 }}
-          >
-            2. Choose the number of people
-          </Text>
-
-          <Text fontSize="16px" color="gray.normal" fontWeight={400}>
-            Get the right quantity of ingredients for one or more people.
-          </Text>
-        </>
-      </GridItem>
-
-      <GridItem w="100%" display={"flex"} justifyContent={"center"}>
-        <Image
-          priority
-          src="/images/people.png"
-          height={250}
-          width={250}
-          alt={"people"}
-        />
-      </GridItem>
-
-      <GridItem w="100%" display={"flex"} justifyContent={"center"}>
-        <Image
-          priority
-          src="/images/rice-bowl.png"
-          height={250}
-          width={250}
-          alt={"rice bowl"}
-        />
-      </GridItem>
-
-      <GridItem
-        w="100%"
-        display={"flex"}
-        justifyContent={"center"}
-        flexDirection={"column"}
-      >
-        <>
-          <Text
-            fontSize="18px"
-            color="gray.dark"
-            fontWeight={500}
-            sx={{ mb: 5 }}
-          >
-            3. Choose your meal preferences
-          </Text>
-
-          <Text fontSize="16px" color="gray.normal" fontWeight={400}>
-            Choose the meal you want to create recipes for and specify any
-            dietary preferences. You can also specify any ingredients you
-            already have.
-          </Text>
-        </>
-      </GridItem>
-
-      <GridItem
-        w="100%"
-        display={"flex"}
-        justifyContent={"center"}
-        flexDirection={"column"}
-      >
-        <>
-          <Text
-            fontSize="18px"
-            color="gray.dark"
-            fontWeight={500}
-            sx={{ mb: 5 }}
-          >
-            4. Choose your budget
-          </Text>
-
-          <Text fontSize="16px" color="gray.normal" fontWeight={400}>
-            You never need to overspend, know exactly how much it will cost
-            before you go.
-          </Text>
-        </>
-      </GridItem>
-
-      <GridItem w="100%" display={"flex"} justifyContent={"center"}>
-        <Image
-          priority
-          src="/images/card.png"
-          height={250}
-          width={250}
-          alt={"bank-card"}
-        />
-      </GridItem>
-    </Grid>
+        {icon}
+      </Flex>
+      <Text fontWeight={600}>{text}</Text>
+    </Stack>
   );
 };
 
 const HowItWorks = () => {
-  const [isLessThan670px] = useMediaQuery("(max-width: 670px)");
-
   return (
-    <Container maxW="1200px" my={20} sx={{ position: "relative" }}>
-      <span id="how-it-works" style={{ position: "absolute", top: "-120px" }} />
-      <Text fontSize="24px" color="gray.dark" fontWeight={500} sx={{ mb: 5 }}>
-        How it works
-      </Text>
+    <Container
+      maxW="1200px"
+      my={10}
+      sx={{ position: 'relative' }}
+      py={{ base: 'none', sm: 5 }}
+    >
+      <span id="how-it-works" style={{ position: 'absolute', top: '-120px' }} />
+      <Stack spacing={3} mb={3}>
+        <Text
+          fontSize="md"
+          color="brand.500"
+          fontWeight={700}
+          textAlign="center"
+        >
+          Simple and easy
+        </Text>
+        <Text
+          fontSize={{ base: '1.9rem', md: '2.25rem' }}
+          color="black"
+          fontWeight={800}
+          textAlign="center"
+        >
+          How it works
+        </Text>
+        <Text
+          fontSize={{ base: '1rem', md: '1.2rem' }}
+          color="gray.dark"
+          fontWeight="400"
+          textAlign="center"
+        >
+          Plan simple and healthy meals using ingredients at the supermarket on
+          any budget with minimal effort.
+        </Text>
+      </Stack>
+      <Stack mt={{ base: 3, md: 10 }}>
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+          <Stack spacing={4}>
+            <Text
+              color="gray.dark"
+              fontSize={'lg'}
+              fontWeight="600"
+              textAlign={{ base: 'center', sm: 'left' }}
+            >
+              5 steps
+            </Text>
 
-      <Container
-        // centerContent
-        maxW={isLessThan670px ? "1200px" : "1100px"}
-        padding={0}
-        mt={10}
-      >
-        {isLessThan670px ? <MobileGrid /> : <DesktopGrid />}
-      </Container>
+            <Stack
+              spacing={4}
+              divider={
+                <StackDivider
+                  borderColor={useColorModeValue('gray.100', 'gray.700')}
+                />
+              }
+            >
+              <Feature
+                icon={
+                  <Icon as={IoStorefrontOutline} color="white" w={5} h={5} />
+                }
+                iconBg={useColorModeValue('brand.500', 'brand.100')}
+                text={'Choose your supermarket'}
+              />
+              <Feature
+                icon={<Icon as={AiOutlineSelect} color="white" w={5} h={5} />}
+                iconBg={useColorModeValue('brand.500', 'brand.100')}
+                text={'Select recipes for your meal plan'}
+              />
+              <Feature
+                icon={<Icon as={BsPencilSquare} color="white" w={5} h={5} />}
+                iconBg={useColorModeValue('brand.500', 'brand.100')}
+                text={'Create meal plan'}
+              />
+              <Feature
+                icon={
+                  <Icon as={AiOutlineShoppingCart} color="white" w={5} h={5} />
+                }
+                iconBg={useColorModeValue('brand.500', 'brand.100')}
+                text={'Shop using meal plan'}
+              />
+              <Feature
+                icon={<Icon as={RiShareLine} color="white" w={5} h={5} />}
+                iconBg={useColorModeValue('brand.500', 'brand.100')}
+                text={'Share meal plan with friends'}
+              />
+            </Stack>
+          </Stack>
+          <Flex>
+            <Image
+              rounded={'md'}
+              alt={'feature image'}
+              src={'/Nutrition-plan.svg'}
+              objectFit={'cover'}
+            />
+          </Flex>
+        </SimpleGrid>
+      </Stack>
     </Container>
   );
 };

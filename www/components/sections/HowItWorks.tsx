@@ -88,14 +88,7 @@ const HowItWorks = () => {
               5 steps
             </Text>
 
-            <Stack
-              spacing={4}
-              divider={
-                <StackDivider
-                  borderColor={useColorModeValue('gray.100', 'gray.700')}
-                />
-              }
-            >
+            <Stack spacing={4}>
               <Feature
                 icon={
                   <Icon as={IoStorefrontOutline} color="white" w={5} h={5} />

@@ -26,7 +26,7 @@ const theme = extendTheme({
     black: '#000',
     white: '#fff',
     gray: {
-      bg: 'F#CFCFC',
+      bg: '#FCFCFC',
       searchBoxGray: 'rgba(228, 228, 228, 0.3)',
       veryLightGray: '#E7EFEC',
       lighterGray: '#F7FAFC',

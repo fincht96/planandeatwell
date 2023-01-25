@@ -116,9 +116,11 @@ export default function WithSubnavigation() {
         </Flex>
       </Flex>
 
-      <Collapse in={isOpen} animateOpacity>
-        <MobileNav toggleShowNav={onToggle} />
-      </Collapse>
+      <Box boxShadow="0px 5px 5px -5px grey">
+        <Collapse in={isOpen} animateOpacity>
+          <MobileNav toggleShowNav={onToggle} />
+        </Collapse>
+      </Box>
     </Box>
   );
 }

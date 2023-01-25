@@ -40,12 +40,13 @@ const Video = () => {
       <Stack>
         <Center>
           <Box
-            as="video"
-            controls
-            src="/biller-hero-2.mp4"
-            poster="/biller-hero-2.png"
-            title="plan and eat well video tutorial"
-            objectFit="contain"
+            allowFullScreen
+            as="iframe"
+            src="https://www.youtube.com/embed/wI2vqXsjsIo" // use planandeatwell video instead
+            width="100%"
+            sx={{
+              aspectRatio: '16/9',
+            }}
           />
         </Center>
       </Stack>

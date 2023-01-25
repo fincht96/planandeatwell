@@ -95,26 +95,21 @@ export const RecipeViewDesktop = ({
                     display="flex"
                     flexDirection={'row'}
                     alignItems={'center'}
-                    mb="0.5rem"
+                    mb="1rem"
                   >
                     <Circle
                       size="27px"
-                      bg="brand.500"
-                      color="white"
+                      border="solid 2px"
+                      borderColor={'gray.600'}
+                      bg={'gray.50'}
+                      color="gray.600"
                       mr="0.5rem"
                     >
                       <Box as="span" fontWeight="600" fontSize="sm">
                         {instruction.step}
                       </Box>
                     </Circle>
-                    <Text
-                      color="black"
-                      fontSize="sm"
-                      fontWeight="300"
-                      letterSpacing={'wide'}
-                    >
-                      <Interweave content={instruction.instruction} />
-                    </Text>
+                    <Interweave content={instruction.instruction} />
                   </Box>
                 );
               })}
@@ -127,12 +122,18 @@ export const RecipeViewDesktop = ({
                 fontWeight={600}
                 color="gray.dark"
                 mt="1rem"
+                mb={'1rem'}
               >
                 Additional information
               </Text>
             </Box>
-            <Flex flexDirection="row">
-              <Text fontSize={'sm'} fontWeight="600" color={'gray.bone'} mr={1}>
+            <Flex flexDirection="row" mb={'1rem'} alignItems={'start'}>
+              <Text
+                fontSize={'1rem'}
+                fontWeight="500"
+                color={'gray.600'}
+                mr={1}
+              >
                 Cooking time
               </Text>
               <Text fontSize={'sm'} fontWeight="600" color={'gray.dark'}>
@@ -140,7 +141,12 @@ export const RecipeViewDesktop = ({
               </Text>
             </Flex>
             <Flex flexDirection="row">
-              <Text fontSize={'sm'} fontWeight="600" color={'gray.bone'} mr={1}>
+              <Text
+                fontSize={'1rem'}
+                fontWeight="500"
+                color={'gray.600'}
+                mr={1}
+              >
                 Prep time
               </Text>
               <Text fontSize={'sm'} fontWeight="600" color={'gray.dark'}>
@@ -150,13 +156,17 @@ export const RecipeViewDesktop = ({
           </Box>
         </Box>
       </GridItem>
-      <GridItem w="100%" h="100">
+      <GridItem
+        w="100%"
+        pb={'2rem'}
+        border={'solid 1px'}
+        borderColor="gray.light"
+        borderRadius={'2xl'}
+      >
         <Box
-          borderColor="gray.light"
-          borderWidth={'1px'}
-          borderTopRadius={'xl'}
-          borderBottom={'none'}
-          p="1rem"
+          borderBottom={'solid 1px'}
+          borderColor={'gray.light'}
+          p="2rem"
           textAlign={'center'}
         >
           <Flex
@@ -203,13 +213,7 @@ export const RecipeViewDesktop = ({
             </Text>
           </Box>
         </Box>
-        <Box
-          borderWidth={'1px'}
-          borderBottomRadius={'xl'}
-          p="1rem"
-          borderColor="gray.light"
-          minHeight="310px"
-        >
+        <Box p="1rem" minHeight="310px" overflow={'hidden'}>
           <Box mb={2.5}>
             <Text fontSize={'1.5rem'} fontWeight={600} color="gray.dark" mt={2}>
               Ingredients
@@ -220,34 +224,17 @@ export const RecipeViewDesktop = ({
               return (
                 <Box
                   key={ingredient.id}
-                  mb={1}
+                  mb={'1rem'}
                   display="flex"
-                  flexDirection="row"
-                  justifyContent={{
-                    base: 'space-between',
-                    lg: 'start',
-                  }}
+                  flexDirection="column"
                 >
-                  <Text
-                    fontSize="sm"
-                    fontWeight="600"
-                    color="gray.bone"
-                    maxWidth={{
-                      base: currentServings > 0 ? '260px' : 'none',
-                      lg: 'none',
-                    }}
-                  >
+                  <Text fontSize="1rem" fontWeight="500" color="gray.700">
                     {currentServings > 0
                       ? `${Math.ceil(ingredient.unitQuantity)}x `
                       : ''}
                     {ingredient.name}
                   </Text>
-                  <Text
-                    fontSize="sm"
-                    fontWeight="600"
-                    color="gray.dark"
-                    ml="0.4rem"
-                  >
+                  <Text fontSize="sm" fontWeight="600" color="gray.dark">
                     {currentServings > 0
                       ? getFormattedQuantityAndUnitText(
                           toTwoSignificantFigures(ingredient.scalarQuantity),
@@ -286,10 +273,10 @@ export const RecipeViewMobile = ({
 
   return (
     <Grid templateColumns="repeat(1, 1fr);" gap={2}>
-      <GridItem w="100%" h="100">
+      <GridItem w="100%">
         <Box display={'flex'} flexDirection={'column'}>
           <Box px="1rem" mb={2}>
-            <Text fontSize={'3rem'} fontWeight={600} color="black">
+            <Text fontSize={'2rem'} fontWeight={600} color="black">
               {recipe.name}
             </Text>
             <Box>
@@ -356,26 +343,21 @@ export const RecipeViewMobile = ({
                             display="flex"
                             flexDirection={'row'}
                             alignItems={'center'}
-                            mb="0.5rem"
+                            mb="1rem"
                           >
                             <Circle
                               size="27px"
-                              bg="brand.500"
-                              color="white"
+                              border="solid 2px"
+                              borderColor={'gray.600'}
+                              bg={'gray.50'}
+                              color="gray.600"
                               mr="0.5rem"
                             >
                               <Box as="span" fontWeight="600" fontSize="sm">
                                 {instruction.step}
                               </Box>
                             </Circle>
-                            <Text
-                              color="black"
-                              fontSize="sm"
-                              fontWeight="300"
-                              letterSpacing={'wide'}
-                            >
-                              <Interweave content={instruction.instruction} />
-                            </Text>
+                            <Interweave content={instruction.instruction} />
                           </Box>
                         );
                       },
@@ -446,37 +428,29 @@ export const RecipeViewMobile = ({
                   </Box>
                 </Box>
                 <Box>
-                  <Box mb={2.5}>
+                  <Box>
                     <Text
                       fontSize={'1rem'}
                       fontWeight={600}
                       color="gray.dark"
-                      mt="1rem"
+                      my="1rem"
                     >
                       Ingredients
                     </Text>
                   </Box>
-                  <Box>
+                  <Box pb={'2rem'}>
                     {ingredients.map((ingredient: any) => {
                       return (
                         <Box
                           key={ingredient.id}
-                          mb={1.5}
+                          mb={5}
                           display="flex"
-                          flexDirection="row"
-                          justifyContent={{
-                            base: 'space-between',
-                            sm: 'start',
-                          }}
+                          flexDirection="column"
                         >
                           <Text
-                            fontSize="sm"
-                            fontWeight="600"
-                            color="gray.bone"
-                            maxWidth={{
-                              base: currentServings > 0 ? '250px' : 'none',
-                              sm: 'none',
-                            }}
+                            fontSize="1rem"
+                            fontWeight="500"
+                            color="gray.700"
                           >
                             {currentServings > 0
                               ? `${Math.ceil(ingredient.unitQuantity)}x `
@@ -505,11 +479,11 @@ export const RecipeViewMobile = ({
                 </Box>
               </TabPanel>
               <TabPanel>
-                <Flex flexDirection="row">
+                <Flex flexDirection="row" mb={'1rem'}>
                   <Text
-                    fontSize={'sm'}
-                    fontWeight="600"
-                    color={'gray.bone'}
+                    fontSize={'1rem'}
+                    fontWeight="500"
+                    color={'gray.600'}
                     mr={1}
                   >
                     Cooking time
@@ -520,9 +494,9 @@ export const RecipeViewMobile = ({
                 </Flex>
                 <Flex flexDirection="row">
                   <Text
-                    fontSize={'sm'}
-                    fontWeight="600"
-                    color={'gray.bone'}
+                    fontSize={'1rem'}
+                    fontWeight="500"
+                    color={'gray.600'}
                     mr={1}
                   >
                     Prep time

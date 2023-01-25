@@ -99,7 +99,7 @@ const CustomEditable = React.forwardRef<
               <Flex>
                 <Icon as={SlPencil} fontSize="1.1rem" color="white" />
                 <Text
-                  fontSize="sm"
+                  fontSize="md"
                   fontWeight={600}
                   textAlign="center"
                   noOfLines={1}

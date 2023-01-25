@@ -615,10 +615,10 @@ const MealPlan: CustomNextPage = () => {
                     bg="gray.searchBoxGray"
                     onChange={handleSelectChange}
                     borderRadius="md"
-                    fontSize="sm"
+                    fontSize="md"
                     fontWeight="600"
                     color="gray.bone"
-                    width={{ base: '28%', xl: '12%' }}
+                    maxW={'15rem'}
                   >
                     <option value="ALL">All</option>
                     <option value="RECIPE">Recipes</option>

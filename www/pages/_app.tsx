@@ -1,18 +1,15 @@
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
 import Script from 'next/script';
 import type { AppProps } from 'next/app';
 import theme from '../theme';
 import { useRouter } from 'next/router';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, Box } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import CookieConsent, { getCookieConsentValue } from 'react-cookie-consent';
 import { GA_TRACKING_ID, pageview } from '../lib/gtag';
 import ChakraNextLink from '../components/NextChakraLink';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Fonts from '../Fonts';
 
 const queryClient = new QueryClient();
 
@@ -59,6 +56,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       )}
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
+          <Fonts />
           <Component {...pageProps} />
         </ChakraProvider>
       </QueryClientProvider>

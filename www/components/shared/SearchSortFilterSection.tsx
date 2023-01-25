@@ -38,7 +38,7 @@ const SearchSortFilterSection = (props: any) => {
           searchFieldHeight="3.5rem"
           searchFieldParentWidth={{ base: '100%' }}
           searchFieldFontWeight="600"
-          searchFieldFontSize="sm"
+          searchFieldFontSize="md"
           searchFieldWidth={{ base: '100rem', xl: '21.7rem' }}
           searchFieldParentMargin="0 1.5rem 0 0"
         />
@@ -68,7 +68,7 @@ const SearchSortFilterSection = (props: any) => {
             btnBgColor="rgba(228, 228, 228, 0.3)"
             btnTextColor="gray.bone"
             btnFontWeight="600"
-            btnFontSize="md"
+            btnFontSize="sm"
             btnBorderColor="gray.lighterGray"
             btnParentWidth={{ base: '50%', xl: '100%' }}
             btnWidth="100%"

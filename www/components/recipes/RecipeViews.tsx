@@ -1,21 +1,23 @@
-import React from 'react';
+import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 import {
+  Badge,
   Box,
-  Text,
+  Button,
+  Circle,
+  Flex,
   Grid,
   GridItem,
-  Badge,
-  TabList,
-  TabPanels,
-  TabPanel,
   Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
   Tabs,
+  Text,
 } from '@chakra-ui/react';
-import BorderBox from '../BorderBox';
-import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
 import dynamic from 'next/dynamic';
-import { RecipeType } from '../../types/recipe.types';
 import { InstructionType } from '../../types/instruction.types';
+import { RecipeType } from '../../types/recipe.types';
+import getSupermarketBrandColor from '../../utils/getSupermarketBrandColor';
 import {
   getFormattedQuantityAndUnitText,
   toTwoSignificantFigures,
@@ -44,119 +46,149 @@ export const RecipeViewDesktop = (
 ) => {
   return (
     <>
-      <Grid templateColumns="repeat(2, 1fr);" gap={2}>
+      <Grid templateColumns="repeat(2, 1fr);" gap={2} p="1.25rem">
         <GridItem w="100%" h="100">
           <Box display={'flex'} flexDirection={'column'}>
-            <BorderBox mb={4} p={3}>
-              <Text fontSize={'3.5rem'} fontWeight={600} color="gray.dark">
+            <Box px="1rem">
+              <Text fontSize={'3rem'} fontWeight={600} color="black">
                 {recipe.name}
               </Text>
               <Box>
                 <Badge
                   variant={'solid'}
                   colorScheme={getSupermarketBrandColor(recipe.supermarketName)}
-                  fontSize="1em"
+                  fontSize="1rem"
                 >
                   {recipe.supermarketName}
                 </Badge>
               </Box>
-            </BorderBox>
-
-            <BorderBox mb={4} display={'flex'} flexDirection={'column'} p={3}>
-              <Box mb={2.5}>
+            </Box>
+            <Box display={'flex'} flexDirection={'column'}>
+              <Box px="1rem" my="1rem">
                 <Box>
                   <Text
                     fontSize={'1.5rem'}
-                    fontWeight={450}
+                    fontWeight={600}
                     color="gray.dark"
                     mt={2}
                   >
-                    Method
+                    Instructions
                   </Text>
                 </Box>
                 <Box>
-                  <Text
-                    fontSize={'sm'}
-                    fontWeight={'semibold'}
-                    color={'gray.500'}
-                    letterSpacing={'wide'}
-                  >
+                  <Text fontSize={'sm'} fontWeight="600" color={'gray.bone'}>
                     for {recipe.baseServings} servings - change as needed
                   </Text>
                 </Box>
               </Box>
-
               <Box>
                 {recipe.instructionsList.map((instruction: InstructionType) => {
                   return (
                     <Box
+                      px="1rem"
                       key={instruction.step}
                       display="flex"
                       flexDirection={'row'}
-                      mb={2.5}
                       alignItems={'center'}
+                      mb="0.5rem"
                     >
-                      <Box
-                        mr={'0.5rem'}
-                        borderRadius={'9999px'}
-                        borderWidth={'1px'}
-                        width={'1.75rem'}
-                        height={'1.75rem'}
-                        display="flex"
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                        borderColor={'gray.dark'}
+                      <Circle
+                        size="27px"
+                        bg="brand.500"
+                        color="white"
+                        mr="0.5rem"
                       >
-                        <Box>{instruction.step}</Box>
-                      </Box>
-                      <Interweave content={instruction.instruction} />
+                        <Box as="span" fontWeight="600" fontSize="sm">
+                          {instruction.step}
+                        </Box>
+                      </Circle>
+                      <Text
+                        color="black"
+                        fontSize="sm"
+                        fontWeight="300"
+                        letterSpacing={'wide'}
+                      >
+                        <Interweave content={instruction.instruction} />
+                      </Text>
                     </Box>
                   );
                 })}
               </Box>
-            </BorderBox>
-            <BorderBox mb={4} p={3}>
+            </Box>
+            <Box px="1rem" mt={2}>
               <Box>
-                <Text fontSize={'1.5rem'} fontWeight={450} color="gray.dark">
+                <Text
+                  fontSize={'1.5rem'}
+                  fontWeight={600}
+                  color="gray.dark"
+                  mt="1rem"
+                >
                   Additional information
                 </Text>
               </Box>
-              <Box>
-                <Text>Cooking time ({recipe.cookTime} mins)</Text>
-              </Box>
-              <Box>
-                <Text>Prep time ({recipe.prepTime} mins)</Text>
-              </Box>
-            </BorderBox>
+              <Flex flexDirection="row">
+                <Text
+                  fontSize={'sm'}
+                  fontWeight="600"
+                  color={'gray.bone'}
+                  mr={1}
+                >
+                  Cooking time
+                </Text>
+                <Text fontSize={'sm'} fontWeight="600" color={'gray.dark'}>
+                  ({recipe.cookTime} mins)
+                </Text>
+              </Flex>
+              <Flex flexDirection="row">
+                <Text
+                  fontSize={'sm'}
+                  fontWeight="600"
+                  color={'gray.bone'}
+                  mr={1}
+                >
+                  Prep time
+                </Text>
+                <Text fontSize={'sm'} fontWeight="600" color={'gray.dark'}>
+                  ({recipe.prepTime} mins)
+                </Text>
+              </Flex>
+            </Box>
           </Box>
         </GridItem>
         <GridItem w="100%" h="100">
           <Box
+            borderColor="gray.light"
             borderWidth={'1px'}
-            borderTopRadius={'lg'}
+            borderTopRadius={'xl'}
             borderBottom={'none'}
-            p={3}
+            p="1rem"
             textAlign={'center'}
           >
             <Box>
-              <Text fontSize={'1.2rem'} fontWeight={450} color="gray.dark">
+              <Text fontSize={'1.2rem'} fontWeight={600} color="gray.dark">
                 {currentServings} servings
               </Text>
             </Box>
             <Box>
-              <Text
-                fontSize={'sm'}
-                fontWeight={'semibold'}
-                color={'gray.500'}
-                letterSpacing={'wide'}
-              >
+              <Text fontSize={'sm'} fontWeight={'300'} color={'gray.dark'}>
                 £{pricePerServing} per serving
               </Text>
             </Box>
           </Box>
-          <Box borderWidth={'1px'} borderBottomRadius={'lg'} mb={4} p={3}>
+          <Box
+            borderWidth={'1px'}
+            borderBottomRadius={'xl'}
+            p="1rem"
+            borderColor="gray.light"
+            minHeight="310px"
+          >
             <Box mb={2.5}>
-              <Text fontSize={'1.5rem'} fontWeight={450} color="gray.dark">
+              <Text
+                fontSize={'1.5rem'}
+                fontWeight={600}
+                color="gray.dark"
+                mt={2}
+              >
                 Ingredients
               </Text>
             </Box>
@@ -165,23 +197,41 @@ export const RecipeViewDesktop = (
                 return (
                   <Box
                     key={ingredient.id}
-                    mb={2.5}
+                    mb={1}
                     display="flex"
                     flexDirection="row"
+                    justifyContent={{
+                      base: 'space-between',
+                      lg: 'start',
+                    }}
                   >
-                    <Text>
-                      {Math.ceil(ingredient.unitQuantity)} x {ingredient.name}
+                    <Text
+                      fontSize="sm"
+                      fontWeight="600"
+                      color="gray.bone"
+                      maxWidth={{
+                        base: currentServings > 0 ? '260px' : 'none',
+                        lg: 'none',
+                      }}
+                    >
+                      {currentServings > 0
+                        ? `${Math.ceil(ingredient.unitQuantity)}x `
+                        : ''}
+                      {ingredient.name}
                     </Text>
-                    <Box ml={1}>
-                      <Text fontWeight={600}>
-                        {getFormattedQuantityAndUnitText(
-                          ingredient.scalarQuantity
-                            ? toTwoSignificantFigures(ingredient.scalarQuantity)
-                            : ingredient.baseValue,
-                          ingredient.unit,
-                        )}
-                      </Text>
-                    </Box>
+                    <Text
+                      fontSize="sm"
+                      fontWeight="600"
+                      color="gray.dark"
+                      ml="0.4rem"
+                    >
+                      {getFormattedQuantityAndUnitText(
+                        ingredient.scalarQuantity
+                          ? toTwoSignificantFigures(ingredient.scalarQuantity)
+                          : ingredient.baseValue,
+                        ingredient.unit,
+                      )}
+                    </Text>
                   </Box>
                 );
               })}
@@ -211,60 +261,65 @@ export const RecipeViewMobile = (
       <Grid templateColumns="repeat(1, 1fr);" gap={2}>
         <GridItem w="100%" h="100">
           <Box display={'flex'} flexDirection={'column'}>
-            <BorderBox mb={4} p={3}>
-              <Text fontSize={'2.5rem'} fontWeight={600} color="gray.dark">
+            <Box px="1rem" mb={2}>
+              <Text fontSize={'3rem'} fontWeight={600} color="black">
                 {recipe.name}
               </Text>
               <Box>
                 <Badge
                   variant={'solid'}
                   colorScheme={getSupermarketBrandColor(recipe.supermarketName)}
-                  fontSize="1em"
+                  fontSize="1rem"
                 >
                   {recipe.supermarketName}
                 </Badge>
               </Box>
-            </BorderBox>
+            </Box>
             <Tabs
-              borderWidth={'1px'}
-              borderRadius={'lg'}
               p={3}
               variant={'enclosed'}
-              size={'lg'}
+              size="sm"
               isFitted
               defaultIndex={1}
             >
               <TabList>
-                <Tab _selected={{ bg: 'brand.50' }}>Method</Tab>
-                <Tab _selected={{ bg: 'brand.50' }}>Ingredients</Tab>
-                <Tab _selected={{ bg: 'brand.50' }}>Additional information</Tab>
+                <Tab
+                  height="3.5rem"
+                  _selected={{ bg: 'black', color: 'white' }}
+                >
+                  <Text fontSize={'1rem'} fontWeight={600}>
+                    Instructions
+                  </Text>
+                </Tab>
+                <Tab
+                  height="3.5rem"
+                  _selected={{ bg: 'black', color: 'white' }}
+                >
+                  <Text fontSize={'1rem'} fontWeight={600}>
+                    Ingredients
+                  </Text>
+                </Tab>
+                <Tab
+                  height="3.5rem"
+                  _selected={{ bg: 'black', color: 'white' }}
+                >
+                  <Text fontSize={'1rem'} fontWeight={600}>
+                    Additional information
+                  </Text>
+                </Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
-                  <Box display={'flex'} flexDirection={'column'} p={3}>
-                    <Box mb={2.5}>
-                      <Box>
-                        <Text
-                          fontSize={'1.5rem'}
-                          fontWeight={450}
-                          color="gray.dark"
-                          mt={2}
-                        >
-                          Method
-                        </Text>
-                      </Box>
-                      <Box>
-                        <Text
-                          fontSize={'sm'}
-                          letterSpacing={'wide'}
-                          fontWeight={'semibold'}
-                          color={'gray.500'}
-                        >
-                          for {recipe.baseServings} servings - change as needed
-                        </Text>
-                      </Box>
+                  <Box display={'flex'} flexDirection={'column'}>
+                    <Box mb={3}>
+                      <Text
+                        fontSize={'sm'}
+                        fontWeight="600"
+                        color={'gray.bone'}
+                      >
+                        for {recipe.baseServings} servings - change as needed
+                      </Text>
                     </Box>
-
                     <Box>
                       {recipe.instructionsList.map(
                         (instruction: InstructionType) => {
@@ -273,25 +328,27 @@ export const RecipeViewMobile = (
                               key={instruction.step}
                               display="flex"
                               flexDirection={'row'}
-                              mb={2.5}
                               alignItems={'center'}
+                              mb="0.5rem"
                             >
-                              <Box
-                                mr={'0.5rem'}
-                                borderRadius={'9999px'}
-                                borderWidth={'1px'}
-                                width={'1.75rem'}
-                                height={'1.75rem'}
-                                display="flex"
-                                alignItems={'center'}
-                                justifyContent={'center'}
-                                borderColor={'gray.dark'}
+                              <Circle
+                                size="27px"
+                                bg="brand.500"
+                                color="white"
+                                mr="0.5rem"
                               >
-                                <Box>{instruction.step}</Box>
-                              </Box>
-                              <Interweave
-                                content={`${instruction.instruction}`}
-                              />
+                                <Box as="span" fontWeight="600" fontSize="sm">
+                                  {instruction.step}
+                                </Box>
+                              </Circle>
+                              <Text
+                                color="black"
+                                fontSize="sm"
+                                fontWeight="300"
+                                letterSpacing={'wide'}
+                              >
+                                <Interweave content={instruction.instruction} />
+                              </Text>
                             </Box>
                           );
                         },
@@ -301,15 +358,16 @@ export const RecipeViewMobile = (
                 </TabPanel>
                 <TabPanel>
                   <Box
+                    borderColor="gray.light"
                     borderWidth={'1px'}
-                    borderRadius={'lg'}
-                    p={3}
+                    borderRadius={'xl'}
+                    p="1rem"
                     textAlign={'center'}
                   >
                     <Box>
                       <Text
                         fontSize={'1.2rem'}
-                        fontWeight={450}
+                        fontWeight={600}
                         color="gray.dark"
                       >
                         {currentServings} servings
@@ -318,20 +376,20 @@ export const RecipeViewMobile = (
                     <Box>
                       <Text
                         fontSize={'sm'}
-                        fontWeight={'semibold'}
-                        color={'gray.500'}
-                        letterSpacing={'wide'}
+                        fontWeight={'300'}
+                        color={'gray.dark'}
                       >
                         £{pricePerServing} per serving
                       </Text>
                     </Box>
                   </Box>
-                  <Box p={3}>
+                  <Box>
                     <Box mb={2.5}>
                       <Text
-                        fontSize={'1.5rem'}
-                        fontWeight={450}
+                        fontSize={'1rem'}
+                        fontWeight={600}
                         color="gray.dark"
+                        mt="1rem"
                       >
                         Ingredients
                       </Text>
@@ -341,26 +399,43 @@ export const RecipeViewMobile = (
                         return (
                           <Box
                             key={ingredient.id}
-                            mb={2.5}
+                            mb={1.5}
                             display="flex"
                             flexDirection="row"
+                            justifyContent={{
+                              base: 'space-between',
+                              sm: 'start',
+                            }}
                           >
-                            <Text>
-                              {Math.ceil(ingredient.unitQuantity)} x{' '}
+                            <Text
+                              fontSize="sm"
+                              fontWeight="600"
+                              color="gray.bone"
+                              maxWidth={{
+                                base: currentServings > 0 ? '250px' : 'none',
+                                sm: 'none',
+                              }}
+                            >
+                              {currentServings > 0
+                                ? `${Math.ceil(ingredient.unitQuantity)}x `
+                                : ''}
                               {ingredient.name}
                             </Text>
-                            <Box ml={1}>
-                              <Text fontWeight={600}>
-                                {getFormattedQuantityAndUnitText(
-                                  ingredient.scalarQuantity
-                                    ? toTwoSignificantFigures(
-                                        ingredient.scalarQuantity,
-                                      )
-                                    : ingredient.baseValue,
-                                  ingredient.unit,
-                                )}
-                              </Text>
-                            </Box>
+                            <Text
+                              fontSize="sm"
+                              fontWeight="600"
+                              color="gray.dark"
+                              ml="0.2rem"
+                            >
+                              {getFormattedQuantityAndUnitText(
+                                ingredient.scalarQuantity
+                                  ? toTwoSignificantFigures(
+                                      ingredient.scalarQuantity,
+                                    )
+                                  : ingredient.baseValue,
+                                ingredient.unit,
+                              )}
+                            </Text>
                           </Box>
                         );
                       })}
@@ -368,12 +443,32 @@ export const RecipeViewMobile = (
                   </Box>
                 </TabPanel>
                 <TabPanel>
-                  <Box p={3}>
-                    <Text>Cooking time (20mins)</Text>
-                  </Box>
-                  <Box p={3}>
-                    <Text>Prep time ({recipe.prepTime} mins)</Text>
-                  </Box>
+                  <Flex flexDirection="row">
+                    <Text
+                      fontSize={'sm'}
+                      fontWeight="600"
+                      color={'gray.bone'}
+                      mr={1}
+                    >
+                      Cooking time
+                    </Text>
+                    <Text fontSize={'sm'} fontWeight="600" color={'gray.dark'}>
+                      ({recipe.cookTime} mins)
+                    </Text>
+                  </Flex>
+                  <Flex flexDirection="row">
+                    <Text
+                      fontSize={'sm'}
+                      fontWeight="600"
+                      color={'gray.bone'}
+                      mr={1}
+                    >
+                      Prep time
+                    </Text>
+                    <Text fontSize={'sm'} fontWeight="600" color={'gray.dark'}>
+                      ({recipe.prepTime} mins)
+                    </Text>
+                  </Flex>
                 </TabPanel>
               </TabPanels>
             </Tabs>

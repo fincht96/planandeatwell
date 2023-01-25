@@ -24,21 +24,18 @@ export default function WithSubnavigation() {
   return (
     <Box sx={{ position: 'fixed', top: '0px', width: '100%', zIndex: '3' }}>
       <Flex
-        bg={useColorModeValue('white', 'gray.800')}
-        color={useColorModeValue('gray.600', 'white')}
-        minH={'60px'}
+        bg={useColorModeValue('gray.lighterGray', 'gray.800')}
+        color={useColorModeValue('gray.dark', 'white')}
+        minH={'80px'}
         py={{ base: 2 }}
         px={{ base: 4 }}
-        borderBottom={1}
-        borderStyle={'solid'}
-        borderColor={useColorModeValue('gray.200', 'gray.900')}
         align={'center'}
       >
-        <Flex alignItems={'center'} flex={{ base: 1.5 }} justify={'start'}>
+        <Flex>
           <ChakraNextLink
             position={'relative'}
-            w={{ base: '11rem', md: '15rem' }}
-            h={{ base: '2.2rem', sm: '3rem' }}
+            w="11rem"
+            h={{ base: '2.5rem', sm: '3rem' }}
             p={0}
             href={'/'}
           >
@@ -50,18 +47,24 @@ export default function WithSubnavigation() {
               objectFit={'contain'}
             />
           </ChakraNextLink>
-
-          <Flex display={{ base: 'none', lg: 'flex' }} ml={'1rem'}>
+        </Flex>
+        <Flex alignItems={'center'} flex={{ base: 1.5 }} justify={'center'}>
+          <Flex
+            display={{ base: 'none', lg: 'flex' }}
+            alignItems={'center'}
+            flex={{ base: 1.5 }}
+            justify={'center'}
+          >
             <DesktopNav />
           </Flex>
         </Flex>
 
         <Flex gap={{ base: '0.5rem', md: '1rem' }} alignItems={'center'}>
           <Button
-            bg={'#ffffff'}
-            color={'brand.500'}
-            fontSize={'1.2rem'}
-            fontWeight={400}
+            bg={'gray.veryLightGray'}
+            color="gray.dark"
+            fontSize="md"
+            fontWeight={600}
             alignContent={'center'}
             as={Link}
             href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-in`}
@@ -70,14 +73,15 @@ export default function WithSubnavigation() {
               background: 'gray.100',
             }}
             padding={{ base: '0.5rem', md: '1.2rem' }}
+            display={{ base: 'none', lg: 'flex' }}
           >
             Sign In
           </Button>
 
           <Button
             colorScheme={'brand'}
-            fontSize={'1.2rem'}
-            fontWeight={500}
+            fontSize="md"
+            fontWeight={600}
             alignContent={'center'}
             as={Link}
             _hover={{
@@ -86,7 +90,7 @@ export default function WithSubnavigation() {
             }}
             href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-up`}
             padding={{ base: '0.5rem', md: '1.2rem' }}
-            display={{ base: 'none', md: 'flex' }}
+            display={{ base: 'none', lg: 'flex' }}
           >
             Get started
           </Button>
@@ -123,7 +127,12 @@ const DesktopNav = () => {
   const linkHoverColor = useColorModeValue('brand.500', 'white');
 
   return (
-    <Stack direction={'row'} spacing={4} alignItems={'center'}>
+    <Stack
+      direction={'row'}
+      spacing={4}
+      alignItems={'center'}
+      justifyContent="center"
+    >
       {NAV_ITEMS.map((navItem) => (
         <Box key={navItem.label}>
           <Popover trigger={'hover'} placement={'bottom-start'}>
@@ -131,9 +140,9 @@ const DesktopNav = () => {
               <ChakraNextLink
                 p={2}
                 href={navItem.href ?? '#'}
-                fontSize={'1.2rem'}
-                fontWeight={400}
-                color={'gray.dark'}
+                fontSize="md"
+                fontWeight={600}
+                color="black"
                 _hover={{
                   textDecoration: 'none',
                   color: linkHoverColor,
@@ -150,13 +159,24 @@ const DesktopNav = () => {
 };
 
 const MobileNav = ({ toggleShowNav }: any) => {
+  const signInAndGetStarted = [
+    {
+      label: 'Sign in',
+      href: `${process.env.NEXT_PUBLIC_APP_BASE_URL}sign-in`,
+    },
+    {
+      label: 'Get started',
+      href: `${process.env.NEXT_PUBLIC_APP_BASE_URL}sign-up`,
+    },
+  ];
+
   return (
     <Stack
-      bg={useColorModeValue('white', 'gray.800')}
+      bg={useColorModeValue('gray.50', 'gray.800')}
       p={4}
       display={{ base: 'flex', lg: 'none' }}
     >
-      {NAV_ITEMS.map((navItem) => (
+      {NAV_ITEMS.concat(signInAndGetStarted).map((navItem) => (
         <MobileNavItem
           key={navItem.label}
           {...navItem}
@@ -182,7 +202,12 @@ const MobileNavItem = ({ label, children, href, toggleShowNav }: NavItem) => {
           textDecoration: 'none',
         }}
       >
-        <Text fontWeight={400} color={'gray.dark'} onClick={toggleShowNav}>
+        <Text
+          fontSize="md"
+          fontWeight={600}
+          color="black"
+          onClick={toggleShowNav}
+        >
           {label}
         </Text>
         {children && (
@@ -227,12 +252,16 @@ interface NavItem {
 
 const NAV_ITEMS: Array<NavItem> = [
   {
-    label: 'What is it?',
-    href: '/#what-is-it',
-  },
-  {
     label: 'How it works',
     href: '/#how-it-works',
+  },
+  {
+    label: 'Video',
+    href: '/#video',
+  },
+  {
+    label: 'Support',
+    href: '/#faq',
   },
   {
     label: 'Recipes',

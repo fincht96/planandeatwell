@@ -16,4 +16,5 @@ export interface RecipeType {
   createdAt: string;
   instructionsList: Array<InstructionType>;
   ingredientsList: Array<IngredientType>;
+  ingredientsCount: number;
 }

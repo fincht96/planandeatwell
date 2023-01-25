@@ -35,7 +35,7 @@ const FAQ = () => {
           fontWeight={800}
           textAlign="center"
         >
-          Frequently Asked Questions
+          Frequently asked questions
         </Text>
         <Text
           fontSize={{ base: '1rem', md: '1.2rem' }}

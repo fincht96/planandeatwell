@@ -67,7 +67,7 @@ const Menu: CustomNextPage = () => {
     searchTerm: string;
     supermarketId: string;
   }>({
-    limit: 8,
+    limit: 12,
     offset: 0,
     meals: [],
     lifestyles: [],

@@ -87,34 +87,36 @@ export const RecipeViewDesktop = ({
               </Box>
             </Box>
             <Box>
-              {recipe.instructionsList.map((instruction: InstructionType) => {
-                return (
-                  <Box
-                    px="1rem"
-                    key={instruction.step}
-                    display="flex"
-                    flexDirection={'row'}
-                    alignItems={'center'}
-                    mb="1rem"
-                  >
-                    <Circle
-                      size="27px"
-                      border="solid 2px"
-                      borderColor={'gray.600'}
-                      bg={'gray.50'}
-                      color="gray.600"
-                      mr="0.5rem"
+              {recipe.instructionsList
+                .sort((a, b) => a.step - b.step)
+                .map((instruction: InstructionType) => {
+                  return (
+                    <Box
+                      px="1rem"
+                      key={instruction.step}
+                      display="flex"
+                      flexDirection={'row'}
+                      alignItems={'center'}
+                      mb="1rem"
                     >
-                      <Box as="span" fontWeight="600" fontSize="sm">
-                        {instruction.step}
-                      </Box>
-                    </Circle>
-                    <Text bg={'gray.lighterGray'}>
-                      <Interweave content={instruction.instruction} />
-                    </Text>
-                  </Box>
-                );
-              })}
+                      <Circle
+                        size="27px"
+                        border="solid 2px"
+                        borderColor={'gray.600'}
+                        bg={'gray.50'}
+                        color="gray.600"
+                        mr="0.5rem"
+                      >
+                        <Box as="span" fontWeight="600" fontSize="sm">
+                          {instruction.step}
+                        </Box>
+                      </Circle>
+                      <Text bg={'gray.lighterGray'}>
+                        <Interweave content={instruction.instruction} />
+                      </Text>
+                    </Box>
+                  );
+                })}
             </Box>
           </Box>
           <Box px="1rem" mt={2} pb={'5rem'}>
@@ -337,8 +339,9 @@ export const RecipeViewMobile = ({
                     </Text>
                   </Box>
                   <Box>
-                    {recipe.instructionsList.map(
-                      (instruction: InstructionType) => {
+                    {recipe.instructionsList
+                      .sort((a, b) => a.step - b.step)
+                      .map((instruction: InstructionType) => {
                         return (
                           <Box
                             key={instruction.step}
@@ -364,8 +367,7 @@ export const RecipeViewMobile = ({
                             </Text>
                           </Box>
                         );
-                      },
-                    )}
+                      })}
                   </Box>
                 </Box>
               </TabPanel>

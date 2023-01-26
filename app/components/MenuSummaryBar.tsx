@@ -4,11 +4,12 @@ import {
   Button,
   Circle,
   Divider,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
   Flex,
   IconButton,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalOverlay,
   Text,
   useColorModeValue,
   useDisclosure,
@@ -105,182 +106,187 @@ export default function MenuSummaryBar({
         </Flex>
       </Box>
 
-      <Drawer onClose={onClose} isOpen={isOpen} placement={'bottom'}>
-        <DrawerContent bg="gray.lighterGray" pt={'1rem'}>
-          <DrawerBody pb={'2rem'} pt={'2rem'}>
-            <Box>
-              <Flex pb={'2rem'} direction={'column'}>
-                <Flex alignItems={'center'} justifyContent={'space-between'}>
-                  <Text fontSize="2xl" fontWeight="600" color="black">
-                    Your meal plan
-                  </Text>
-                  <IconButton
-                    borderRadius="lg"
-                    fontSize="0.7rem"
-                    bg="gray.lighterGray"
-                    icon={<CloseIcon />}
-                    onClick={onClose}
-                    aria-label="close-modal-button"
-                  />
-                </Flex>
-                <Text
-                  color={'gray.dark'}
-                  fontWeight={'600'}
-                  letterSpacing={'wide'}
-                  fontSize={'0.9rem'}
-                >
-                  ({servings} servings @ £{roundTo2dp(currentPrice / servings)}{' '}
-                  /serving)
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        isCentered
+        scrollBehavior="inside"
+        size={'full'}
+      >
+        <ModalOverlay />
+        <ModalContent bg="gray.lighterGray">
+          <ModalBody pb={'2rem'}>
+            <Flex direction={'column'} py={'2rem'}>
+              <Flex alignItems={'center'} justifyContent={'space-between'}>
+                <Text fontSize="2xl" fontWeight="600" color="black">
+                  Your meal plan
                 </Text>
+                <IconButton
+                  borderRadius="lg"
+                  fontSize="0.7rem"
+                  bg="gray.lighterGray"
+                  icon={<CloseIcon />}
+                  onClick={onClose}
+                  aria-label="close-modal-button"
+                />
               </Flex>
-              <Box pb={'0.5rem'}>
-                <Divider />
-              </Box>
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize={'0.9rem'}
+              >
+                ({servings} servings @ £{roundTo2dp(currentPrice / servings)}{' '}
+                /serving)
+              </Text>
+            </Flex>
+            <Box pb={'0.5rem'}>
+              <Divider />
+            </Box>
 
-              <Box pb={'0.5rem'}>
-                <Text
-                  fontSize="sm"
-                  fontWeight="600"
-                  color="gray.dark"
-                  pb={'0.25rem'}
-                >
-                  Recipes
-                </Text>
+            <Box pb={'0.5rem'}>
+              <Text
+                fontSize="sm"
+                fontWeight="600"
+                color="gray.dark"
+                pb={'0.25rem'}
+              >
+                Recipes
+              </Text>
 
-                {recipeList.map((recipe: any) => {
-                  return (
-                    <Flex
-                      justifyContent={'space-between'}
-                      key={recipe.recipe.id}
-                      mb={'1rem'}
-                    >
-                      <Text fontSize="1rem" fontWeight="500" color="gray.700">
-                        {recipe.recipe.name}
-                      </Text>
+              {recipeList.map((recipe: any) => {
+                return (
+                  <Flex
+                    justifyContent={'space-between'}
+                    key={recipe.recipe.id}
+                    mb={'1rem'}
+                  >
+                    <Text fontSize="1rem" fontWeight="500" color="gray.700">
+                      {recipe.recipe.name}
+                    </Text>
 
-                      <Flex alignItems={'center'} gridGap={'0.5rem'}>
-                        <Circle
-                          _hover={{ background: 'brand.100' }}
-                          size="1.1rem"
-                          bg="white"
-                          border={'solid 1px'}
-                          borderColor={'brand.500'}
-                          cursor={'pointer'}
-                          onClick={() => {
-                            onRemoveRecipeServings(
-                              recipe.recipe,
-                              recipe.recipe.baseServings,
-                            );
-                          }}
-                        >
-                          <MinusIcon color={'brand.500'} width={'0.5rem'} />
-                        </Circle>
-                        <Text
-                          color={'gray.dark'}
-                          fontWeight={'600'}
-                          letterSpacing={'wide'}
-                          fontSize={{ base: '0.8rem', lg: '0.9rem' }}
-                        >
-                          {recipe.servings} servings
-                        </Text>
-
-                        <Circle
-                          _hover={{ background: 'brand.100' }}
-                          size="1.1rem"
-                          bg="white"
-                          border={'solid 1px'}
-                          borderColor={'brand.500'}
-                          cursor={'pointer'}
-                          onClick={() => {
-                            onAddRecipeServings(
-                              recipe.recipe,
-                              recipe.recipe.baseServings,
-                            );
-                          }}
-                        >
-                          <AddIcon color={'brand.500'} width={'0.5rem'} />
-                        </Circle>
-                      </Flex>
-                    </Flex>
-                  );
-                })}
-              </Box>
-
-              <Box pb={'0.5rem'}>
-                <Text
-                  fontSize="sm"
-                  fontWeight="600"
-                  color="gray.dark"
-                  pb={'0.25rem'}
-                >
-                  Ingredients
-                </Text>
-
-                {ingredientList.map((ingredient: any) => {
-                  return (
-                    <Flex
-                      justifyContent={'space-between'}
-                      key={ingredient.id}
-                      mb={'1rem'}
-                    >
-                      <Text fontSize="1rem" fontWeight="500" color="gray.700">
-                        {ingredient.unitQuantity}x {ingredient.name}
-                      </Text>
-
+                    <Flex alignItems={'center'} gridGap={'0.5rem'}>
+                      <Circle
+                        _hover={{ background: 'brand.100' }}
+                        size="1.1rem"
+                        bg="white"
+                        border={'solid 1px'}
+                        borderColor={'brand.500'}
+                        cursor={'pointer'}
+                        onClick={() => {
+                          onRemoveRecipeServings(
+                            recipe.recipe,
+                            recipe.recipe.baseServings,
+                          );
+                        }}
+                      >
+                        <MinusIcon color={'brand.500'} width={'0.5rem'} />
+                      </Circle>
                       <Text
                         color={'gray.dark'}
                         fontWeight={'600'}
                         letterSpacing={'wide'}
                         fontSize={{ base: '0.8rem', lg: '0.9rem' }}
-                        ml={'0.5rem'}
                       >
-                        £{ingredient.price}
+                        {recipe.servings} servings
                       </Text>
+
+                      <Circle
+                        _hover={{ background: 'brand.100' }}
+                        size="1.1rem"
+                        bg="white"
+                        border={'solid 1px'}
+                        borderColor={'brand.500'}
+                        cursor={'pointer'}
+                        onClick={() => {
+                          onAddRecipeServings(
+                            recipe.recipe,
+                            recipe.recipe.baseServings,
+                          );
+                        }}
+                      >
+                        <AddIcon color={'brand.500'} width={'0.5rem'} />
+                      </Circle>
                     </Flex>
-                  );
-                })}
-              </Box>
-
-              <Box pb={'1rem'}>
-                <Divider />
-              </Box>
-
-              <Flex justifyContent={'space-between'} pb={'1rem'}>
-                <Text
-                  color={'gray.dark'}
-                  fontWeight={'600'}
-                  letterSpacing={'wide'}
-                  fontSize={'1rem'}
-                >
-                  Total
-                </Text>
-
-                <Text
-                  color={'gray.dark'}
-                  fontWeight={'600'}
-                  letterSpacing={'wide'}
-                  fontSize={'1rem'}
-                >
-                  £{currentPrice}
-                </Text>
-              </Flex>
-
-              <Button
-                colorScheme="brand"
-                borderRadius="lg"
-                fontSize="sm"
-                fontWeight={600}
-                padding={'1.5rem 1.5rem'}
-                disabled={!recipeList.length}
-                width={'100%'}
-                onClick={onComplete}
-              >
-                Create plan
-              </Button>
+                  </Flex>
+                );
+              })}
             </Box>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+
+            <Box pb={'0.5rem'}>
+              <Text
+                fontSize="sm"
+                fontWeight="600"
+                color="gray.dark"
+                pb={'0.25rem'}
+              >
+                Ingredients
+              </Text>
+
+              {ingredientList.map((ingredient: any) => {
+                return (
+                  <Flex
+                    justifyContent={'space-between'}
+                    key={ingredient.id}
+                    mb={'1rem'}
+                  >
+                    <Text fontSize="1rem" fontWeight="500" color="gray.700">
+                      {ingredient.unitQuantity}x {ingredient.name}
+                    </Text>
+
+                    <Text
+                      color={'gray.dark'}
+                      fontWeight={'600'}
+                      letterSpacing={'wide'}
+                      fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                      ml={'0.5rem'}
+                    >
+                      £{ingredient.price}
+                    </Text>
+                  </Flex>
+                );
+              })}
+            </Box>
+
+            <Box pb={'1rem'}>
+              <Divider />
+            </Box>
+
+            <Flex justifyContent={'space-between'} pb={'1rem'}>
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize={'1rem'}
+              >
+                Total
+              </Text>
+
+              <Text
+                color={'gray.dark'}
+                fontWeight={'600'}
+                letterSpacing={'wide'}
+                fontSize={'1rem'}
+              >
+                £{currentPrice}
+              </Text>
+            </Flex>
+
+            <Button
+              colorScheme="brand"
+              borderRadius="lg"
+              fontSize="md"
+              fontWeight={600}
+              padding={'1.5rem 1.5rem'}
+              disabled={!recipeList.length}
+              width={'100%'}
+              onClick={onComplete}
+            >
+              Create plan
+            </Button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

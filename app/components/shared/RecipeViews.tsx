@@ -274,7 +274,7 @@ export const RecipeViewMobile = ({
     !!onAddRecipeServings && !!onRemoveRecipeServings;
 
   return (
-    <Grid templateColumns="repeat(1, 1fr);" gap={2}>
+    <Grid templateColumns="repeat(1, 1fr);" gap={2} mb={'5rem'}>
       <GridItem w="100%">
         <Box display={'flex'} flexDirection={'column'}>
           <Box px="1rem" mb={2}>

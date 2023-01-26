@@ -50,7 +50,7 @@ const MealPlans: CustomNextPage = () => {
     orderBy: OrderBy;
     searchTerm: string;
   }>({
-    limit: 8,
+    limit: 12,
     offset: 0,
     order: 'any',
     orderBy: 'relevance',

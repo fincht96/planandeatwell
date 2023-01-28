@@ -42,7 +42,7 @@ const Video = () => {
           <Box
             allowFullScreen
             as="iframe"
-            src="https://www.youtube.com/watch?v=b8_x92LX-Pc"
+            src="https://www.youtube.com/embed/b8_x92LX-Pc"
             width="100%"
             sx={{
               aspectRatio: '16/9',

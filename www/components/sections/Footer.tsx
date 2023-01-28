@@ -80,7 +80,10 @@ export default function Footer() {
             © 2022 Plan and Eat Well. All rights reserved.
           </Text>
           <Stack direction={'row'} spacing={6}>
-            <SocialButton label={'YouTube'} href={'#'}>
+            <SocialButton
+              label={'YouTube'}
+              href={'https://www.youtube.com/@planandeatwell'}
+            >
               <FaYoutube />
             </SocialButton>
             <SocialButton

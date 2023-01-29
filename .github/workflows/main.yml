@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - prod
+  pull_request:
+    branches:
+      - prod
+
 jobs:
   db-migrations: 
     runs-on: ubuntu-latest

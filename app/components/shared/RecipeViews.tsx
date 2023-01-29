@@ -111,9 +111,7 @@ export const RecipeViewDesktop = ({
                           {instruction.step}
                         </Box>
                       </Circle>
-                      <Text bg={'gray.lighterGray'}>
-                        <Interweave content={instruction.instruction} />
-                      </Text>
+                      <Interweave content={instruction.instruction} />
                     </Box>
                   );
                 })}

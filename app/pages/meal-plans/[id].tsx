@@ -295,7 +295,10 @@ const MealPlan: CustomNextPage = () => {
         return {
           id: recipeWithServings.recipe.id,
           content: (
-            <Flex justifyContent={'space-between'}>
+            <Flex
+              justifyContent={'space-between'}
+              key={recipeWithServings.recipe.id}
+            >
               <Text color="black" fontSize="sm" as="b" mb="0.3rem">
                 {recipeWithServings.recipe.name} - {recipeWithServings.servings}{' '}
                 servings
@@ -494,112 +497,110 @@ const MealPlan: CustomNextPage = () => {
               </Flex>
               {recipes.map((recipeWithServings: any) => {
                 return (
-                  <>
-                    <Card
-                      cursor={'pointer'}
-                      key={recipeWithServings.id}
-                      direction={{ base: 'column', sm: 'row' }}
-                      overflow="hidden"
-                      variant="outline"
-                      borderRadius="xl"
-                      borderColor="gray.light"
-                      mb="1.5rem"
-                      _hover={{
-                        bg: 'gray.searchBoxGray',
-                      }}
-                      onClick={() => {
-                        setSelectedRecipe({
-                          ...recipeWithServings.recipe,
-                          selectedServings: recipeWithServings.servings,
-                        });
-                      }}
-                    >
-                      <Box width={{ base: '100%', sm: '400px' }} height="200px">
-                        <Image
-                          objectFit="cover"
-                          height="100%"
-                          width="100%"
-                          src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}/${recipeWithServings.recipe.imagePath}`}
-                          alt={recipeWithServings.name}
-                        />
-                      </Box>
-                      <Stack>
-                        <CardBody>
-                          <Heading fontSize="xl">
-                            {recipeWithServings.recipe.name}
-                          </Heading>
-                          <Flex flexDirection="row" alignItems="center" mt={3}>
-                            <Flex
-                              flexDirection="column"
-                              justifyContent="flex-start"
-                              mr="1.5rem"
-                            >
-                              <Flex alignItems="center" mb="0.8rem">
-                                <SlClock fontSize="1rem" />
-                                <Text
-                                  color={'gray.dark'}
-                                  fontWeight={'600'}
-                                  letterSpacing={'wide'}
-                                  fontSize={{ base: '0.8rem', lg: '0.9rem' }}
-                                  ml={'0.5rem'}
-                                >
-                                  {recipeWithServings.recipe.prepTime +
-                                    recipeWithServings.recipe.cookTime}
-                                  mins total
-                                </Text>
-                              </Flex>
-                              <Flex alignItems="center">
-                                <SlInfo fontSize="1rem" />
-                                <Text
-                                  color={'gray.dark'}
-                                  fontWeight={'600'}
-                                  letterSpacing={'wide'}
-                                  fontSize={{ base: '0.8rem', lg: '0.9rem' }}
-                                  ml={'0.5rem'}
-                                >
-                                  £
-                                  {recipeWithServings.recipe.pricePerServing.toFixed(
-                                    2,
-                                  )}{' '}
-                                  per serving
-                                </Text>
-                              </Flex>
+                  <Card
+                    cursor={'pointer'}
+                    key={recipeWithServings.recipe.id}
+                    direction={{ base: 'column', sm: 'row' }}
+                    overflow="hidden"
+                    variant="outline"
+                    borderRadius="xl"
+                    borderColor="gray.light"
+                    mb="1.5rem"
+                    _hover={{
+                      bg: 'gray.searchBoxGray',
+                    }}
+                    onClick={() => {
+                      setSelectedRecipe({
+                        ...recipeWithServings.recipe,
+                        selectedServings: recipeWithServings.servings,
+                      });
+                    }}
+                  >
+                    <Box width={{ base: '100%', sm: '400px' }} height="200px">
+                      <Image
+                        objectFit="cover"
+                        height="100%"
+                        width="100%"
+                        src={`${process.env.NEXT_PUBLIC_CDN}/${process.env.NODE_ENV}/${recipeWithServings.recipe.imagePath}`}
+                        alt={recipeWithServings.name}
+                      />
+                    </Box>
+                    <Stack>
+                      <CardBody>
+                        <Heading fontSize="xl">
+                          {recipeWithServings.recipe.name}
+                        </Heading>
+                        <Flex flexDirection="row" alignItems="center" mt={3}>
+                          <Flex
+                            flexDirection="column"
+                            justifyContent="flex-start"
+                            mr="1.5rem"
+                          >
+                            <Flex alignItems="center" mb="0.8rem">
+                              <SlClock fontSize="1rem" />
+                              <Text
+                                color={'gray.dark'}
+                                fontWeight={'600'}
+                                letterSpacing={'wide'}
+                                fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                                ml={'0.5rem'}
+                              >
+                                {recipeWithServings.recipe.prepTime +
+                                  recipeWithServings.recipe.cookTime}
+                                mins total
+                              </Text>
                             </Flex>
-                            <Flex
-                              flexDirection="column"
-                              justifyContent="flex-start"
-                            >
-                              <Flex alignItems="center" mb="0.8rem">
-                                <SlPeople fontSize="1rem" />
-                                <Text
-                                  color={'gray.dark'}
-                                  fontWeight={'600'}
-                                  letterSpacing={'wide'}
-                                  fontSize={{ base: '0.8rem', lg: '0.9rem' }}
-                                  ml={'0.5rem'}
-                                >
-                                  Serves ({recipeWithServings.servings})
-                                </Text>
-                              </Flex>
-                              <Flex alignItems="center">
-                                <SlBasketLoaded fontSize="1rem" />
-                                <Text
-                                  color={'gray.dark'}
-                                  fontWeight={'600'}
-                                  letterSpacing={'wide'}
-                                  fontSize={{ base: '0.8rem', lg: '0.9rem' }}
-                                  ml={'0.5rem'}
-                                >
-                                  Ingredients (
-                                  {recipeWithServings.recipe.ingredientsCount})
-                                </Text>
-                              </Flex>
+                            <Flex alignItems="center">
+                              <SlInfo fontSize="1rem" />
+                              <Text
+                                color={'gray.dark'}
+                                fontWeight={'600'}
+                                letterSpacing={'wide'}
+                                fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                                ml={'0.5rem'}
+                              >
+                                £
+                                {recipeWithServings.recipe.pricePerServing.toFixed(
+                                  2,
+                                )}{' '}
+                                per serving
+                              </Text>
                             </Flex>
                           </Flex>
-                        </CardBody>
-                      </Stack>
-                    </Card>
-                  </>
+                          <Flex
+                            flexDirection="column"
+                            justifyContent="flex-start"
+                          >
+                            <Flex alignItems="center" mb="0.8rem">
+                              <SlPeople fontSize="1rem" />
+                              <Text
+                                color={'gray.dark'}
+                                fontWeight={'600'}
+                                letterSpacing={'wide'}
+                                fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                                ml={'0.5rem'}
+                              >
+                                Serves ({recipeWithServings.servings})
+                              </Text>
+                            </Flex>
+                            <Flex alignItems="center">
+                              <SlBasketLoaded fontSize="1rem" />
+                              <Text
+                                color={'gray.dark'}
+                                fontWeight={'600'}
+                                letterSpacing={'wide'}
+                                fontSize={{ base: '0.8rem', lg: '0.9rem' }}
+                                ml={'0.5rem'}
+                              >
+                                Ingredients (
+                                {recipeWithServings.recipe.ingredientsCount})
+                              </Text>
+                            </Flex>
+                          </Flex>
+                        </Flex>
+                      </CardBody>
+                    </Stack>
+                  </Card>
                 );
               })}
             </TabPanel>

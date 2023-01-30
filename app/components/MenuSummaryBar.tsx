@@ -45,7 +45,7 @@ export default function MenuSummaryBar({
           bottom: '0px',
           width: '100%',
         }}
-        zIndex={{ base: !isOpen ? '1800' : '3', md: '3' }}
+        zIndex={{ base: !isOpen ? '1800' : '3', lg: '3' }}
       >
         <Flex
           bg={useColorModeValue('gray.veryLightGray', 'gray.800')}

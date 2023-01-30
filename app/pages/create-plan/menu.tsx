@@ -305,6 +305,7 @@ const Menu: CustomNextPage = () => {
 
   const mealPlanBasketProps = () => {
     return {
+      recipeModalIsOpen: !!selectedRecipe,
       currentPrice: totalBasketPrice,
       ingredientList: ingredientsBasket,
       recipeList: recipeBasket,

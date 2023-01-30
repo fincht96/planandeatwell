@@ -23,9 +23,9 @@ const RecipeCard = ({
       cursor={'pointer'}
       borderColor="gray.light"
       onClick={onOpen}
-      bg="gray.lighterGray"
+      bg={'gray.lighterGray'}
       position="relative"
-      _hover="brand.100"
+      _hover={{ bg: 'gray.searchBoxGray' }}
     >
       <RecipeModal
         onClose={onClose}

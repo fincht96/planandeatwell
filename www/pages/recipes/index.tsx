@@ -243,7 +243,7 @@ const Recipes: NextPage = (props: any) => {
             <Text fontSize={'sm'} color="black" fontWeight={600} mb={'2rem'}>
               Results&nbsp;
               <Text as={'span'} fontWeight={600} color="black">
-                ({recipes.length})
+                ({totalCountRecipes})
               </Text>
             </Text>
           </Container>

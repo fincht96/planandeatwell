@@ -78,12 +78,14 @@ const Recipe: NextPage = ({ recipe }: any) => {
           </Container>
           <Container maxW="1200px">
             {!!isLessThan900
-              ? RecipeViewMobile(recipe, {
+              ? RecipeViewMobile({
+                  recipe,
                   pricePerServing,
                   currentServings,
                   ingredients,
                 })
-              : RecipeViewDesktop(recipe, {
+              : RecipeViewDesktop({
+                  recipe,
                   pricePerServing,
                   currentServings,
                   ingredients,

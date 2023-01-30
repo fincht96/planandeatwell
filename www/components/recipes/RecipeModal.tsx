@@ -36,12 +36,10 @@ export default function RecipeModal({
   isOpen,
   onClose,
   recipe,
-  fullPath,
 }: {
   isOpen: boolean;
   onClose: () => void;
   recipe: RecipeType;
-  fullPath: string;
 }) {
   const {
     onClose: onPopoverClose,
@@ -196,7 +194,9 @@ export default function RecipeModal({
                           alignItems="center"
                           justifyContent="center"
                           onClick={() => {
-                            copy(`${fullPath}/${recipe.id}`);
+                            copy(
+                              `${process.env.NEXT_PUBLIC_WWW_URL}/recipes/${recipe.id}`,
+                            );
                             setShareRecipeLinkCopied(true);
                           }}
                         >
@@ -214,7 +214,8 @@ export default function RecipeModal({
                               width="200px"
                               noOfLines={1}
                             >
-                              {fullPath}/{recipe.id}
+                              {process.env.NEXT_PUBLIC_WWW_URL}/recipes/
+                              {recipe.id}
                             </Text>
                           </Box>
                         </BorderBox>
@@ -243,17 +244,21 @@ export default function RecipeModal({
                 />
               </Box>
             </Box>
-            {!!isLessThan900
-              ? RecipeViewMobile(recipe, {
-                  pricePerServing: recipe.pricePerServing,
-                  currentServings: recipe.baseServings,
-                  ingredients: recipe.ingredientsList,
-                })
-              : RecipeViewDesktop(recipe, {
-                  pricePerServing: recipe.pricePerServing,
-                  currentServings: recipe.baseServings,
-                  ingredients: recipe.ingredientsList,
-                })}
+            {!!isLessThan900 ? (
+              <RecipeViewMobile
+                recipe={recipe}
+                pricePerServing={recipe.pricePerServing}
+                currentServings={recipe.baseServings}
+                ingredients={recipe.ingredientsList}
+              />
+            ) : (
+              <RecipeViewDesktop
+                recipe={recipe}
+                pricePerServing={recipe.pricePerServing}
+                currentServings={recipe.baseServings}
+                ingredients={recipe.ingredientsList}
+              />
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

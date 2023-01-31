@@ -100,7 +100,7 @@ export default function RecipeModal({
         onClose={onClose}
         isCentered
         scrollBehavior="inside"
-        size={showFullModalScreen || isLessThan900 ? 'full' : ''}
+        size={{ base: 'full', lg: '' }}
       >
         <ModalOverlay />
         <ModalContent

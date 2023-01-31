@@ -25,6 +25,7 @@ export default function MenuSummaryBar({
   onComplete,
   onAddRecipeServings,
   onRemoveRecipeServings,
+  recipeModalIsOpen,
 }: {
   currentPrice: number;
   ingredientList: any;
@@ -33,8 +34,23 @@ export default function MenuSummaryBar({
   onComplete: any;
   onAddRecipeServings: (recipe, servings) => void;
   onRemoveRecipeServings: (recipe, servings) => void;
+  recipeModalIsOpen: boolean;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const calcMenuSummaryBarZIndex = () => {
+    // meal plan basket is open
+    if (isOpen) {
+      return { base: 3 };
+    }
+    // recipe modal is open
+    if (recipeModalIsOpen) {
+      return { base: 1800, lg: 3 };
+    }
+
+    // default
+    return { base: 3 };
+  };
 
   return (
     <>
@@ -45,7 +61,7 @@ export default function MenuSummaryBar({
           bottom: '0px',
           width: '100%',
         }}
-        zIndex={{ base: !isOpen ? '1800' : '3', lg: '3' }}
+        zIndex={calcMenuSummaryBarZIndex()}
       >
         <Flex
           bg={useColorModeValue('gray.veryLightGray', 'gray.800')}
@@ -53,8 +69,8 @@ export default function MenuSummaryBar({
           minH="4rem"
           py={{ base: 2 }}
           px={{ base: 4 }}
-          justifyContent={{ base: 'center', md: 'flex-end' }}
-          display={{ base: 'none', md: 'flex' }}
+          justifyContent={{ base: 'center', lg: 'flex-end' }}
+          display={{ base: 'none', lg: 'flex' }}
           alignItems="center"
         >
           <RecipeBasketButton
@@ -77,7 +93,7 @@ export default function MenuSummaryBar({
           borderBottom={1}
           borderColor={useColorModeValue('gray.200', 'gray.900')}
           justifyContent={'center'}
-          display={{ base: 'flex', md: 'none' }}
+          display={{ base: 'flex', lg: 'none' }}
         >
           <Button
             colorScheme="brand"
@@ -106,6 +122,7 @@ export default function MenuSummaryBar({
         </Flex>
       </Box>
 
+      {/* Mobile - Recipe basket modal */}
       <Modal
         isOpen={isOpen}
         onClose={onClose}

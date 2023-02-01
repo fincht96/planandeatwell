@@ -10,7 +10,7 @@ import {
   Flex,
   Link,
 } from '@chakra-ui/react';
-
+import SignupForm from '../SignUpForm';
 import { useEffect, useState, useMemo } from 'react';
 import NavDown from '../NavDown';
 
@@ -64,13 +64,21 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
               </Stack>
             </Stack>
             <Stack>
-              <Text fontSize="1.2rem" color="gray.dark" fontWeight={400}>
-                Create budgeted meal plans from your local supermarket with
-                meals starting from less than £0.99/per person.
+              <Text
+                fontSize="1.2rem"
+                color="gray.dark"
+                fontWeight={400}
+                w={{ base: '18rem', sm: '31rem' }}
+              >
+                Create meal plans using our amazing recipes today. Enter your
+                email to request early adopter access.
               </Text>
+              <Box w={{ base: '18rem', sm: '31rem' }}>
+                <SignupForm />
+              </Box>
             </Stack>
             <Stack direction={'row'}>
-              <Button
+              {/* <Button
                 colorScheme="brand"
                 fontSize="md"
                 fontWeight="600"
@@ -78,7 +86,7 @@ const DesktopHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
                 href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-up`}
               >
                 Join for free now
-              </Button>
+              </Button> */}
             </Stack>
           </Stack>
         </Box>
@@ -156,20 +164,24 @@ const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
               </Stack>
             </Stack>
 
-            <Stack direction={'row'} justifyContent="center">
+            <Stack direction={'column'} alignItems="center">
               <Text
                 fontSize="1rem"
                 color="gray.dark"
                 fontWeight={400}
                 textAlign="center"
-                maxW={{ base: '19rem', sm: '28rem' }}
+                w={{ base: '18rem', sm: '26rem' }}
               >
-                Create budgeted meal plans from your local supermarket with
-                meals starting from less than £0.99/per person.
+                Create meal plans using our amazing recipes today. Enter your
+                email to request early adopter access.
               </Text>
+              <Box w={{ base: '18rem', sm: '26rem' }}>
+                <SignupForm />
+              </Box>
             </Stack>
+
             <Stack direction={'row'} justifyContent="center">
-              <Button
+              {/* <Button
                 colorScheme="brand"
                 fontSize="md"
                 fontWeight="600"
@@ -177,7 +189,7 @@ const MobileHero = ({ keyword, show }: { keyword: string; show: boolean }) => {
                 href={`${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-up`}
               >
                 Join for free now
-              </Button>
+              </Button> */}
             </Stack>
           </Stack>
         </Box>

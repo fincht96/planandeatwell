@@ -91,4 +91,15 @@ export default class UserService {
 
     return result[0];
   }
+
+  async addEarlyAccessRequest({ email }: { email: string }) {
+    // insert email into early access table
+    const result = await this.db('early_access_emails').insert(
+      {
+        email: email.toLowerCase(),
+      },
+      ['*'],
+    );
+    return result[0];
+  }
 }

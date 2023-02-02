@@ -16,6 +16,10 @@ const createAccountSchema = Joi.object({
   password: Joi.string().min(8).max(400).required(),
 }).and('firstName', 'lastName', 'email', 'password');
 
+const requestEarlyAccess = Joi.object({
+  email: Joi.string().min(3).max(200).required(),
+});
+
 export default class UserController {
   constructor(
     private readonly eventsService: EventsService,
@@ -83,6 +87,34 @@ export default class UserController {
       );
       return res.status(400).json({
         errors: [e?.message],
+      });
+    }
+  }
+
+  async requestEarlyAccess(req: Request, res: Response) {
+    try {
+      const { error, value } = requestEarlyAccess.validate(req.body);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const result = await this.userService.addEarlyAccessRequest(value);
+
+      return res.status(200).json({
+        result,
+        errors: [],
+      });
+    } catch (e: any) {
+      await this.eventsService.insert(
+        'USER_CONTROLLER',
+        'ERROR',
+        e.message ?? '',
+      );
+      return res.status(400).json({
+        errors: [
+          `An error occurred registering your email, have you already registered?`,
+        ],
       });
     }
   }

@@ -14,7 +14,6 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import Head from 'next/head';
-import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -192,7 +191,7 @@ const SignIn: CustomNextPage = () => {
                 </Stack>
               </Stack>
             </form>
-            <Stack pt={6}>
+            {/* <Stack pt={6}>
               <Text align={'center'}>
                 Don&apos;t have an account?{' '}
                 <NextLink href={'/sign-up'}>
@@ -206,7 +205,7 @@ const SignIn: CustomNextPage = () => {
                   </Text>
                 </NextLink>
               </Text>
-            </Stack>
+            </Stack> */}
           </Box>
         </Stack>
       </Flex>

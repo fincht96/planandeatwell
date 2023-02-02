@@ -129,4 +129,8 @@ router.post('/user/create', (req: Request, res: Response) => {
   req.container.resolve('userController').createAccount(req, res);
 });
 
+router.post('/user/early-access', (req: Request, res: Response) => {
+  req.container.resolve('userController').requestEarlyAccess(req, res);
+});
+
 export default router;

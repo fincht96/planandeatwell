@@ -78,7 +78,7 @@ export default function WithSubnavigation() {
             Sign In
           </Button>
 
-          <Button
+          {/* <Button
             colorScheme={'brand'}
             fontSize="md"
             fontWeight={600}
@@ -93,7 +93,7 @@ export default function WithSubnavigation() {
             display={{ base: 'none', lg: 'flex' }}
           >
             Get started
-          </Button>
+          </Button> */}
 
           <Flex
             ml={{ base: -2 }}
@@ -166,10 +166,10 @@ const MobileNav = ({ toggleShowNav }: any) => {
       label: 'Sign in',
       href: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-in`,
     },
-    {
-      label: 'Get started',
-      href: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-up`,
-    },
+    // {
+    //   label: 'Get started',
+    //   href: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/sign-up`,
+    // },
   ];
 
   return (

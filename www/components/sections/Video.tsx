@@ -33,8 +33,7 @@ const Video = () => {
           textAlign="center"
           mx="auto"
         >
-          The video below guides you through our app and the core features.
-          Click on the video to watch on youtube.
+          The video below shows you how to quickly get started.
         </Text>
       </Stack>
       <Stack>
@@ -42,7 +41,7 @@ const Video = () => {
           <Box
             allowFullScreen
             as="iframe"
-            src="https://www.youtube.com/embed/b8_x92LX-Pc"
+            src="https://www.youtube.com/embed/eQitaUgqv9M"
             width="100%"
             sx={{
               aspectRatio: '16/9',

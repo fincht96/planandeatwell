@@ -167,164 +167,165 @@ const MealPlans: CustomNextPage = () => {
 
   const userFirstName = user?.displayName?.split(' ')[0];
 
-  if (isLoading) {
-    return <CenteredLoadingSpinner />;
-  } else {
-    return (
-      <Layout>
-        <Head>
-          <title>Meal Plans | Plan and Eat Well</title>
-        </Head>
-
-        <Container maxW={'1200px'}>
-          {!mealPlans.length &&
-          !mealPlansQueryParams.searchTerm.length &&
-          !mealPlanQuery.isLoading ? (
-            showNoMealPlans()
-          ) : (
-            <>
-              <Flex
-                justifyContent={'space-between'}
-                alignItems={'center'}
-                mb={10}
-              >
-                <Text
-                  noOfLines={2}
-                  fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
-                  color="black"
-                  fontWeight={700}
-                  textAlign={'left'}
+  return (
+    <Layout>
+      <Head>
+        <title>Meal Plans | Plan and Eat Well</title>
+      </Head>
+      {isLoading ? (
+        <CenteredLoadingSpinner />
+      ) : (
+        <>
+          <Container maxW={'1200px'}>
+            {!mealPlans.length &&
+            !mealPlansQueryParams.searchTerm.length &&
+            !mealPlanQuery.isLoading ? (
+              showNoMealPlans()
+            ) : (
+              <>
+                <Flex
+                  justifyContent={'space-between'}
+                  alignItems={'center'}
+                  mb={10}
                 >
-                  {userFirstName ? `${userFirstName}'s` : 'User'} meal plans
-                </Text>
-                <Box
-                  cursor={'pointer'}
-                  p={'0.5rem'}
-                  onClick={() => onNavigate('/create-plan/supermarket')}
-                  color="black"
-                >
-                  <SlPlus fontSize="2rem" />
-                </Box>
-              </Flex>
-              <Box>
-                <Box>
-                  <SearchSortFilterSection
-                    searchFieldPlaceHolderText="Search meal plans..."
-                    selectValues={{
-                      relevance: 'Relevance',
-                      newest: 'Newest',
-                    }}
-                    sortBy={orderToSortBy(
-                      mealPlansQueryParams.order,
-                      mealPlansQueryParams.orderBy,
-                    )}
-                    searchTerm={mealPlansQueryParams.searchTerm}
-                    onSearchSubmit={({
-                      searchTerm,
-                    }: {
-                      searchTerm: string;
-                    }) => {
-                      setMealPlansQueryParams((current) => {
-                        return {
-                          ...current,
-                          offset: 0,
-                          searchTerm,
-                        };
-                      });
-
-                      const {
-                        searchTerm: oldSearchTerm,
-                        ...unchangedQueryParams
-                      } = router.query;
-                      router.push({
-                        query: {
-                          ...unchangedQueryParams,
-                          ...(searchTerm.length && { searchTerm }),
-                        },
-                      });
-                    }}
-                    handleSortChange={(sortBy: SortBy) => {
-                      const orderAndOrderBy = sortByToOrder(sortBy);
-                      setMealPlansQueryParams((current) => {
-                        return {
-                          ...current,
-                          ...orderAndOrderBy,
-                          offset: 0,
-                        };
-                      });
-
-                      router.push({
-                        query: {
-                          ...router.query,
-                          ...orderAndOrderBy,
-                        },
-                      });
-                    }}
-                  />
-                </Box>
-                <Box>
                   <Text
-                    fontSize={'sm'}
+                    noOfLines={2}
+                    fontSize={{ base: '1.4rem', sm: '1.7rem', md: '2rem' }}
                     color="black"
-                    fontWeight={600}
-                    mb={'2rem'}
+                    fontWeight={700}
+                    textAlign={'left'}
                   >
-                    Results&nbsp;
-                    <Text as={'span'} fontWeight={600} color="black">
-                      ({totalCountMealPlans})
-                    </Text>
+                    {userFirstName ? `${userFirstName}'s` : 'User'} meal plans
                   </Text>
+                  <Box
+                    cursor={'pointer'}
+                    p={'0.5rem'}
+                    onClick={() => onNavigate('/create-plan/supermarket')}
+                    color="black"
+                  >
+                    <SlPlus fontSize="2rem" />
+                  </Box>
+                </Flex>
+                <Box>
+                  <Box>
+                    <SearchSortFilterSection
+                      searchFieldPlaceHolderText="Search meal plans..."
+                      selectValues={{
+                        relevance: 'Relevance',
+                        newest: 'Newest',
+                      }}
+                      sortBy={orderToSortBy(
+                        mealPlansQueryParams.order,
+                        mealPlansQueryParams.orderBy,
+                      )}
+                      searchTerm={mealPlansQueryParams.searchTerm}
+                      onSearchSubmit={({
+                        searchTerm,
+                      }: {
+                        searchTerm: string;
+                      }) => {
+                        setMealPlansQueryParams((current) => {
+                          return {
+                            ...current,
+                            offset: 0,
+                            searchTerm,
+                          };
+                        });
+
+                        const {
+                          searchTerm: oldSearchTerm,
+                          ...unchangedQueryParams
+                        } = router.query;
+                        router.push({
+                          query: {
+                            ...unchangedQueryParams,
+                            ...(searchTerm.length && { searchTerm }),
+                          },
+                        });
+                      }}
+                      handleSortChange={(sortBy: SortBy) => {
+                        const orderAndOrderBy = sortByToOrder(sortBy);
+                        setMealPlansQueryParams((current) => {
+                          return {
+                            ...current,
+                            ...orderAndOrderBy,
+                            offset: 0,
+                          };
+                        });
+
+                        router.push({
+                          query: {
+                            ...router.query,
+                            ...orderAndOrderBy,
+                          },
+                        });
+                      }}
+                    />
+                  </Box>
+                  <Box>
+                    <Text
+                      fontSize={'sm'}
+                      color="black"
+                      fontWeight={600}
+                      mb={'2rem'}
+                    >
+                      Results&nbsp;
+                      <Text as={'span'} fontWeight={600} color="black">
+                        ({totalCountMealPlans})
+                      </Text>
+                    </Text>
+                  </Box>
+                  <Grid
+                    templateColumns="repeat(auto-fill, minMax(275px,1fr));"
+                    gap={6}
+                  >
+                    {mealPlans.map((mealPlan: any) => {
+                      return (
+                        <MealPlan
+                          key={mealPlan.uuid}
+                          uuid={mealPlan.uuid}
+                          name={mealPlan.name}
+                          recipesCount={mealPlan.recipesCount}
+                          ingredientsCount={mealPlan.ingredientsCount}
+                          totalServings={mealPlan.totalServings}
+                          totalPrice={mealPlan.totalPrice}
+                          supermarketName={mealPlan.supermarketName}
+                        />
+                      );
+                    })}
+                  </Grid>
                 </Box>
-                <Grid
-                  templateColumns="repeat(auto-fill, minMax(275px,1fr));"
-                  gap={6}
+              </>
+            )}
+          </Container>
+          <Container maxW="1200px" mb={10}>
+            {showMore && !!mealPlans.length && (
+              <Flex justifyContent={'center'}>
+                <Button
+                  onClick={() => {
+                    setMealPlansQueryParams((current) => {
+                      return {
+                        ...current,
+                        offset: current.offset + current.limit,
+                      };
+                    });
+                  }}
+                  mt={2}
+                  colorScheme="brand"
+                  fontSize={{ base: '0.9rem', md: '1.1rem' }}
+                  fontWeight={600}
+                  padding={'1.5rem 1rem'}
+                  isLoading={mealPlanQuery.isLoading}
                 >
-                  {mealPlans.map((mealPlan: any) => {
-                    return (
-                      <MealPlan
-                        key={mealPlan.uuid}
-                        uuid={mealPlan.uuid}
-                        name={mealPlan.name}
-                        recipesCount={mealPlan.recipesCount}
-                        ingredientsCount={mealPlan.ingredientsCount}
-                        totalServings={mealPlan.totalServings}
-                        totalPrice={mealPlan.totalPrice}
-                        supermarketName={mealPlan.supermarketName}
-                      />
-                    );
-                  })}
-                </Grid>
-              </Box>
-            </>
-          )}
-        </Container>
-        <Container maxW="1200px" mb={10}>
-          {showMore && !!mealPlans.length && (
-            <Flex justifyContent={'center'}>
-              <Button
-                onClick={() => {
-                  setMealPlansQueryParams((current) => {
-                    return {
-                      ...current,
-                      offset: current.offset + current.limit,
-                    };
-                  });
-                }}
-                mt={2}
-                colorScheme="brand"
-                fontSize={{ base: '0.9rem', md: '1.1rem' }}
-                fontWeight={600}
-                padding={'1.5rem 1rem'}
-                isLoading={mealPlanQuery.isLoading}
-              >
-                Show more
-              </Button>
-            </Flex>
-          )}
-        </Container>
-      </Layout>
-    );
-  }
+                  Show more
+                </Button>
+              </Flex>
+            )}
+          </Container>
+        </>
+      )}
+    </Layout>
+  );
 };
 
 MealPlans.requireAuth = true;

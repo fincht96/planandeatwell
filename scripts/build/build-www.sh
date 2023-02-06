@@ -7,6 +7,7 @@
     --build-arg NEXT_PUBLIC_ENV=production \
     --build-arg NEXT_PUBLIC_CDN=https://newstack.fra1.cdn.digitaloceanspaces.com \
     --build-arg NEXT_PUBLIC_APP_BASE_URL=https://app.planandeatwell.uk \
+    --build-arg NEXT_PUBLIC_FACEBOOK_PIXEL_ID=864712941314332 \
     -t dokku/planandeatwell_web_prod:latest \
     . 
 

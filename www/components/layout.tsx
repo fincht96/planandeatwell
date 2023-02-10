@@ -9,11 +9,16 @@ import { Box } from '@chakra-ui/react';
 interface layoutArg {
   children: ReactNode;
   excludeFooter?: boolean;
+  campaignId?: number;
 }
 
 export const siteTitle = 'Plan and Eat Well';
 
-export default function Layout({ children, excludeFooter }: layoutArg) {
+export default function Layout({
+  children,
+  excludeFooter,
+  campaignId,
+}: layoutArg) {
   return (
     <Box>
       <Head>
@@ -29,7 +34,7 @@ export default function Layout({ children, excludeFooter }: layoutArg) {
         <meta name="og:title" content={siteTitle} />
       </Head>
       <header className={styles.header}>
-        <Navbar />
+        <Navbar campaignId={campaignId} />
       </header>
 
       <Container p={0} maxW={'100%'} w={'100%'}>

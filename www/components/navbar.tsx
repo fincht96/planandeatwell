@@ -179,7 +179,8 @@ const MobileNav = ({ toggleShowNav, campaignId }: any) => {
   if (campaignId === 0) {
     return (
       <Stack
-        bg={useColorModeValue('gray.50', 'gray.800')}
+        // bg={useColorModeValue('gray.50', 'gray.800')}
+        bg={'gray.50'}
         p={4}
         display={{ base: 'flex', lg: 'none' }}
       >

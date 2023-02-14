@@ -122,31 +122,23 @@ const DesktopHero = ({
             <Stack spacing={5} my="auto">
               <Stack direction={'column'} spacing={1} mb={'1rem'}>
                 <Text
-                  fontSize={{ base: '1rem', md: '2.5rem', xl: '3rem' }}
+                  fontSize={{ base: '1.2rem', xl: '1.45rem' }}
                   color="black"
                   fontWeight={800}
                 >
-                  Test test test.
+                  The ultimate platform for food content creators.
                 </Text>
 
                 <Stack direction={'row'}>
-                  <Text
-                    fontSize={{ base: '1rem', md: '2.5rem', xl: '3rem' }}
-                    color="black"
-                    fontWeight={800}
-                  >
-                    test test.
-                  </Text>
-                  {/* 
                   <Box
                     display="inline-block"
                     borderBottom="solid black 2px"
-                    width="170px"
+                    width="110px"
                     marginBottom="0px"
                   >
                     {' '}
                     <Text
-                      fontSize={{ base: '1rem', md: '2.5rem', xl: '3rem' }}
+                      fontSize={{ base: '1.2rem', xl: '1.45rem' }}
                       color="brand.500"
                       fontWeight={500}
                       className={show ? styles.typedOut : ''}
@@ -155,19 +147,27 @@ const DesktopHero = ({
                     >
                       {keyword}
                     </Text>
-                  </Box> */}
+                  </Box>
+                  <Text
+                    fontSize={{ base: '1.2rem', xl: '1.45rem' }}
+                    color="black"
+                    fontWeight={800}
+                  >
+                    your food content.
+                  </Text>
                 </Stack>
               </Stack>
               <Stack>
                 <Text
-                  fontSize="1.2rem"
+                  fontSize="1rem"
                   color="gray.dark"
                   fontWeight={400}
                   w={{ base: '18rem', sm: '31rem' }}
                   mb={'1rem'}
                 >
-                  We find you amazing recipes from around the world, created by
-                  popular social media food influencers.
+                  We take your food content to the next level by making it easy
+                  to create, share, and sell your recipes, meal plans, and
+                  merchandise.
                 </Text>
                 <Box w={{ base: '18rem', sm: '31rem' }}>
                   <SignupForm campaignId={campaignId} />
@@ -186,10 +186,10 @@ const DesktopHero = ({
               </Stack>
             </Stack>
           </Box>
-          <Box>
+          <Box boxShadow="15px -12px 0px 0px #39C698">
             <Image
               priority
-              src="/images/influencer.jpg"
+              src="/images/influencer2.jpg"
               height={400}
               width={600}
               alt={'cooking pan'}
@@ -305,38 +305,37 @@ const MobileHero = ({
       {campaignId === 1 && (
         // campaign social media influencer
         <SimpleGrid columns={1} spacing={0}>
-          <Flex justifyContent="center" mt={{ base: '5rem', md: '1rem' }}>
-            <Image
-              priority
-              src="/images/cooking-pan.png"
-              height={250}
-              width={250}
-              alt={'cooking pan'}
-            />
+          <Flex
+            justifyContent="center"
+            mt={{ base: '6rem', md: '1rem' }}
+            mb={{ base: '2rem', md: '0.5rem' }}
+          >
+            <Box boxShadow="15px -12px 0px 0px #39C698">
+              <Image
+                priority
+                src="/images/influencer2.jpg"
+                height={280}
+                width={280}
+                alt={'cooking pan'}
+              />
+            </Box>
           </Flex>
           <Box w="100%" display={'flex'} flexDirection="column">
             <Stack spacing={8}>
               <Stack direction={'column'} alignItems={'center'}>
                 <Stack direction={'row'}>
                   <Text
-                    fontSize={{ base: '1.5rem', sm: '2.1rem' }}
+                    w={{ base: '18rem', sm: '26rem' }}
+                    fontSize={{ base: '1.1rem', sm: '1.2rem' }}
                     color="black"
                     fontWeight={800}
                     textAlign="center"
                   >
-                    Test test
+                    The ultimate platform for food content creators.
                   </Text>
                 </Stack>
 
                 <Stack direction={'row'}>
-                  <Text
-                    fontSize={{ base: '1.5rem', sm: '2.1rem' }}
-                    color="black"
-                    fontWeight={800}
-                  >
-                    Retest test
-                  </Text>
-
                   <Box
                     display="inline-block"
                     borderBottom="solid black 2px"
@@ -344,7 +343,7 @@ const MobileHero = ({
                     marginBottom="0px"
                   >
                     <Text
-                      fontSize={{ base: '1.5rem', sm: '1.8rem' }}
+                      fontSize={{ base: '1.1rem', sm: '1.2rem' }}
                       color="brand.500"
                       fontWeight={500}
                       className={show ? styles.typedOut : ''}
@@ -354,6 +353,13 @@ const MobileHero = ({
                       {keyword}
                     </Text>
                   </Box>
+                  <Text
+                    fontSize={{ base: '1.1rem', sm: '1.2rem' }}
+                    color="black"
+                    fontWeight={800}
+                  >
+                    Your food content
+                  </Text>
                 </Stack>
               </Stack>
 
@@ -362,12 +368,13 @@ const MobileHero = ({
                   fontSize="1rem"
                   color="gray.dark"
                   fontWeight={400}
-                  textAlign="left"
+                  textAlign="center"
                   w={{ base: '18rem', sm: '26rem' }}
                   mb={'2rem'}
                 >
-                  Create meal plans using our amazing recipes today by getting
-                  early access.
+                  We take your food content to the next level by making it easy
+                  to create, share, and sell your recipes, meal plans, and
+                  merchandise.
                 </Text>
                 <Box w={{ base: '18rem', sm: '26rem' }}>
                   <SignupForm campaignId={campaignId} />
@@ -399,7 +406,14 @@ const MobileHero = ({
 
 const Hero = ({ campaignId }: { campaignId: number }) => {
   const [show, setShow] = useState(true);
-  const words = useMemo(() => ['time', 'money', 'effort'], []);
+  const words = useMemo(() => {
+    if (campaignId === 0) {
+      return ['time', 'money', 'effort'];
+    }
+    if (campaignId === 1) {
+      return ['Create', 'Share', 'Sell'];
+    }
+  }, [campaignId]);
   const [keyword, setKeyword] = useState(words[0]);
 
   useEffect(() => {

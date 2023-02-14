@@ -108,21 +108,24 @@ const HowItWorks = ({ campaignId }: { campaignId: number }) => {
                         h={5}
                       />
                     }
-                    iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    // iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    iconBg={'brand.500'}
                     text={'Choose your supermarket'}
                   />
                   <Feature
                     icon={
                       <Icon as={AiOutlineSelect} color="white" w={5} h={5} />
                     }
-                    iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    // iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    iconBg={'brand.500'}
                     text={'Select recipes for your meal plan'}
                   />
                   <Feature
                     icon={
                       <Icon as={BsPencilSquare} color="white" w={5} h={5} />
                     }
-                    iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    // iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    iconBg={'brand.500'}
                     text={'Create meal plan'}
                   />
                   <Feature
@@ -134,12 +137,14 @@ const HowItWorks = ({ campaignId }: { campaignId: number }) => {
                         h={5}
                       />
                     }
-                    iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    // iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    iconBg={'brand.500'}
                     text={'Shop using meal plan'}
                   />
                   <Feature
                     icon={<Icon as={RiShareLine} color="white" w={5} h={5} />}
-                    iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    // iconBg={useColorModeValue('brand.500', 'brand.100')}
+                    iconBg={'brand.500'}
                     text={'Share meal plan with friends'}
                   />
                 </Stack>

@@ -17,7 +17,7 @@ type Inputs = {
   email: string;
 };
 
-const SignupForm = () => {
+const SignupForm = ({ campaignId }: { campaignId: number }) => {
   const {
     handleSubmit,
     register,
@@ -28,7 +28,10 @@ const SignupForm = () => {
   const toast = useToast();
 
   async function onSubmit(values: Inputs) {
-    const emailRegisterRes: ApiResp = await registerEmail(values.email);
+    const emailRegisterRes: ApiResp = await registerEmail(
+      values.email,
+      campaignId,
+    );
 
     const { errors } = emailRegisterRes;
 

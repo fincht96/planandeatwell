@@ -18,6 +18,7 @@ const createAccountSchema = Joi.object({
 
 const requestEarlyAccess = Joi.object({
   email: Joi.string().min(3).max(200).required(),
+  campaignId: Joi.number().min(0).required(),
 });
 
 export default class UserController {

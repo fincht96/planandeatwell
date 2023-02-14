@@ -18,7 +18,7 @@ import Image from 'next/image';
 import React from 'react';
 import ChakraNextLink from './NextChakraLink';
 
-export default function WithSubnavigation() {
+export default function WithSubnavigation({ campaignId }: any) {
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -55,7 +55,7 @@ export default function WithSubnavigation() {
             flex={{ base: 1.5 }}
             justify={'center'}
           >
-            <DesktopNav />
+            <DesktopNav campaignId={campaignId} />
           </Flex>
         </Flex>
 
@@ -118,49 +118,53 @@ export default function WithSubnavigation() {
 
       <Box boxShadow="0px 5px 5px -5px grey">
         <Collapse in={isOpen} animateOpacity>
-          <MobileNav toggleShowNav={onToggle} />
+          <MobileNav toggleShowNav={onToggle} campaignId={campaignId} />
         </Collapse>
       </Box>
     </Box>
   );
 }
 
-const DesktopNav = () => {
+const DesktopNav = ({ campaignId }: any) => {
   const linkHoverColor = useColorModeValue('brand.500', 'white');
 
-  return (
-    <Stack
-      direction={'row'}
-      spacing={4}
-      alignItems={'center'}
-      justifyContent="center"
-    >
-      {NAV_ITEMS.map((navItem) => (
-        <Box key={navItem.label}>
-          <Popover trigger={'hover'} placement={'bottom-start'}>
-            <PopoverTrigger>
-              <ChakraNextLink
-                p={2}
-                href={navItem.href ?? '#'}
-                fontSize="md"
-                fontWeight={600}
-                color="black"
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                {navItem.label}
-              </ChakraNextLink>
-            </PopoverTrigger>
-          </Popover>
-        </Box>
-      ))}
-    </Stack>
-  );
+  if (campaignId === 0) {
+    return (
+      <Stack
+        direction={'row'}
+        spacing={4}
+        alignItems={'center'}
+        justifyContent="center"
+      >
+        {NAV_ITEMS.map((navItem) => (
+          <Box key={navItem.label}>
+            <Popover trigger={'hover'} placement={'bottom-start'}>
+              <PopoverTrigger>
+                <ChakraNextLink
+                  p={2}
+                  href={navItem.href ?? '#'}
+                  fontSize="md"
+                  fontWeight={600}
+                  color="black"
+                  _hover={{
+                    textDecoration: 'none',
+                    color: linkHoverColor,
+                  }}
+                >
+                  {navItem.label}
+                </ChakraNextLink>
+              </PopoverTrigger>
+            </Popover>
+          </Box>
+        ))}
+      </Stack>
+    );
+  } else {
+    return null;
+  }
 };
 
-const MobileNav = ({ toggleShowNav }: any) => {
+const MobileNav = ({ toggleShowNav, campaignId }: any) => {
   const signInAndGetStarted = [
     {
       label: 'Sign in',
@@ -172,21 +176,25 @@ const MobileNav = ({ toggleShowNav }: any) => {
     // },
   ];
 
-  return (
-    <Stack
-      bg={useColorModeValue('gray.50', 'gray.800')}
-      p={4}
-      display={{ base: 'flex', lg: 'none' }}
-    >
-      {NAV_ITEMS.concat(signInAndGetStarted).map((navItem) => (
-        <MobileNavItem
-          key={navItem.label}
-          {...navItem}
-          toggleShowNav={toggleShowNav}
-        />
-      ))}
-    </Stack>
-  );
+  if (campaignId === 0) {
+    return (
+      <Stack
+        bg={useColorModeValue('gray.50', 'gray.800')}
+        p={4}
+        display={{ base: 'flex', lg: 'none' }}
+      >
+        {NAV_ITEMS.concat(signInAndGetStarted).map((navItem) => (
+          <MobileNavItem
+            key={navItem.label}
+            {...navItem}
+            toggleShowNav={toggleShowNav}
+          />
+        ))}
+      </Stack>
+    );
+  } else {
+    return null;
+  }
 };
 
 const MobileNavItem = ({ label, children, href, toggleShowNav }: NavItem) => {

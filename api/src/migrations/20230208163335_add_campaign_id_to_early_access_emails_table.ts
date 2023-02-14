@@ -2,7 +2,7 @@ import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.table('early_access_emails', (table) => {
-    table.integer('campaignId').unique().unsigned().nullable();
+    table.integer('campaignId').unsigned().nullable();
   });
 }
 
